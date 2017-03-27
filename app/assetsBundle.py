@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# author kissf lu  kissf b kissf c kissf d
+# author kissf lu  kissf b kissf c kissf d  kissf e
 
 from flask_assets import Bundle
 
