@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 from flask_assets import Bundle
 
 
@@ -121,7 +120,6 @@ vsimmanual_css = Bundle(
     filters='cssmin',
     output='css/gsvc_vsimmanual.css'
 )
-
 vsimmanual_js = Bundle(
     # ("--vsimmanul-demo js--")
     'js/main/demo/vsimmanul02_demo.js',
@@ -135,7 +133,6 @@ vsimmanual_js = Bundle(
     filters='jsmin',
     output='js/gsvc_vsimmanual.js'
 )
-
 muticountry140_css = Bundle(
     # ("-- jqx css --")
     'css/main/plugins/jqxGrid/jqx.base.css',
