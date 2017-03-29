@@ -1,2 +1,3 @@
 a=1
-b=abs
+daadladaldda
+大大大和
