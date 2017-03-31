@@ -10,3 +10,6 @@ app/api_1_0/api_functions/SqlPack/
 
 # 忽略根目录下的config.py配置文件，含有基本配置信息
 /config.py
+
+# 剔除.idea文件夹的跟踪
+.idea/
