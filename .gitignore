@@ -6,7 +6,7 @@
 *.pyc
 
 # 忽略所有SqlPack/文件夹内的文件，因为里面有基本配置信息
-app/api_1_0/api_functions/SqlPack/
+#app/api_1_0/api_functions/SqlPack/
 
 # 忽略根目录下的config.py配置文件，含有基本配置信息
 /config.py
