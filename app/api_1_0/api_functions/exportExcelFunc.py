@@ -181,7 +181,6 @@ def get_excelCountrySrcStaticDataAndSorted(dic_data):
                u'流量使用率']
 
     dateTimeKey = [u'套餐更新日期']
-    # print (dicData[0][u'套餐更新日期'])
     sorted_list_data = getDayHourListExcelData(dic_data=dicData,
                                                sort_key=sortKey,
                                                datetimekey=dateTimeKey)
@@ -274,7 +273,6 @@ def get_excelManulInfoDataAndSorted(dic_data):
                    u'上次套餐更新日期',
                    u'下次套餐更新日期',
                    u'上架日期']
-    print (dicData[0][u'上次套餐更新日期'])
     sorted_list_data = getListExcelData(dic_data=dicData,
                                         sort_key=sortKey,
                                         datetimekey=dateTimeKey)
@@ -487,8 +485,7 @@ def get_excelNewVsimTestInfoInsertTemple(dic_data):
                u"协商速率",
                u"协商速率一致性(0 否, 1是)",
                u"失败原因",
-               u"备注"
-               ]
+               u"备注"]
     dateTimeKey = []
     sorted_list_data = getListExcelData(dic_data=dicData,
                                         sort_key=sortKey,

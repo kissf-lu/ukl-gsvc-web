@@ -8,7 +8,7 @@ from . import api
 from .api_functions.getVsimCardCountryInfo import (getVsimCountryStatic, getindexHtmlMutiLineData)
 # 导入查询手工维护表、系统资源统计表模块
 from .api_functions.getonSysSrc import (getVsimManulInfor,
-                                       quryonSysSrc)
+                                        quryonSysSrc)
 # 获取gsvchome国家维度卡资源统计栏
 from .api_functions.getCountrySrcConIndexGrid import qurycountrySrcCon
 # 获取问题初诊的信息函数

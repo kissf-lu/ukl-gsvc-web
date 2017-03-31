@@ -17,17 +17,18 @@ from . import api
 import flask_excel as excel
 # Python excel Mole
 from .api_functions.exportExcelFunc import (get_excel140countryDataAndSorted,
-                                           get_excelFlowerDataAndSorted,
-                                           get_excelManulInfoDataAndSorted,
-                                           get_excelOnSysInfoDataAndSorted,
-                                           get_excelFirsProbDicDataAndSorted,
-                                           get_excelManualDeleteTemple,
-                                           get_excelManualInsertTemple,
-                                           get_excelCountrySrcStaticDataAndSorted,
-                                           get_excelNewVsimTestInfoDeleteTemple,
-                                           get_excelNewVsimTestInfoInsertTemple,
-                                           get_excelNewVsimTestInfoUpdateTemple,
-                                           get_excelNewVsimTestInfo)
+                                            get_excelFlowerDataAndSorted,
+                                            get_excelManulInfoDataAndSorted,
+                                            get_excelOnSysInfoDataAndSorted,
+                                            get_excelFirsProbDicDataAndSorted,
+                                            get_excelManualDeleteTemple,
+                                            get_excelManualInsertTemple,
+                                            get_excelCountrySrcStaticDataAndSorted,
+                                            get_excelNewVsimTestInfoDeleteTemple,
+                                            get_excelNewVsimTestInfoInsertTemple,
+                                            get_excelNewVsimTestInfoUpdateTemple,
+                                            get_excelNewVsimTestInfo
+                                            )
 
 
 @api.route('/export_countrySrcStatic/', methods=['POST'])
@@ -113,7 +114,7 @@ def export_FirsProbDic():
         dic_data = json.loads(request.form['data'])
         sortedDicData = get_excelFirsProbDicDataAndSorted(dic_data=dic_data)
 
-        return excel.make_response_from_array(sortedDicData, "xls", file_name="ExportOnSysInfoData")
+        return excel.make_response_from_array(sortedDicData, "xls", file_name="ExportFirsProbDicData")
     return False
 
 
