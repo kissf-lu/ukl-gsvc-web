@@ -61,7 +61,7 @@ def get_new_vsim_info(person, country, imsi):
             "`operator`, "
             "`plmn`, "
             "(CASE WHEN `rat`='4' THEN 'GSM' "
-            "      WHEN `rat`='8' THEN 'WCDM' "
+            "      WHEN `rat`='8' THEN 'WCDMA' "
             "      WHEN `rat`='16' THEN 'LTE' "
             "      WHEN `rat`='12' THEN 'GSM/WCDMA' "
             "      WHEN `rat`='24' THEN 'WCDMA/LTE' "
