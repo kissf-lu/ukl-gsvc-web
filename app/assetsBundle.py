@@ -74,7 +74,9 @@ vsimFlowerQuery_js = Bundle(
     # ("-- select2 js --")
     'js/main/plugins/select2/select2.min.js',
     # ("-- customer js --")
+    'js/main/demo/common.js',
     'js/main/demo/vsimFlowerQuery-demo.js',
+
 
     filters='jsmin',
     output='js/gsvc_vsimFlowerQuery.js'

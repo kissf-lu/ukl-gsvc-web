@@ -83,6 +83,9 @@ function FlowerQueryjqxGrid(){
 }
 //--------------------------------------------------------------END ----------------------------------------------------
 
+
+
+
 //-------------------------------------------------------显示选择菜单设置----------------------------------------
 var jqxDropDownList=[
             { label: 'imsi', value: 'imsi', checked: true },
@@ -119,6 +122,7 @@ $("#jqxDropDownList").on('checkChange', function (event) {
        $("#FlowerQueryjqxGrid").jqxGrid('endupdate');
 });
 //--------------------------------------------------------------显示选择菜单设置-END-------------------------------
+
 
 //--------------------------------------------------------过滤菜单栏-----------------------------------------
 var ProbDicBuildFilterPanel = function (filterPanel, datafield){
@@ -287,79 +291,7 @@ $("#chosenFlowerQueryKey").on('change', function(evt, params) {
 });
 
 
-//-----------------------------------------------------------初始化小时颗粒度时间面板
-function daterange_hour_init(){
-    //var endTime = new Date();
-    var endTime = moment().subtract(0, 'h');
-    var beginTime = moment().subtract(6, 'h');
-    $('#input-daterange-start').daterangepicker({
-        showDropdowns: true,
-        timePicker: true,
-        timePicker24Hour: true,
-        singleDatePicker: true,
-        startDate: beginTime,
-        locale: {
-        format: "YYYY-MM-DD HH:mm:ss",
-        applyLabel: "确定",
-        cancelLabel: "取消",
-        daysOfWeek: ["周日","周一","周二","周三","周四","周五","周六"],
-        monthNames: ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"],
-        firstDay: 1
-    }
-    });
 
-    $('#input-daterange-end').daterangepicker({
-        showDropdowns: true,
-        timePicker: true,
-        timePicker24Hour: true,
-        singleDatePicker: true,
-        startDate: endTime,
-        locale: {
-        format: "YYYY-MM-DD HH:mm:ss",
-        //separator: " - ",
-        applyLabel: "确定",
-        cancelLabel: "取消",
-        daysOfWeek: ["周日","周一","周二","周三","周四","周五","周六"],
-        monthNames: ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"],
-        firstDay: 1
-    }
-    });
-}
-
-//-----------------------------------
-function daterange_day_init(){
-    //var endTime = new Date();
-    var endTime = moment().subtract(1, 'days');
-    var beginTime = moment().subtract(15, 'days');
-    $('#input-daterange-start').daterangepicker({
-        showDropdowns: true,
-        singleDatePicker: true,
-        startDate: beginTime,
-        locale: {
-        format: "YYYY-MM-DD",
-        applyLabel: "确定",
-        cancelLabel: "取消",
-        daysOfWeek: ["周日","周一","周二","周三","周四","周五","周六"],
-        monthNames: ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"],
-        firstDay: 1
-    }
-    });
-
-    $('#input-daterange-end').daterangepicker({
-        showDropdowns: true,
-        singleDatePicker: true,
-        startDate: endTime,
-        locale: {
-        format: "YYYY-MM-DD",
-        //separator: " - ",
-        applyLabel: "确定",
-        cancelLabel: "取消",
-        daysOfWeek: ["周日","周一","周二","周三","周四","周五","周六"],
-        monthNames: ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"],
-        firstDay: 1
-    }
-    });
-}
 
 // -----------------------------------------------------------初始化选择通知栏
 function SetNotification_init(){
@@ -412,10 +344,16 @@ $('#timeDim').change(function () {
       $("#FlowerQueryNotification").jqxNotification("open");
 
       if (timeDimVar == 'days') {
-          daterange_day_init();
+            var daterange_day_begin = new Mydaterange(15,'days',$('#input-daterange-start'));
+            daterange_day_begin.initTime();
+            var daterange_day_end = new Mydaterange(1,'days',$('#input-daterange-end'));
+            daterange_day_end.initTime();
       }
       else {
-          daterange_hour_init();
+            var daterange_hour_begin = new Mydaterange(0,'h',$('#input-daterange-start'));
+            daterange_hour_begin.initTime();
+            var daterange_hour_end = new Mydaterange(6,'h',$('#input-daterange-end'));
+            daterange_hour_end.initTime();
       }
   }
   else{
@@ -427,51 +365,6 @@ $('#timeDim').change(function () {
   }
 });
 
-//-----------起始时间选择通知
-$('#input-daterange-start').change(function () {
-  // Do something
-  $("#FlowerQueryNotificationContent").children().detach();
-  var inputDateRangeStart = $('#input-daterange-start').val();
-  if (inputDateRangeStart != ''){
-      //$("#country_lineChart_date").children().detach();
-      $("#FlowerQueryNotificationContent").append(
-          '<strong>'+'起始时间设置为：'+ inputDateRangeStart +'</strong>'
-      );
-      //
-      SetNotification_init();
-      $("#FlowerQueryNotification").jqxNotification("open");
-  }
-  else{
-      $("#FlowerQueryNotificationContent").append(
-          '<strong>'+'请设置起始时间'+'</strong>'
-      );
-      SetNotification_init();
-      $("#FlowerQueryNotification").jqxNotification("open");
-  }
-});
-
-//-----------截止时间选择通知
-$('#input-daterange-end').change(function () {
-  // Do something
-  $("#FlowerQueryNotificationContent").children().detach();
-  var inputDateRangeEnd = $('#input-daterange-end').val();
-  if (inputDateRangeEnd != ''){
-      //$("#country_lineChart_date").children().detach();
-      $("#FlowerQueryNotificationContent").append(
-          '<strong>'+'截止时间设置为：'+ inputDateRangeEnd + '</strong>'
-      );
-      //
-      SetNotification_init();
-      $("#FlowerQueryNotification").jqxNotification("open");
-  }
-  else{
-      $("#FlowerQueryNotificationContent").append(
-          '<strong>'+'请设置截止时间'+'</strong>'
-      );
-      SetNotification_init();
-      $("#FlowerQueryNotification").jqxNotification("open");
-  }
-});
 
 //---------------------------------------------ajax获取api1.0
 $("#FlowerQuery_dataGet").click(function (){
@@ -833,8 +726,26 @@ $(function () {
     FlowerQueryjqxGrid();
     //初始化显示栏
     initjqxDropDownList();
+
+
     //初始化小时颗粒日期栏
-    daterange_hour_init();
+    var daterange_hour_begin = new Mydaterange(0,'h',$('#input-daterange-start'));
+    daterange_hour_begin.initTime();
+    var daterange_hour_end = new Mydaterange(6,'h',$('#input-daterange-end'));
+    daterange_hour_end.initTime();
+
+
+    //-----------截止时间/起始V时间选择通知
+    var selector = {
+    "timeSelectorEnd":$('#input-daterange-end'),
+    "timeSelectorStart":$('#input-daterange-start'),
+    "flowerNot":$("#FlowerQueryNotification"),
+    "flowerContent":$("#FlowerQueryNotificationContent")
+    };
+    changeNotice(selector.timeSelectorStart,selector.flowerNot,selector.flowerContent);
+    changeNotice(selector.timeSelectorEnd,selector.flowerNot,selector.flowerContent);
+
+
     //初始化chosen
     $("#chosenFlowerQueryKey").chosen({width: "100%"});
 });
