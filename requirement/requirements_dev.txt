@@ -36,7 +36,6 @@ jsmin==2.2.1
 kombu==3.0.35
 Markdown==2.6.7
 MarkupSafe==0.23
-mod-wsgi==4.4.23+ap24vc9
 mysql-connector==2.1.4
 pyexcel==0.3.3
 pyexcel-io==0.2.4
