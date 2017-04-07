@@ -23,7 +23,7 @@ var FlowerQuerySource ={
 };
 //jqxgrid data adapter
 var FlowerQueryAdapter = new $.jqx.dataAdapter(FlowerQuerySource);
-//--------------------------------------------------初始化统计表单-------------
+//--------------------------------------------------py-------------
 function FlowerQueryjqxGrid(){
     $("#FlowerQueryjqxGrid").jqxGrid({
                 width: "99.8%",
@@ -742,8 +742,8 @@ $(function () {
     "flowerNot":$("#FlowerQueryNotification"),
     "flowerContent":$("#FlowerQueryNotificationContent")
     };
-    changeNotice(selector.timeSelectorStart,selector.flowerNot,selector.flowerContent);
-    changeNotice(selector.timeSelectorEnd,selector.flowerNot,selector.flowerContent);
+    changeNotice(selector.timeSelectorStart,selector.flowerNot,selector.flowerContent,1);
+    changeNotice(selector.timeSelectorEnd,selector.flowerNot,selector.flowerContent,0);
 
 
     //初始化chosen

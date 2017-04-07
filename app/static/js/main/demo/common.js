@@ -67,24 +67,30 @@ Mydaterange.prototype.initTime = function () {
 
 
 //-----------起始时间/截止时间选择通知
-function changeNotice(timeSelector,flowerNot,flowerContent){
+function changeNotice(timeSelector,flowerNot,flowerContent,flag){
     timeSelector.change(function () {
         // Do something
         flowerContent.children().detach();
         var inputDateRangeStart = timeSelector.val();
         if (inputDateRangeStart != ''){
             //$("#country_lineChart_date").children().detach();
-            flowerContent.append(
-                '<strong>'+'起始时间设置为：'+ inputDateRangeStart +'</strong>'
-            );
+            if(flag == 1){
+                flowerContent.append(
+                '<strong>'+'起始时间设置为：'+ inputDateRangeStart +'</strong>');
+            }else if(flag == 0){
+                flowerContent.append(
+                '<strong>'+'截止时间设置为：'+ inputDateRangeStart +'</strong>');
+            }
             //
             SetNotification_init();
             flowerNot.jqxNotification("open");
         }
         else{
-            flowerContent.append(
-                '<strong>'+'请设置起始时间'+'</strong>'
-            );
+            if(flag == 1){
+                flowerContent.append('<strong>'+'请设置起始时间'+'</strong>');
+            }else if(flag == 0){
+                 flowerContent.append('<strong>'+'请设置截止时间'+'</strong>');
+            }
             SetNotification_init();
             flowerNot.jqxNotification("open");
         }
