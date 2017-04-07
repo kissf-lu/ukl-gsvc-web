@@ -196,7 +196,10 @@ new_vsim_test_info_js = Bundle(
 )
 jqwidgets_globle_js = Bundle(
     # ("--jqwidgets js--")
-    'js/main/plugins/jqwidgets/jqx-all.js',
+    'js/main/plugins/jqwidgets/jqxcore.js',
+    'js/main/plugins/jqwidgets/jqxgrid.js',
+    'js/main/plugins/jqwidgets/jqxdata.js',
+    'js/main/plugins/jqwidgets/jqxgrid.gsvc.js',
     'js/main/plugins/jqwidgets/localization.zh-CN.js',
     filters='jsmin',
     output='js/gsvc_jqwidgets.js'

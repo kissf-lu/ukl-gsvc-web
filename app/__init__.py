@@ -35,6 +35,7 @@ from .assetsBundle import (
 from config import config
 
 
+
 bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
@@ -43,8 +44,6 @@ login_manager = LoginManager()
 pagedown = PageDown()
 cache = Cache()
 assets_env = Environment()
-
-
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
 
@@ -96,14 +95,14 @@ def create_app(config_name):
     # 140country-statics
     assets_env.register("uploadfiles_css", uploadfiles_css)
     assets_env.register("uploadfiles_js", uploadfiles_js)
-
+    # register blueprint
+    # blueprint config
     from .main import main as main_blueprint
-    app.register_blueprint(main_blueprint)
-
     from .auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint, url_prefix='/auth')
-
     from .api_1_0 import api as api_1_0_blueprint
+    #
+    app.register_blueprint(main_blueprint)
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')
     app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
 
     return app
