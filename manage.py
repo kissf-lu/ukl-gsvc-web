@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # author kissf @ukl.com
+# testing py35 and uWSGI model
 
 import os
 
