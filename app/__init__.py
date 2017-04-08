@@ -25,6 +25,7 @@ from assetsBundle import (
     vsimmanual_js,
     muticountry140_css,
     muticountry140_js,
+    jqwidgets_globle_css,
     jqwidgets_globle_js,
     uploadfiles_css,
     uploadfiles_js,
@@ -70,6 +71,7 @@ def create_app(config_name):
     # 各个模块打包模块路径声明
     assets_env.init_app(app)
     # jqwidgets-plus
+    assets_env.register("jqwidgets_globle_css", jqwidgets_globle_css)
     assets_env.register("jqwidgets_globle_js", jqwidgets_globle_js)
     # login -statics
     assets_env.register("login_css", login_css)
@@ -93,7 +95,7 @@ def create_app(config_name):
     # new vsim infor table
     assets_env.register("new_vsim_test_info_css", new_vsim_test_info_css)
     assets_env.register("new_vsim_test_info_js", new_vsim_test_info_js)
-    # 140country-statics
+    # uploadfiles
     assets_env.register("uploadfiles_css", uploadfiles_css)
     assets_env.register("uploadfiles_js", uploadfiles_js)
 

@@ -6,6 +6,7 @@
 {% block head %}
     {{ super() }}
     <!-- index_login 文件夹内CSS为login , register, index, edit_profiel CSS 文件 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet" type="text/css">
     {% assets "login_css" %}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
     {% endassets %}
