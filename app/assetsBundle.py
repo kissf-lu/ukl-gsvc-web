@@ -18,153 +18,47 @@ main_js = Bundle(
     filters='jsmin',
     output='js/gsvc_main.js'
 )
-home_css = Bundle(
-    # ("-- datepicker css --")
-    # 'css/main/plugins/datepicker/datepicker3.css',
-    # 'css/main/plugins/datepicker/daterangepicker.css',
-    filters='cssmin',
-    output='css/gsvc_home.css'
-)
 home_js = Bundle(
-    # 'js/main/plugins/Chart/Chart.min.js',
     # ("-- customer js --")
-    'js/main/demo/home-demo.js',
+    'js/home/home-demo.js',
     filters='jsmin',
-    output='js/gsvc_home.js'
-)
-vsimFlowerQuery_css = Bundle(
-    # 'css/main/plugins/switchery/switchery.min.css',
-    # ("-- select2 css--")
-    # 'css/main/plugins/selectForm/select2.min.css',
-    # ("-- datepicker css --")
-    # 'css/main/plugins/datepicker/daterangepicker.css',
-    # ("--chosen css--")
-    #'css/main/plugins/chosen/bootstrap-chosen.css',
-    # ("--clockpicker css--")
-    # 'css/main/plugins/clockpicker/clockpicker.css',
-    filters='cssmin',
-    output='css/gsvc_vsimFlowerQuery.css'
+    output='js/home/gsvc_home.js'
 )
 vsimFlowerQuery_js = Bundle(
-    # (--switchery js--)
-    # 'js/main/plugins/switchery/switchery.min.js',
-    # ("--daterangepicker js--")
-    # 'js/main/plugins/daterangepicker/moment.min.js',
-    # 'js/main/plugins/daterangepicker/daterangepicker.js',
-    # ("--clockpicker js--")
-    # 'js/main/plugins/clockpicker/clockpicker.js',
-    # ("--chosen js--")
-    # 'js/main/plugins/chosen/chosen.jquery.min.js',
-    # ("-- select2 js --")
-    # 'js/main/plugins/select2/select2.min.js',
     # ("-- customer js --")
     'js/main/demo/vsimFlowerQuery-demo.js',
 
     filters='jsmin',
     output='js/gsvc_vsimFlowerQuery.js'
 )
-probVsimFirstDict_css = Bundle(
-    # 'css/main/plugins/switchery/switchery.min.css',
-    # ("-- select2 css--")
-    # 'css/main/plugins/selectForm/select2.min.css',
-    # ("-- datepicker css --")
-    # 'css/main/plugins/datepicker/daterangepicker.css',
-    # ("--clockpicker css--")
-    # 'css/main/plugins/clockpicker/clockpicker.css',
-    filters='cssmin',
-    output='css/gsvc_probVsimFirstDict.css'
-)
 probVsimFirstDict_js = Bundle(
-    # ("---switchery js--------")
-    # 'js/main/plugins/switchery/switchery.min.js',
-    # ("--daterangepicker js--")
-    # 'js/main/plugins/daterangepicker/moment.min.js',
-    # 'js/main/plugins/daterangepicker/daterangepicker.js',
-    # ("--clockpicker js--")
-    # 'js/main/plugins/clockpicker/clockpicker.js',
-    # ("-- select2 js --")
-    # 'js/main/plugins/select2/select2.min.js',
-    # ("-- customer js --")
     'js/main/demo/probVsimFirstDict-demo.js',
     filters='jsmin',
     output='js/gsvc_probVsimFirstDict.js'
-)
-vsimmanual_css = Bundle(
-    # ("--select2 css--")
-    # 'css/main/plugins/selectForm/select2.min.css',
-    # ("-- datepicker css --")
-    # 'css/main/plugins/datepicker/datepicker3.css',
-    # 'css/main/plugins/datepicker/daterangepicker.css',
-    # ("-- jasny-bootstrap --")
-    # 'css/main/plugins/jasny-bootstrap/jasny-bootstrap.min.css',
-    filters='cssmin',
-    output='css/gsvc_vsimmanual.css'
 )
 vsimmanual_js = Bundle(
     # ("--vsimmanul-demo js--")
     'js/main/demo/vsimmanul02_demo.js',
     'js/main/demo/ManualDataBaseUpdate-demo.js',
-    # ("-- 下拉筛选扩展 --")
-    # 'js/main/plugins/select2/select2.min.js',
-    # ("-- jasny-bootstrap --")
-    # 'js/main/plugins/jasny-bootstrap/jasny-bootstrap.min.js',
-    # ("-- jquery form --")
-    # 'js/main/plugins/jqueryform/jquery.form.min.js',
     filters='jsmin',
     output='js/gsvc_vsimmanual.js'
 )
-muticountry140_css = Bundle(
-    # ("-- datepicker css --")
-    # 'css/main/plugins/datepicker/datepicker3.css',
-    # 'css/main/plugins/datepicker/daterangepicker.css',
-    filters='cssmin',
-    output='css/gsvc_muticountry140.css'
-)
 muticountry140_js = Bundle(
-    # ("<!-- datepicker js -->")
-    # 'js/main/plugins/fullcalendar/moment.min.js',
-    # ("<!--datapicker js  -->")
-    # 'js/main/plugins/daterangepicker/daterangepicker.js',
-    # 'js/main/plugins/datapicker/bootstrap-datepicker.js',
-    # 'js/main/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js',
     # (<!--定制脚本-->)
     'js/main/demo/140countryFlowerStatic-demo.js',
     filters='jsmin',
     output='js/gsvc_muticountry140.js'
 )
-uploadfiles_css = Bundle(
-    # ("-- jasny-bootstrap --")
-    'css/main/plugins/jasny-bootstrap/jasny-bootstrap.min.css',
-    filters='cssmin',
-    output='css/gsvc_uploadfiles.css'
-)
 uploadfiles_js = Bundle(
     # <!--定制脚本-->
     'js/main/demo/test_upfiles.js',
-    'js/main/plugins/jqueryform/jquery.form.min.js',
-    # ("-- jasny-bootstrap --")
-    'js/main/plugins/jasny-bootstrap/jasny-bootstrap.min.js',
     filters='cssmin',
     output='js/gsvc_uploadfiles.js'
-)
-new_vsim_test_info_css = Bundle(
-    # ("--select2 css--")
-    # 'css/main/plugins/selectForm/select2.min.css',
-    # ("-- jasny-bootstrap --")
-    # 'css/main/plugins/jasny-bootstrap/jasny-bootstrap.min.css',
-    filters='cssmin',
-    output='css/gsvc_new_vsim_test_info.css'
 )
 new_vsim_test_info_js = Bundle(
     # ("--vsimmanul-demo js--")
     'js/main/demo/newVsimInfoTable-demo.js',
     'js/main/demo/newVsimTestTableUpdate-demo.js',
-    # ("-- 下拉筛选扩展 --")
-    # 'js/main/plugins/select2/select2.min.js',
-    # ("-- jasny-bootstrap --")
-    # 'js/main/plugins/jasny-bootstrap/jasny-bootstrap.min.js',
-    # ("-- jquery form --")
-    # 'js/main/plugins/jqueryform/jquery.form.min.js',
     filters='jsmin',
     output='js/gsvc_new_vsim_test_info.js'
 )
@@ -172,15 +66,15 @@ jqwidgets_globle_css = Bundle(
     # ("-- jqx css --")
     'css/jqxGrid/jqx.base.css',
     filters='cssmin',
-    output='css/jqwidgets/gsvc_jqwidgets.css'
+    output='css/jqwidgets/gsvc_jqwidgets.min.css'
 )
 jqwidgets_globle_js = Bundle(
     # ("--jqwidgets js--")
-    'js/main/plugins/jqwidgets/jqxcore.js',
-    'js/main/plugins/jqwidgets/jqxgrid.js',
-    'js/main/plugins/jqwidgets/jqxdata.js',
-    'js/main/plugins/jqwidgets/jqxgrid.gsvc.js',
-    'js/main/plugins/jqwidgets/localization.zh-CN.js',
+    'js/jqwidgets/jqxcore.js',
+    'js/jqwidgets/jqxgrid.js',
+    'js/jqwidgets/jqxdata.js',
+    'js/jqwidgets/jqxgrid.gsvc.js',
+    'js/jqwidgets/localization.zh-CN.js',
     filters='jsmin',
-    output='js/jqwidgets/gsvc_jqwidgets.js'
+    output='js/jqwidgets/gsvc_jqwidgets.min.js'
 )

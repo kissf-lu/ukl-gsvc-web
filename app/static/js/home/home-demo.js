@@ -137,7 +137,7 @@ function initcountrySrcConjqxGrid(item_grid, array){
                 autoheight: false,
                 autorowheight: false,
                 width: "99.8%",
-                height: 600,
+                height: 500,
                 pageSize: 1000,
                 pagesizeoptions:['1000', '2000', '5000'],
                 localization: getLocalization('zh-CN'),

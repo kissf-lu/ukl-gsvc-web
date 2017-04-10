@@ -5,15 +5,12 @@
 
 {% block head %}
 {{ super() }}
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker3.min.css" rel="stylesheet" type="text/css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/2.1.25/daterangepicker.min.css" rel="stylesheet" type="text/css">
 
-{% assets "muticountry140_css" %}
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
-{% endassets %}
 {% assets "jqwidgets_globle_css" %}
-<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
 {% endassets %}
 <script type="text/javascript">
   var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
