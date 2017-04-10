@@ -11,10 +11,7 @@
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
     {% endassets %}
 {% endblock %}
-
-
 {% block content %}
-
 <div class="loginColumns animated fadeInDown">
     {% for message in get_flashed_messages() %}
     <div class="alert alert-warning">

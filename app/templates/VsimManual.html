@@ -11,9 +11,6 @@
 {% assets "jqwidgets_globle_css" %}
 <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
 {% endassets %}
-<script type="text/javascript">
-  var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-</script>
 {% endblock %}
 
 {% block modal %}

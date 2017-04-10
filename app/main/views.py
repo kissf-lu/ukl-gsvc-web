@@ -1,20 +1,16 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from bson import json_util
-from datetime import  datetime
-import flask_excel as excel
-from flask import render_template, redirect, url_for, session, abort, flash, request,\
-    current_app, jsonify, json, make_response
-from flask_login import login_required, current_user
-from flask_sqlalchemy import get_debug_queries
-from . import main
-from .forms import NameForm, EditProfileForm, EditProfileAdminForm, PostForm, SrcvsimForm
-from .. import db,cache
-from ..models import User, Post,  Permission, Role, VsimManualInfor
-from ..decorators import admin_required, permission_required
-from ..api_1_0 import exportExcelFunc
 
+from datetime import datetime
+from flask import render_template, redirect, url_for, abort, flash, request,\
+    current_app, jsonify, json
+from flask_login import login_required, current_user
+from . import main
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm
+from .. import db
+from ..models import User, Post,  Permission, Role, VsimManualInfor
+from ..decorators import admin_required
+from ..api_1_0 import exportExcelFunc
 
 
 @main.route('/')
@@ -133,7 +129,6 @@ def query_vsim(username):
 
 @main.route('/srcimsi/<username>', methods=['GET', 'POST'])
 @login_required
-
 def srcimsi(username):
 
     user = User.query.filter_by(username=username).first_or_404()
@@ -147,7 +142,7 @@ def srcimsi(username):
 @login_required
 def mutiCountrySRC_140country():
 
-    return render_template('140country_flowerStatic.html')
+    return render_template('mul_country_templates/140country_flowerStatic.html')
 
 
 @main.route('/probVsimFirstDict')

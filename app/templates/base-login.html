@@ -5,7 +5,6 @@
 {{ super() }}
 	<!-- title ico -->
 	<link rel="shortcut icon" href="{{ url_for('static', filename='title.ico') }}" type="image/x-icon">
-	<link rel="icon" href="{{ url_for('static', filename='title.ico') }}" type="image/x-icon">
 {% endblock %}
 
 {% block body %}
@@ -23,12 +22,10 @@
 {# navbar end #}
 {% endblock %}
 
-
 {% block content %}
 
 {# content end #}
 {% endblock %}
-
 
 {% block scripts %}
 

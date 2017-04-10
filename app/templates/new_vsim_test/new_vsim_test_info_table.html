@@ -10,11 +10,7 @@
 {% assets "jqwidgets_globle_css" %}
 <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
 {% endassets %}
-<script type="text/javascript">
-    var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-</script>
 {% endblock %}
-
 {% block modal %}
 <!-- set Modal -->
 <div class="modal fade" id="newVsimTestInfo-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -34,7 +30,6 @@
         </div>
     </div>
 </div>
-
 <!--progress Modal -->
 <div class="modal fade" id="newVsimTestInfo-progress-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
