@@ -3,12 +3,12 @@
 
 from datetime import datetime
 from flask import render_template, redirect, url_for, abort, flash, request,\
-    current_app, jsonify, json
+    current_app, jsonify
 from flask_login import login_required, current_user
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm
 from .. import db
-from ..models import User, Post,  Permission, Role, VsimManualInfor
+from ..models import User, Post,  Permission, Role
 from ..decorators import admin_required
 from ..api_1_0 import exportExcelFunc
 
@@ -22,7 +22,7 @@ def index():
 @main.route('/gsvchome', methods=['GET', 'POST'])
 @login_required
 def gsvchome():
-    return render_template('gsvchome.html')
+    return render_template('home_templates/gsvchome.html')
 
 
 @main.route('/user/<username>')
@@ -105,37 +105,13 @@ def edit(id):
     form.body.data = post.body
     return render_template('edit_post.html', form=form)
 
-@main.route('/srcimsi/<username>/_query_vsim/')
-@login_required
-def query_vsim(username):
-    # user_query = User.query.filter_by(username=username).first_or_404()
-    # name = user_query.username
-    country = request.args.get('a', '', type=str)
-    person = request.args.get('b', '', type=str)
-    # user_gsvc = User.query.filter_by(name=person).first_or_404()
-    person_gsvc = person
-    if country == "" and person == "":
-        vsim_con = VsimManualInfor.query.count()
-    elif country == "" and person != "":
-        vsim_con = VsimManualInfor.query.filter_by(person_gsvc=person_gsvc).count()
-    elif country != "" and person == "":
-        vsim_con = VsimManualInfor.query.filter_by(country_iso=country).count()
-    else:
-        vsim_con = VsimManualInfor.query.filter_by(country_iso=country, person_gsvc=person_gsvc).count()
-
-    query = [{'country': country, 'person': person_gsvc, 'vsim_con': vsim_con}]
-    return json.dumps(query, sort_keys=True, indent=4)
-
 
 @main.route('/srcimsi/<username>', methods=['GET', 'POST'])
 @login_required
 def srcimsi(username):
-
     user = User.query.filter_by(username=username).first_or_404()
 
-    return render_template('VsimManual.html',
-                           user=user,
-                           current_time=datetime.utcnow())
+    return render_template('vsim_src_templates/VsimManual.html', user=user, current_time=datetime.utcnow())
 
 
 @main.route('/mutiCountryVsimSRC/140country')
@@ -153,7 +129,7 @@ def probVsimFirstDict():
     :return:
     """
 
-    return render_template('probVsimFirstDict.html')
+    return render_template('prob_vsim_dict_templates/probVsimFirstDict.html')
 
 
 @main.route('/vsimFlowerQuery')
@@ -164,13 +140,13 @@ def vsimFlowerQuery():
     :return:
     """
 
-    return render_template('vsimFlowerQuery.html')
+    return render_template('flower_query_templates/vsimFlowerQuery.html')
 
 
 @main.route('/newVsimInfoTable', methods=['GET', 'POST'])
 @login_required
 def newVsimInfoTable():
-    return render_template('new_vsim_test/new_vsim_test_info_table.html')
+    return render_template('new_vsim_test_templates/new_vsim_test_info_table.html')
 
 
 @main.route('/test_uploadfiles')
@@ -178,15 +154,17 @@ def newVsimInfoTable():
 def test_jqxgrid():
     return render_template('test_jquery/test_uploadfiles.html')
 
-@main.route('/test_uploadExcel', methods=['GET','POST'])
+
+@main.route('/test_uploadExcel', methods=['GET', 'POST'])
 @login_required
 def export_excel():
     if request.method == 'POST':
-        arrayData = request.get_array(field_name= 'file')
-        DicData = exportExcelFunc.getDictExcelData(array_data= arrayData)
+        arrayData = request.get_array(field_name='file')
+        DicData = exportExcelFunc.getDictExcelData(array_data=arrayData)
         print (DicData['data'][0])
         if DicData['err']:
             returnJsonData = {'err': True, 'errinfo': DicData['errinfo'], 'data': []}
+            return jsonify({"data": returnJsonData})
         else:
             returnJsonData = {'err': False, 'errinfo': DicData['errinfo'], 'data': DicData['data']}
             return jsonify({"data": returnJsonData})

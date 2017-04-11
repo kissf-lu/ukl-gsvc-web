@@ -4,7 +4,7 @@ from flask_assets import Bundle
 
 
 login_css = Bundle(
-    'css/auth/styles.css',
+    'css/auth/login_auth.css',
     filters='cssmin',
     output='css/auth/gsvc_login.css'
 )
