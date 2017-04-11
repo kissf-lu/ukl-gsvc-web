@@ -5,11 +5,6 @@
 {{ super() }}
 	<!-- title ico -->
 	<link rel="shortcut icon" href="{{ url_for('static', filename='title.ico') }}" type="image/x-icon">
-	<link rel="icon" href="{{ url_for('static', filename='title.ico') }}" type="image/x-icon">
-
-	<!-- Bootstrap core CSS
-	<link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
-    -->
 {% endblock %}
 
 {% block body %}
@@ -27,12 +22,10 @@
 {# navbar end #}
 {% endblock %}
 
-
 {% block content %}
 
 {# content end #}
 {% endblock %}
-
 
 {% block scripts %}
 
