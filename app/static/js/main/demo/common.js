@@ -82,8 +82,10 @@ function changeNotice(timeSelector,flowerNot,flowerContent,flag){
                 '<strong>'+'截止时间设置为：'+ inputDateRangeStart +'</strong>');
             }
             //
-            SetNotification_init();
-            flowerNot.jqxNotification("open");
+            var setNotificationOpen = new Notificationbar($("#FlowerQueryNotification"),"#container",2000,true,"open");
+            setNotificationOpen.notificationBar();
+            // SetNotification_init();
+            // flowerNot.jqxNotification("open");
         }
         else{
             if(flag == 1){
@@ -91,8 +93,37 @@ function changeNotice(timeSelector,flowerNot,flowerContent,flag){
             }else if(flag == 0){
                  flowerContent.append('<strong>'+'请设置截止时间'+'</strong>');
             }
-            SetNotification_init();
-            flowerNot.jqxNotification("open");
+            setNotificationOpen.notificationBar();
+            // SetNotification_init();
+            // flowerNot.jqxNotification("open");
         }
     });
 }
+
+
+//通知栏
+// ---初始化选择/查询通知栏
+function Notificationbar(selector,appendContainer,autoCloseDelay,autoClose,flag) {
+    this.selector = selector;
+    this.appendContainer = appendContainer;
+    this.autoCloseDelay = autoCloseDelay;
+    this.autoClose = autoClose;
+    this.flag = flag;
+}
+Notificationbar.prototype.notificationBar = function () {
+   //初始化通知
+   this.selector.jqxNotification({
+                width: "100%",
+                position: "top-right",
+                blink: true ,
+                appendContainer: this.appendContainer,
+                opacity: 0.9,
+                autoOpen: false,
+                animationOpenDelay: 800,
+                autoClose: this.autoClose,   //控制显示与隐藏
+                autoCloseDelay: this.autoCloseDelay,
+                template: "info"
+    });
+   this.selector.jqxNotification(this.flag);
+};
+
