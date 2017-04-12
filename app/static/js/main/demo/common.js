@@ -38,11 +38,7 @@ function myPostAction(data,target_url,callback,method,datatype,errfunc) {
         }
     });
 };
-
-
-
-
-//-----------------------------------------------------------初始化小时颗粒度时间面板
+//初始化小时颗粒度时间面板
 function Mydaterange(number,time,timeSelector){
     this.begintime = moment().subtract(number, time);
     this.timeSelector = timeSelector;
@@ -64,66 +60,35 @@ Mydaterange.prototype.initTime = function () {
     }
     });
 };
-
-
-//-----------起始时间/截止时间选择通知
-function changeNotice(timeSelector,flowerNot,flowerContent,flag){
-    timeSelector.change(function () {
-        // Do something
-        flowerContent.children().detach();
-        var inputDateRangeStart = timeSelector.val();
-        if (inputDateRangeStart != ''){
-            //$("#country_lineChart_date").children().detach();
-            if(flag == 1){
-                flowerContent.append(
-                '<strong>'+'起始时间设置为：'+ inputDateRangeStart +'</strong>');
-            }else if(flag == 0){
-                flowerContent.append(
-                '<strong>'+'截止时间设置为：'+ inputDateRangeStart +'</strong>');
-            }
-            //
-            var setNotificationOpen = new Notificationbar($("#FlowerQueryNotification"),"#container",2000,true,"open");
-            setNotificationOpen.notificationBar();
-            // SetNotification_init();
-            // flowerNot.jqxNotification("open");
-        }
-        else{
-            if(flag == 1){
-                flowerContent.append('<strong>'+'请设置起始时间'+'</strong>');
-            }else if(flag == 0){
-                 flowerContent.append('<strong>'+'请设置截止时间'+'</strong>');
-            }
-            setNotificationOpen.notificationBar();
-            // SetNotification_init();
-            // flowerNot.jqxNotification("open");
-        }
-    });
-}
-
-
-//通知栏
 // ---初始化选择/查询通知栏
-function Notificationbar(selector,appendContainer,autoCloseDelay,autoClose,flag) {
+function Notificationbar(selector,appendContainer,autoCloseDelay,autoClose,content) {
     this.selector = selector;
     this.appendContainer = appendContainer;
     this.autoCloseDelay = autoCloseDelay;
     this.autoClose = autoClose;
-    this.flag = flag;
+    this.content = content;
 }
-Notificationbar.prototype.notificationBar = function () {
+Notificationbar.prototype.init = function () {
    //初始化通知
    this.selector.jqxNotification({
-                width: "100%",
-                position: "top-right",
-                blink: true ,
-                appendContainer: this.appendContainer,
-                opacity: 0.9,
-                autoOpen: false,
-                animationOpenDelay: 800,
-                autoClose: this.autoClose,   //控制显示与隐藏
-                autoCloseDelay: this.autoCloseDelay,
-                template: "info"
+       width: "100%",
+       position: "top-right",
+       blink: true ,
+       appendContainer: this.appendContainer,
+       opacity: 0.9,
+       autoOpen: false,
+       animationOpenDelay: 800,
+       autoClose: this.autoClose,   //控制显示与隐藏
+       autoCloseDelay: this.autoCloseDelay,
+       template: "info"
     });
-   this.selector.jqxNotification(this.flag);
 };
-
+Notificationbar.prototype.notificationContent = function (notifi_content) {
+    //通知内容设置
+    this.content.children().detach();
+    this.content.append(notifi_content);
+};
+Notificationbar.prototype.notificationAction = function (action_flag) {
+    //可视化操作
+    this.selector.jqxNotification(action_flag);
+};
