@@ -98,7 +98,10 @@ def getVsimPackageflowStatus(country):
         "b.`package_type_name` AS 'PackageName', "
         "DATE_FORMAT(b.`next_update_time`,'%Y-%m-%d %H')  AS 'NextUpdateTime', "
         "e.`org_name`          AS 'ORG', "
-        "CAST((SUM(b.`total_use_flow`)/SUM(CASE WHEN `activate_status` = 0 THEN b.`init_flow` ELSE 0 END ))*100  AS DECIMAL(64,1)) AS 'Percentage' "
+        "CAST((SUM(b.`total_use_flow`)/SUM(CASE "
+        "                                  WHEN `activate_status` = 0 "
+        "                                  THEN b.`init_flow` ELSE 0 END ))*100  "
+        "AS DECIMAL(64,1)) AS 'Percentage' "
         "FROM `t_css_vsim` AS a "
         "LEFT  JOIN `t_css_vsim_packages` AS b  ON a.`imsi`= b.`imsi` "
         "LEFT  JOIN `t_css_group`         AS e  ON a.`group_id`= e.`id` "
@@ -247,7 +250,7 @@ def getMutiLineMaxUser(country, begintime, endtime, butype_set, timedim_set):
         "   " + butype_set +
         "GROUP BY a.`country`, a.`createtime` ) AS b "
         "GROUP BY b.country ,DATE_FORMAT(b.sampletime, " + timedim_set + ")")
-    print (query_str_MaxUser)
+
     jsonResults_MaxUser = getJosonData(sysStr=amzami_sysStr, Database=amzami_Database, query_str=query_str_MaxUser)
 
     return jsonResults_MaxUser

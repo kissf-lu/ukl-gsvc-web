@@ -265,7 +265,7 @@ def getCountryDispatchAndVsimInfo(country, queryPlmn, begintime, endtime, Dispat
         "(CAST(a.`imsi` AS CHAR)) AS 'imsi', "
         "a.`iccid`, "
         "b.`package_type_name`, "
-        "b.`next_update_time`, "
+        "DATE_FORMAT(b.`next_update_time`, '%Y-%m-%d %H:%i:%s') AS 'next_update_time', "
         "a.`bam_id` as 'bam', "
         "COUNT(c.`imsi`)AS 'imsi_con', "
         "COUNT(DISTINCT c.`imei`)AS 'imei_con' "

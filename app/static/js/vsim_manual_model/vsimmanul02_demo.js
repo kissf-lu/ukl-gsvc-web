@@ -329,19 +329,9 @@ function initjqxGrid(initGrid){
                           return "<div style='margin:4px;'>" + (value + 1) + "</div>";
                       }
                     },
-                    { text: 'imsi', datafield: 'imsi' , width: 150,filtertype: "custom",
-                      createfilterpanel: function (datafield, filterPanel) {
-                          buildFilterPanel(filterPanel, datafield, initGrid, SrcAdapter);
-                      }
-                    },
-                    { text: '国家简码', datafield: 'country_iso' ,
-                      filtertype: "custom",
-                      createfilterpanel: function (datafield, filterPanel) {
-                          buildFilterPanel(filterPanel, datafield, initGrid, SrcAdapter);
-                      },
-                      width: 70
-                    },
-                    { text: '国家', datafield: 'country_cn',filtertype: 'checkedlist',width: 70},
+                    { text: 'imsi', datafield: 'imsi' , width: 150},
+                    { text: '国家简码', datafield: 'country_iso', width: 70},
+                    { text: '国家', datafield: 'country_cn',width: 70},
                     { text: '卡负责人', datafield: 'person_gsvc', filtertype: 'checkedlist', width: 80 },
                     { text: '运营负责人', datafield: 'person_operator', filtertype: 'checkedlist', width: 80 },
                     { text: '卡所在系统', datafield: 'sys', filtertype: 'checkedlist', width: 80 },
@@ -349,35 +339,11 @@ function initjqxGrid(initGrid){
                     { text: '卡位状态', datafield: 'slot_state', filtertype: 'checkedlist', width: 70 },
                     { text: '是否代理商卡', datafield: 'owner_attr', filtertype: 'checkedlist', width: 80 },
                     { text: '是否多国卡', datafield: 'country_attr', filtertype: 'checkedlist', width: 70 },
-                    { text: '卡批次', datafield: 'vsim_batch_num',
-                        filtertype: "custom",
-                        createfilterpanel: function (datafield, filterPanel) {
-                            buildFilterPanel(filterPanel, datafield, initGrid, SrcAdapter);
-                        },
-                      width: 100
-                    },
-                    { text: 'BAM编码', datafield: 'bam_code',
-                        filtertype: "custom",
-                        createfilterpanel: function (datafield, filterPanel) {
-                            buildFilterPanel(filterPanel, datafield, initGrid, SrcAdapter);
-                        },
-                        width: 80
-                    },
-                    { text: '卡位', datafield: 'slot_num',
-                        filtertype: "custom",
-                        createfilterpanel: function (datafield, filterPanel) {
-                            buildFilterPanel(filterPanel, datafield, initGrid, SrcAdapter);
-                        },
-                        width: 80
-                    },
-                    { text: '运营商', datafield: 'operator', filtertype: 'checkedlist', width: 70},
-                    { text: 'iccid', datafield: 'iccid',
-                      filtertype: "custom",
-                      createfilterpanel: function (datafield, filterPanel) {
-                          buildFilterPanel(filterPanel, datafield, initGrid, SrcAdapter);
-                      },
-                      width: 200
-                    },
+                    { text: '卡批次', datafield: 'vsim_batch_num', width: 100},
+                    { text: 'BAM编码', datafield: 'bam_code', width: 80},
+                    { text: '卡位', datafield: 'slot_num', width: 80},
+                    { text: '运营商', datafield: 'operator', width: 70},
+                    { text: 'iccid', datafield: 'iccid', width: 200},
                     { text: '套餐', datafield: 'package_type', filtertype: 'checkedlist' , width: 200  },
                     { text: '套餐外付费类型', datafield: 'charge_noflower', filtertype: 'checkedlist' , width: 100  },
                     { text: '激活日期', datafield: 'activated_time', filtertype: 'date', cellsformat: 'yyyy-MM-dd HH:mm:ss', width: 170 },
@@ -698,8 +664,8 @@ function initSysjqxGrid(grid_item){
                     { text: '激活类型', datafield: 'activate_type', filtertype: 'checkedlist', width: 80 },
                     { text: '本网可用', datafield: 'use_locally', filtertype: 'checkedlist', width: 80 },
                     { text: '是否多国卡', datafield: 'vsim_type', filtertype: 'checkedlist', width: 80 },
-                    { text: '初始流量/MB', datafield: 'init_flow', filtertype: 'checkedlist', width: 80 },
-                    { text: '累计使用流量/MB', datafield: 'total_use_flow', filtertype: 'checkedlist', width: 80 },
+                    { text: '初始流量/MB', datafield: 'init_flow', width: 80 },
+                    { text: '累计使用流量/MB', datafield: 'total_use_flow', width: 80 },
                     { text: '剩余流量/MB', datafield: 'leave_flow', width: 80 },
                     { text: '激活日期', datafield: 'activate_time', filtertype: 'date', cellsformat: 'yyyy-MM-dd HH:mm:ss', width: 170 },
                     { text: '上次套餐更新时间', datafield: 'update_time', filtertype: 'date', cellsformat: 'yyyy-MM-dd HH:mm:ss', width: 170 },
