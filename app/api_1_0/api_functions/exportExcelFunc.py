@@ -125,7 +125,7 @@ def getDayHourListExcelData(dic_data, sort_key, datetimekey):
             for date in datetimeKey:
                 if date in data.keys():
                     if (data[date] is not None) and (data[date] != ''):
-                        data[date] = str(datetime.strptime(data[date], '%Y-%m-%d %H') + dt.timedelta(hours=8))
+                        data[date] = str(datetime.strptime(data[date], '%Y-%m-%d %H') + dt.timedelta(hours=0))
     for dic in dicData:
         temp_key = dic.keys()
         if len(max_key) < len(temp_key):
@@ -181,7 +181,7 @@ def get_excelCountrySrcStaticDataAndSorted(dic_data):
                unicode('流量使用率')]
 
     dateTimeKey = [unicode('套餐更新日期')]
-    # print (dicData[0][unicode('套餐更新日期')])
+    print (dicData[1][unicode('套餐更新日期')])
     sorted_list_data = getDayHourListExcelData(dic_data=dicData,
                                                sort_key=sortKey,
                                                datetimekey=dateTimeKey)
@@ -274,7 +274,7 @@ def get_excelManulInfoDataAndSorted(dic_data):
                    unicode('上次套餐更新日期'),
                    unicode('下次套餐更新日期'),
                    unicode('上架日期')]
-    print (dicData[0][unicode('上次套餐更新日期')])
+    # print (dicData[0][unicode('上次套餐更新日期')])
     sorted_list_data = getListExcelData(dic_data=dicData,
                                         sort_key=sortKey,
                                         datetimekey=dateTimeKey)
@@ -341,6 +341,7 @@ def get_excelFirsProbDicDataAndSorted(dic_data):
                unicode('累计流量MB'),
                unicode('报错信息')]
     dateTimeKey = [unicode('套餐更新日期')]
+    print(dicData[0][unicode('套餐更新日期')])
     sorted_list_data = getListExcelData(dic_data=dicData,
                                         sort_key=sortKey,
                                         datetimekey=dateTimeKey)
