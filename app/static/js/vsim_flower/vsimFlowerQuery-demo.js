@@ -564,7 +564,7 @@ $("#FlowerQuery_dataGet").click(function (){
                  $("#QueryingNotificationContent").append(
                          '<strong>'+'查询天数差为：'+ DayGap +'. 数据获取中......'+'</strong>'
                  );
-                 openQueryjqxNotification.notificationBar();
+                 closeQueryjqxNotification.notificationBar();
                  $("#FlowerQuery_dataGet").attr("disabled", true);
                  var hoursAjaxRequest = $.ajax({
                      type: "POST",
