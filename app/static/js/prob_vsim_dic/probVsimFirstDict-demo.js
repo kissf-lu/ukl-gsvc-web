@@ -200,7 +200,7 @@ $("#probDicExcelExport").click(function () {
         $("#queryQlert").children().detach();
         $("#queryQlert").append((queryAndReturnAlert+'<p>无输出数据！</p></div>'));
      }
-     else if (alldatanum <= 200){
+     else if (alldatanum <= 0){
          for(var i = 0; i < rows.length; i++){
              if (i==pagenum*pagesize){
                  for (var j = 0; j< pagesize; j++){
@@ -231,6 +231,7 @@ $("#probDicExcelExport").click(function () {
              if (i==pagenum*pagesize){
                  for (var j = 0; j< pagesize; j++){
                      if (i+j< alldatanum){
+                         alert(typeof (rows[i+j].imsi));
                          view_data.push({
                          country: rows[i+j].country,
                          imsi: rows[i+j].imsi,
