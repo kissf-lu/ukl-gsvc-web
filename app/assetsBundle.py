@@ -26,6 +26,8 @@ home_js = Bundle(
 )
 vsimFlowerQuery_js = Bundle(
     # ("-- customer js --")
+    'js/main/demo/common.js',
+    'js/main/demo/vsimFlowerQuery-demo.js',
     'js/vsim_flower/vsimFlowerQuery-demo.js',
     filters='jsmin',
     output='js/vsim_flower/gsvc_vsimFlowerQuery.js'
