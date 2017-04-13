@@ -93,6 +93,49 @@ def getDictExcelData(array_data, key_database, key_mirr_database):
     return returnDictData
 
 
+def getDictExcelDataNext(array_data, key_database, key_mirr_database):
+    """==========================================================
+    本函数将前端传入的array_data数据和对应的key_database
+    :param array_data: 待处理前端数据
+    :param key_database: 与数据库的列表相同，用于替换前端中文标头值
+    :param key_mirr_database: 与前端表头相同的中文列表
+    =============================================================
+    :return:
+    =================================================================="""
+    dicData = []
+    key_dic = key_database
+    key_mirr = key_mirr_database
+    errinfo = ''
+    if (type(array_data) is list) and (len(array_data) >= 2):
+        for i in range(len(array_data)):
+            temp_dic = {}
+            if i == 0:
+                excelCloName = array_data[0]
+                # 根据excelCloName和key_mirr判断模板是否正确
+                ifConfirm = confirmExcelTemplateReg(excel_col_name=excelCloName, reg_col_name=key_mirr)
+                if not ifConfirm:
+                    errinfo = "模板非法！核实模板是否正确！"
+                    returnDictData = {'err': True, 'errinfo': errinfo, 'data': []}
+
+                    return returnDictData
+            else:
+                for j in range(len(key_dic)):
+                    try:
+                        temp_dic.update({key_dic[j]: array_data[i][j]})
+                    except IndexError:
+                        errinfo = 'Index Error'
+                dicData.append(temp_dic)
+
+    else:
+        errinfo = '导入数据不合法！请核实模板数据。'
+    if errinfo:
+        returnDictData = {'err': True, 'errinfo': errinfo, 'data': []}
+    else:
+        returnDictData = {'err': False, 'errinfo': errinfo, 'data': dicData}
+
+    return returnDictData
+
+
 def deleManuleVsimSrc(array_data):
     """=============================
     数据删除API函数
@@ -307,7 +350,7 @@ def insertNewVsimTestInfo(array_data):
                       unicode("简称"),
                       unicode("运营商"),
                       unicode("plmn"),
-                      unicode("网络制式"),
+                      unicode("网络制式(GSM-4，WCDM-8，LTE-16，GSM/WCDMA-12,WCDMA/LTE-24,GSM/WCDMA/LTE-28)"),
                       unicode("配置更改"),
                       unicode("imsi"),
                       unicode("账户"),
@@ -320,7 +363,7 @@ def insertNewVsimTestInfo(array_data):
                       unicode("注册网络"),
                       unicode("lac"),
                       unicode("cellid"),
-                      unicode("基本可用性(0 否, 1是)"),
+                      unicode("测试是否通过(0 否, 1是)"),
                       unicode("小时稳定性(0 否, 1是)"),
                       unicode("协商速率"),
                       unicode("协商速率一致性(0 否, 1是)"),
@@ -391,7 +434,7 @@ def updateNewVsimTestInfo(array_data):
                       unicode("简称"),
                       unicode("运营商"),
                       unicode("plmn"),
-                      unicode("网络制式"),
+                      unicode("网络制式(GSM-4，WCDM-8，LTE-16，GSM/WCDMA-12,WCDMA/LTE-24,GSM/WCDMA/LTE-28)"),
                       unicode("配置更改"),
                       unicode("imsi"),
                       unicode("账户"),
@@ -404,7 +447,7 @@ def updateNewVsimTestInfo(array_data):
                       unicode("注册网络"),
                       unicode("lac"),
                       unicode("cellid"),
-                      unicode("基本可用性(0 否, 1是)"),
+                      unicode("测试是否通过(0 否, 1是)"),
                       unicode("小时稳定性(0 否, 1是)"),
                       unicode("协商速率"),
                       unicode("协商速率一致性(0 否, 1是)"),

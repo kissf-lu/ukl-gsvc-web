@@ -155,7 +155,7 @@ function initDropDownList(item_related_grid, item_jqx_drop_down){
         {label: '注册网络', value: 'register_rat', checked: true },
         {label: 'LAC', value: 'lac', checked: true },
         {label: 'CELLID', value: 'cellid', checked: true },
-        {label: '基本可用性', value: 'service_usability', checked: true },
+        {label: '测试是否通过', value: 'service_usability', checked: true },
         {label: '1小时稳定性', value: 'stability_onehour', checked: true },
         {label: '协商速率', value: 'agree_mbr', checked: true },
         {label: '协商速率一致性', value: 'agree_consistency', checked: true },
@@ -325,7 +325,7 @@ function initjqxGrid(initGrid, array){
             { text: '注册网络', datafield: 'register_rat', filtertype: 'checkedlist', width: 80 },
             { text: 'lac', datafield: 'lac', filtertype: 'checkedlist', width: 80 },
             { text: 'cellid', datafield: 'cellid', filtertype: 'checkedlist', width: 80 },
-            { text: '基本可用性', datafield: 'service_usability', filtertype: 'checkedlist', width: 80 },
+            { text: '测试是否通过', datafield: 'service_usability', filtertype: 'checkedlist', width: 80 },
             { text: '小时稳定性', datafield: 'stability_onehour', filtertype: 'checkedlist', width: 80 },
             { text: '协商速率', datafield: 'agree_mbr', filtertype: 'checkedlist', width: 150 },
             { text: '协商速率一致性', datafield: 'agree_consistency', filtertype: 'checkedlist', width: 150 },
@@ -338,13 +338,11 @@ function initjqxGrid(initGrid, array){
 
 function newVsimTestInfoTableGetAjaxAPI(option) {
     var PostData = option.postData;
-    //var person = PostData.person;
-    var country = PostData.country;
     //clear old warn content.
     globeVarNewVsimTestinfo.ID.alertModelID.children().detach();
-    if (country==''){
+    if (''){
         //
-        alert_func(globeVarNewVsimTestinfo.ID.alertModelID,"请设置测试卡归属国家!");
+        alert_func(globeVarNewVsimTestinfo.ID.alertModelID,"请设置测试人!");
     }else{
         globeVarNewVsimTestinfo.clearGridArrayData();
         globeVarNewVsimTestinfo.ID.newVsimTestInfoJqgridID.jqxGrid("clear");
@@ -475,7 +473,7 @@ function excelExportAPI(item_jqxgrid,item_app_growl) {
                             注册网络: rows[i+j].register_rat,
                             lac: rows[i+j].lac,
                             cellid: rows[i+j].cellid,
-                            基本可用性: rows[i+j].service_usability,
+                            测试是否通过: rows[i+j].service_usability,
                             小时稳定性: rows[i+j].stability_onehour,
                             协商速率: rows[i+j].agree_mbr,
                             协商速率一致性: rows[i+j].agree_consistency,
@@ -525,7 +523,7 @@ var globeVarNewVsimTestinfo = {
     'gridArray': [],
     'ID':{
         'DataGetID' : $("#newVsimTestInfoDataGet"),
-        'imsiID': $("#input-imsi"),
+        'testVsimInfoID': $("#input_test_vsim_info"),
         'countryClass' : $(".select-country"),
         'personClass' : $(".select-person"),
         'newVsimTestInfoJqgridID' : $("#jqxgrid"),
@@ -570,7 +568,7 @@ $(function () {
                 'gridSource': JqxGridSource
             },
             'postData':{
-                imsi: globeVarNewVsimTestinfo.ID.imsiID.val(),
+                test_vsim_info: globeVarNewVsimTestinfo.ID.testVsimInfoID.val(),
                 country: globeVarNewVsimTestinfo.ID.countryClass.val(),
                 person: globeVarNewVsimTestinfo.ID.personClass.val()
             }

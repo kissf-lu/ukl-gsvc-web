@@ -186,11 +186,11 @@ def get_newVsimTestInforTable():
     """
     if request.method == 'POST':
         Dic_data = request.get_json()
-        imsi = str(Dic_data['imsi'])
+        test_vsim_info = str(Dic_data['test_vsim_info'])
         country = str(Dic_data['country'])
         person = str(Dic_data['person'])
 
-        return get_new_vsim_test_info(person, country, imsi)
+        return get_new_vsim_test_info(person, country, test_vsim_info)
 
     return False
 
