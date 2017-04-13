@@ -1,43 +1,29 @@
 /**
  * Created by wang.ding on 2017/4/5.
  */
-//ajax
-function myPostAction(data,target_url,callback,method,datatype,errfunc) {
-    if(target_url == undefined){
-        alert('no url specified');
-        return ;
-    }
 
-    if(method == undefined){
-        method = 'POST';
-    }
 
-    if(datatype == undefined){
-        datatype = 'json';
-    }
+/**=======================================================
+ *                          appendAlertInfo api
+ *=========================================================
+ * @param alert_class 设置告警栏的class属性
+ * @param info_str 设置告警栏的内容
+ * @param alert_id 告警栏在html中的标签id
+ *===================================================================================*/
+function appendAlertInfo(alert_class, info_str, alert_id){
 
-    $.ajax({
-        type:method.toUpperCase(),
-        url:target_url,
-        dataType:datatype,
-        data:data,
-        processData:false,
-        success:function (data) {
-            if(callback != undefined){
-                if(typeof callback === "function"){
-                    callback(data);
-                }
-            }
-        },
-        error:function (XMLHttpRequest, textStatus, errorThrown) {
-            if(errfunc != undefined){
-                if(typeof errfunc === "function"){
-                    errfunc(XMLHttpRequest, textStatus, errorThrown);
-                }
-            }
-        }
-    });
-};
+    var alertHTML = (
+    alert_class +
+    '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'+
+    '<span aria-hidden="true">&times;</span>'+
+    '</button>'+
+    '<strong>'+info_str+'</strong> '+
+    '</div>');
+    // remove old form html
+    alert_id.children().remove();
+    // append new form html
+    alert_id.append(alertHTML);
+}
 //初始化小时颗粒度时间面板
 function Mydaterange(number,time,timeSelector){
     this.begintime = moment().subtract(number, time);

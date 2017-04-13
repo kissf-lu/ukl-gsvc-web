@@ -328,350 +328,193 @@ $('#timeDim').change(function () {
         }
     }
     else {
-        var html_notif ='<strong>' + '请设置时间颗粒度！' + '</strong>';
+        var html_notif = '<strong>' + '请设置时间颗粒度！' + '</strong>';
         NotificationTimeDim.notificationContent(html_notif);
         NotificationTimeDim.notificationAction('open');
     }
 });
 
-
-//---------------------------------------------ajax获取api1.0
-$("#FlowerQuery_dataGet").click(function () {
-    var TimeDim = $('#timeDim').val();
-    var Mcc = $('#FlowerQueryMCC').val();
-    var Plmn = $('#FlowerQueryPlmn').val();
-    var Begintime = $('#input-daterange-start').val();
-    var Endtime = $('#input-daterange-end').val();
-    var Imsi = $('#inputimsi').val();
-    var addkey = $('#chosenFlowerQueryKey').val();
-    var FlowerQueryKey = addkey;
+function getFlowerAjax(option_data, option_id, ajax_set) {
+    var TimeDim =option_data.TimeDim;
+    var Mcc = option_data.Mcc;
+    var Plmn = option_data.Plmn;
+    var Begintime = option_data.Begintime;
+    var Endtime = option_data.Endtime;
+    var Imsi = option_data.Imsi;
+    var addkey = option_data.AddKey;
+    //
     var momentBegin = moment(Begintime, "YYYY-MM-DD HH:mm:ss");
     var momentEnd = moment(Endtime, "YYYY-MM-DD HH:mm:ss");
     var HourGap = momentEnd.diff(momentBegin, 'hours');
     var DayGap = momentEnd.diff(momentBegin, 'days');
     var TimezoneOffset = moment().utcOffset();
-    var queryPost = {};
+    //
+    var id_item = option_id;
+    //
     var QueryjqxNotification = new Notificationbar(
-        $("#QueryingQueryjqxNotification"),
+        id_item.id_JqxNotification,
         "#Querycontainer",
         3000,
         false,
-        $("#QueryingNotificationContent")
+        id_item.id_JqxNotificationContent
     );
+    //
     QueryjqxNotification.init();
     //隐藏上次通知
     QueryjqxNotification.notificationAction('closeLast');
     //  隐藏上一次告警栏
-    $("#queryQlert").children().detach();
-    if (TimeDim == 'hours') {
-        //输入格式匹配
-        var conformPlmn = checkplmnReg(Plmn);
-        //mcc have the same reg rules
-        var conformMcc = checkplmnReg(Mcc);
-        var conformImsi = checkImsiReg(Imsi);
-        queryPost = {
-            querySort: TimeDim,
-            begintime: Begintime,
-            endtime: Endtime,
-            mcc: Mcc,
-            plmn: Plmn,
-            imsi: Imsi,
-            agg_group_key: FlowerQueryKey,
-            TimezoneOffset: TimezoneOffset
-        };
-        if (!(conformImsi)) {
-            $("#queryQlert").append(
-                queryAndReturnAlert +
-                '<p>imsi输入格式不对!</p>' +
-                '</div>'
-            );
-        }
-        else if (Begintime == "") {
-            $("#queryQlert").append(
-                queryAndReturnAlert +
-                '<p>请选择要查询的起始时间!</p>' +
-                '</div>'
-            );
-        }
-        else if (Endtime == "") {
-            $("#queryQlert").append(
-                queryAndReturnAlert +
-                '<p>请选择要查询的截止时间!</p>' +
-                '</div>'
-            );
-        }
-        else if ((Plmn != "") && (!(conformPlmn))) {
-            $("#queryQlert").append(
-                queryAndReturnAlert +
-                '<p>plmn输入格式不对!</p>' +
-                '</div>'
-            );
-        }
-        else if ((Mcc != "") && (!(conformMcc))) {
-            $("#queryQlert").append(
-                queryAndReturnAlert +
-                '<p>mcc输入格式不对!</p>' +
-                '</div>'
-            );
-        }
-        else {
-            if (HourGap == 0) {
-                $("#queryQlert").append(
-                    queryAndReturnAlert +
-                    '<p>起始和截止时间相同!</p>' +
-                    '</div>'
-                );
-            }
-            else {
-                $("#FlowerQueryNotificationContent").children().detach();
-                if (HourGap > 48) {
-                    $("#queryQlert").append(
-                        queryAndReturnAlert +
-                        '<p>时常超过48小时，请从新设置时间!</p>' +
-                        '</div>'
-                    );
-                }
-                else {
-                    var notifi_content = '<strong>' + '查询时差为：' + HourGap + '. 数据获取中......' + '</strong>';
-                    QueryjqxNotification.notificationContent(notifi_content);
-                    QueryjqxNotification.notificationAction('open');
-                    //情况历史数据
-                    FlowerQueryGridArrayData = [];
-                    $("#FlowerQuery_dataGet").attr("disabled", true);
-                    var hoursAjaxRequest = $.ajax({
-                        type: "POST",
-                        //get方法url地址
-                        url: $SCRIPT_ROOT + "/api/v1.0/get_FlowerQuery/",
-                        //request set
-                        contentType: "application/json",
-                        //data参数
-                        data: JSON.stringify(queryPost),
-                        //server back data type
-                        dataType: "json"
-                    })
-                        .done(function (data) {
-                            QueryjqxNotification.notificationAction('closeLast');
-                            var getData = data;
-                            var alert_str = "";
-                            if (getData.data.length == 0) {
-                                $("#FlowerQueryjqxGrid").jqxGrid("clear");
-                                if (getData.info.err) {
-                                    $("#queryQlert").append(
-                                        queryAndReturnAlert +
-                                        '<p>Error：' + getData.info.errinfo + '</p></div>'
-                                    );
-                                }
-                                else {
-                                    $("#queryQlert").append(
-                                        queryAndReturnAlert +
-                                        '<p>无查询结果!</p></div>'
-                                    );
-                                }
+    id_item.id_Alert.children().detach();
+    //输入格式匹配
+    var conformPlmn = checkplmnReg(Plmn);
+    //mcc have the same reg rules
+    var conformMcc = checkplmnReg(Mcc);
+    var conformImsi = checkImsiReg(Imsi);
+    var alert_str = '';
+    var alertClass = '<div class="alert alert-warning" role="alert">';
+    var queryPost = {
+        querySort: TimeDim,
+        begintime: Begintime,
+        endtime: Endtime,
+        mcc: Mcc,
+        plmn: Plmn,
+        imsi: Imsi,
+        agg_group_key: addkey,
+        TimezoneOffset: TimezoneOffset
+    };
 
-                            }
-                            else {
-                                $("#FlowerQueryjqxGrid").jqxGrid("clear");
-                                $.each(getData.data, function (i, item) {
-                                    FlowerQueryGridArrayData.push({
-                                        imsi: item.imsi,
-                                        time: item.time,
-                                        mcc: item.mcc,
-                                        plmn: item.plmn,
-                                        lac: item.lac,
-                                        Flower: item.Flower
-                                    });
-                                });//each函数完成
-                                // set the new data
-                                FlowerQuerySource.localdata = FlowerQueryGridArrayData;
-                                $('#FlowerQueryjqxGrid').jqxGrid('updatebounddata');
-                            }
-                        })
-                        .fail(function (jqXHR, status) {
-                            QueryjqxNotification.notificationAction('closeLast');
-                            $("#FlowerQueryjqxGrid").jqxGrid("clear");
-                            $("#queryQlert").append(
-                                queryAndReturnAlert +
-                                '<p> Servers False!</p></div>'
-                            );
-                        })
-                        .always(function () {
-                            $("#FlowerQuery_dataGet").attr("disabled", false);
-                        });
-                }
-            }
-        }
+    if (!(conformImsi)) {
+        alert_str = ['imsi输入格式不对!', '请按照正确格式输入！'].join(' ');
+        appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
+    }
+    else if (Begintime === "") {
+        alert_str = ['请选择要查询的起始时间!', '完成输入！'].join(' ');
+        appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
+
+    }
+    else if (Endtime === "") {
+        alert_str = ['请选择要查询的截止时间!', '完成输入！'].join(' ');
+        appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
+    }
+    else if ((Plmn !== "") && (!(conformPlmn))) {
+        alert_str = ['plmn输入格式不对!', '请按照正确格式输入！'].join(' ');
+        appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
+    }
+    else if ((Mcc !== "") && (!(conformMcc))) {
+        alert_str = ['mcc输入格式不对!', '请按照正确格式输入！'].join(' ');
+        appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
     }
     else {
-        //输入格式匹配
-        var conformPlmn = checkplmnReg(Plmn);
-        //mcc have the same reg rules
-        var conformMcc = checkplmnReg(Mcc);
-        var conformImsi = checkImsiReg(Imsi);
-        queryPost = {
-            querySort: TimeDim,
-            begintime: Begintime,
-            endtime: Endtime,
-            mcc: Mcc,
-            plmn: Plmn,
-            imsi: Imsi,
-            agg_group_key: FlowerQueryKey,
-            TimezoneOffset: TimezoneOffset
-        };
-
-        if (!(conformImsi)) {
-            $("#queryQlert").append(
-                queryAndReturnAlert +
-                '<p>imsi输入格式不对!</p>' +
-                '</div>'
-            );
-        }
-        else if (Begintime == "") {
-            $("#queryQlert").append(
-                queryAndReturnAlert +
-                '<p>请选择要查询的起始时间!</p>' +
-                '</div>'
-            );
-        }
-        else if (Endtime == "") {
-            $("#queryQlert").append(
-                queryAndReturnAlert +
-                '<p>请选择要查询的截止时间!</p>' +
-                '</div>'
-            );
-        }
-        else if ((Plmn != "") && (!(conformPlmn))) {
-            $("#queryQlert").append(
-                queryAndReturnAlert +
-                '<p>plmn输入格式不对!</p>' +
-                '</div>'
-            );
-        }
-        else if ((Mcc != "") && (!(conformMcc))) {
-            $("#queryQlert").append(
-                queryAndReturnAlert +
-                '<p>mcc输入格式不对!</p>' +
-                '</div>'
-            );
+        if (HourGap === 0) {
+            alert_str = ['起始和截止时间相同!', '请按照正确格式输入！'].join(' ');
+            appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
         }
         else {
-            if (DayGap == 0) {
-                $("#queryQlert").append(
-                    queryAndReturnAlert +
-                    '<p>起始和截止时间设置相同，请从新设置时间!</p>' +
-                    '</div>'
-                );
+            var notifi_content = '';
+            if ((TimeDim === 'hours') && (HourGap > 48)) {
+                alert_str = ['时常超过48小时，', '请重新设置时间!'].join(' ');
+                appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
+            } else if ((TimeDim === 'days') && (DayGap > 93)) {
+                alert_str = ['天数超过93天，', '请重新设置时间!'].join(' ');
+                appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
             }
             else {
-                $("#FlowerQueryNotificationContent").children().detach();
-                if (DayGap > 93) {
-                    $("#queryQlert").append(
-                        queryAndReturnAlert +
-                        '<p>天数超过93天，请从新设置时间!</p>' +
-                        '</div>'
-                    );
+                if (TimeDim === 'hours'){
+                    notifi_content = ['<strong>', '查询时差为：', HourGap, '  数据获取中......', '</strong>'].join('')
+                }else {
+                    notifi_content = ['<strong>', '查询天数为：', DayGap, '  数据获取中......', '</strong>'].join('')
                 }
-                else {
-                    $("#QueryingNotificationContent").children().detach();
-                    $("#QueryingNotificationContent").append(
-                        '<strong>' + '查询天数差为：' + DayGap + '. 数据获取中......' + '</strong>'
-                    );
-                    closeQueryjqxNotification.notificationBar();
-                    $("#FlowerQuery_dataGet").attr("disabled", true);
-                    var hoursAjaxRequest = $.ajax({
-                        type: "POST",
-                        //get方法url地址
-                        url: $SCRIPT_ROOT + "/api/v1.0/get_FlowerQuery/",
-                        //request set
-                        contentType: "application/json",
-                        //data参数
-                        data: JSON.stringify(queryPost),
-                        //server back data type
-                        dataType: "json"
-                    })
-                        .done(function (data) {
-                            var getData = data;
-                            var alert_str = "";
-                            if (getData.data.length == 0) {
-                                if (getData.info.err) {
-                                    closeQueryjqxNotification.notificationBar();
-                                    $("#FlowerQueryjqxGrid").jqxGrid("clear");
-                                    $("#queryQlert").append(
-                                        queryAndReturnAlert +
-                                        '<p>Error：' + getData.info.errinfo + '</p></div>'
-                                    );
-                                }
-                                else {
-                                    closeQueryjqxNotification.notificationBar();
-                                    $("#FlowerQueryjqxGrid").jqxGrid("clear");
-                                    $("#queryQlert").append(
-                                        queryAndReturnAlert +
-                                        '<p>无查询结果!</p></div>'
-                                    );
-                                }
+                QueryjqxNotification.notificationContent(notifi_content);
+                QueryjqxNotification.notificationAction('open');
+                //重置表格历史数据
+                FlowerQueryGridArrayData = [];
+                //做表格数据清空操作
+                id_item.id_JqxGrid.jqxGrid("clear");
+                //禁用查询按钮,防止多次点击，造成重复查询
+                id_item.id_GetDataButtonAjax.attr("disabled", true);
+                $.ajax({
+                    type: ajax_set.type,
+                    //get方法url地址
+                    url: ajax_set.url,
+                    //request set
+                    contentType: "application/json",
+                    //data参数
+                    data: JSON.stringify(queryPost),
+                    //server back data type
+                    dataType: "json"
+                })
+                    .done(function (data) {
+                        //数据返回后关闭通知button
+                        QueryjqxNotification.notificationAction('closeLast');
+                        var getData = data;
+                        var alert_str = "";
+                        if (getData.data.length === 0) {
+                            if (getData.info.err) {
+                                alert_str = ['Error', ':', getData.info.errinfo].join(' ');
+                                alertClass = '<div class="alert alert-danger" role="alert">';
+                                appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
                             }
                             else {
-                                $("#FlowerQueryjqxGrid").jqxGrid("clear");
-                                FlowerQueryGridArrayData = [];
-                                closeQueryjqxNotification.notificationBar();
-                                $.each(getData.data, function (i, item) {
-                                    FlowerQueryGridArrayData.push({
-                                        imsi: item.imsi,
-                                        time: item.time,
-                                        mcc: item.mcc,
-                                        plmn: item.plmn,
-                                        lac: item.lac,
-                                        Flower: item.Flower
-                                    });
-                                });//each函数完成
-                                // set the new data
-                                FlowerQuerySource.localdata = FlowerQueryGridArrayData;
-                                $('#FlowerQueryjqxGrid').jqxGrid('updatebounddata');
+                                alert_str = ['查询结束', ',', '无查询结果!'].join(' ');
+                                appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
                             }
-                        })
-                        .fail(function (jqXHR, status) {
-                            closeQueryjqxNotification.notificationBar();
-                            $("#FlowerQueryjqxGrid").jqxGrid("clear");
-                            $("#queryQlert").append(
-                                queryAndReturnAlert +
-                                '<p> Servers False!</p></div>'
-                            );
-                        })
-                        .always(function () {
-                            $("#FlowerQuery_dataGet").attr("disabled", false);
-                        });
-                }
+                        }
+                        else {
+                            alert_str = ['查询完成，', '结果如下：'].join(' ');
+                            alertClass = '<div class="alert alert-success" role="alert">';
+                            appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
+                            $.each(getData.data, function (i, item) {
+                                FlowerQueryGridArrayData.push({
+                                    imsi: item.imsi,
+                                    time: item.time,
+                                    mcc: item.mcc,
+                                    plmn: item.plmn,
+                                    lac: item.lac,
+                                    Flower: item.Flower
+                                });
+                            });//each函数完成
+                            // set the new data
+                            FlowerQuerySource.localdata = FlowerQueryGridArrayData;
+                            id_item.id_JqxGrid.jqxGrid('updatebounddata');
+                        }
+                    })
+                    .fail(function (jqXHR, status) {
+                        //数据返回失败后关闭通知button
+                        QueryjqxNotification.notificationAction('closeLast');
+                        id_item.id_JqxGrid.jqxGrid("clear");
+                        alert_str = ['Servers False', ':', jqXHR, status].join(' ');
+                        alertClass = '<div class="alert alert-danger" role="alert">';
+                        appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
+                    })
+                    .always(function () {
+                        //ajax结束后恢复查询按钮
+                        $("#FlowerQuery_dataGet").attr("disabled", false);
+                    });
             }
-
         }
     }
     return false;
-});
-
+}
 //------------------------------------------------------------验证imsi格式
 function checkImsiReg(str) {
     var stringTest = str;
     var RegExp1 = /^([0-9]+)$/;
     var RegExp2 = /^([0-9]+[,])*([0-9]+)$/;
     //plmn非空时监测输入格式是否合法
-    if ((RegExp1.exec(stringTest) || (RegExp2.exec(stringTest)) ) && (str != '')) {
-        return true;
+    if ((RegExp1.exec(stringTest) || (RegExp2.exec(stringTest)) ) && (str !== '')) {
+        return ((RegExp1.exec(stringTest) || (RegExp2.exec(stringTest)) ) && (str !== ''));
     }
     else {
-        return false;
+        return ((RegExp1.exec(stringTest) || (RegExp2.exec(stringTest)) ) && (str !== ''));
     }
 }
 
 //------------------------------------------------------------验证plmn格式
 function checkplmnReg(str) {
-    var stringTest = str;
-    var RegExp1 = /^([0-9]+)$/;
-    //plmn非空时监测输入格式是否合法-规则为以数组开头结尾
-    if ((RegExp1.exec(stringTest) ) && (str != '')) {
+    var RegExp1 = /^([0-9]+)$/;  //plmn非空时监测输入格式是否合法-规则为以数组开头结尾
+    if ((RegExp1.exec(str) ) && (str !== '')) {
         return true;
-    }
-    //准许plmn为空
-    else if (str == '') {
-        return true;
+    } else if (str === '') {
+        return (str === '');
     }
     else {
         return false;
@@ -686,14 +529,14 @@ $(function () {
     //初始化显示栏
     initjqxDropDownList();
 
-    //-----------截止时间/起始V时间选择通知
+    //截止时间/起始V时间选择通知
     var selector = {
         "timeSelectorStart": $('#input-daterange-start'),
         "timeSelectorEnd": $('#input-daterange-end'),
         "flowerNot": $("#FlowerQueryNotification"),
-        "flowerContent": $("#FlowerQueryNotificationContent")
+        "flowerContent": $("#FlowerQueryNotificationContent"),
+        "flowerQueryDataGet": $("#FlowerQuery_dataGet")
     };
-
     //初始化小时颗粒日期栏
     var daterange_hour_begin = new Mydaterange(6, 'h', selector.timeSelectorStart);
     daterange_hour_begin.initTime();
@@ -701,5 +544,33 @@ $(function () {
     daterange_hour_end.initTime();
     //初始化chosen
     $("#chosenFlowerQueryKey").chosen({width: "100%"});
+
+    selector.flowerQueryDataGet.click( function (){
+        var option = {
+            data:{
+                TimeDim: $('#timeDim').val(),
+                Mcc: $('#FlowerQueryMCC').val(),
+                Plmn : $('#FlowerQueryPlmn').val(),
+                Begintime : $('#input-daterange-start').val(),
+                Endtime: $('#input-daterange-end').val(),
+                Imsi : $('#inputimsi').val(),
+                AddKey : $('#chosenFlowerQueryKey').val()
+            },
+            id:{
+                id_JqxNotification: $("#QueryingQueryjqxNotification"),
+                id_JqxNotificationContent: $("#QueryingNotificationContent"),
+                id_Alert: $("#queryQlert"),
+                id_JqxGrid: $("#FlowerQueryjqxGrid"),
+                id_GetDataButtonAjax: $("#FlowerQuery_dataGet")
+            },
+            ajaxSet:{
+                type: 'POST',
+                url: $SCRIPT_ROOT + "/api/v1.0/get_FlowerQuery/"
+            }
+        };
+        getFlowerAjax(option.data, option.id, option.ajaxSet);
+    });
+
+
 });
 //-----------------------------------------------------end main 函数-----------------------------------------------------
