@@ -73,7 +73,7 @@ function FlowerQueryjqxGrid() {
                 }
             },
             {
-                text: 'time', datafield: 'time', cellsformat: 'yyyy-MM-dd HH:mm:ss', width: 200,
+                text: 'time(GMT0)', datafield: 'time', cellsformat: 'yyyy-MM-dd HH:mm:ss', width: 200,
                 filtertype: 'date', hidden: true
             },
             {text: 'mcc', datafield: 'mcc', filtertype: "range", width: 100, hidden: true},
@@ -316,9 +316,9 @@ $('#timeDim').change(function () {
         NotificationTimeDim.notificationAction('open');
         if (timeDimVar == 'days') {
             var daterange_day_begin = new Mydaterange(15, 'days', $('#input-daterange-start'));
-            daterange_day_begin.initTime();
-            var daterange_day_end = new Mydaterange(1, 'days', $('#input-daterange-end'));
-            daterange_day_end.initTime();
+            daterange_day_begin.initTime({'hour':0,'minute': 0, 'second': 0},"YYYY-MM-DD", false);
+            var daterange_day_end = new Mydaterange(0, 'days', $('#input-daterange-end'));
+            daterange_day_end.initTime({'hour':0,'minute': 0, 'second': 0},"YYYY-MM-DD", false);
         }
         else {
             var daterange_hour_begin = new Mydaterange(6, 'h', $('#input-daterange-start'));
@@ -370,7 +370,7 @@ function getFlowerAjax(option_data, option_id, ajax_set) {
     var conformMcc = checkplmnReg(Mcc);
     var conformImsi = checkImsiReg(Imsi);
     var alert_str = '';
-    var alertClass = '<div class="alert alert-warning" role="alert">';
+    var alertClass = 'warning';
     var queryPost = {
         querySort: TimeDim,
         begintime: Begintime,
@@ -419,9 +419,9 @@ function getFlowerAjax(option_data, option_id, ajax_set) {
             }
             else {
                 if (TimeDim === 'hours'){
-                    notifi_content = ['<strong>', '查询时差为：', HourGap, '  数据获取中......', '</strong>'].join('')
+                    notifi_content = ['<strong>', '查询时差为：', HourGap, '  数据获取中......', '</strong>'].join('');
                 }else {
-                    notifi_content = ['<strong>', '查询天数为：', DayGap, '  数据获取中......', '</strong>'].join('')
+                    notifi_content = ['<strong>', '查询天数为：', DayGap, '  数据获取中......', '</strong>'].join('');
                 }
                 QueryjqxNotification.notificationContent(notifi_content);
                 QueryjqxNotification.notificationAction('open');
@@ -450,7 +450,7 @@ function getFlowerAjax(option_data, option_id, ajax_set) {
                         if (getData.data.length === 0) {
                             if (getData.info.err) {
                                 alert_str = ['Error', ':', getData.info.errinfo].join(' ');
-                                alertClass = '<div class="alert alert-danger" role="alert">';
+                                alertClass = 'danger';
                                 appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
                             }
                             else {
@@ -460,7 +460,7 @@ function getFlowerAjax(option_data, option_id, ajax_set) {
                         }
                         else {
                             alert_str = ['查询完成，', '结果如下：'].join(' ');
-                            alertClass = '<div class="alert alert-success" role="alert">';
+                            alertClass = 'success';
                             appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
                             $.each(getData.data, function (i, item) {
                                 FlowerQueryGridArrayData.push({
@@ -482,7 +482,7 @@ function getFlowerAjax(option_data, option_id, ajax_set) {
                         QueryjqxNotification.notificationAction('closeLast');
                         id_item.id_JqxGrid.jqxGrid("clear");
                         alert_str = ['Servers False', ':', jqXHR, status].join(' ');
-                        alertClass = '<div class="alert alert-danger" role="alert">';
+                        alertClass = 'danger';
                         appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
                     })
                     .always(function () {
@@ -528,7 +528,6 @@ $(function () {
     FlowerQueryjqxGrid();
     //初始化显示栏
     initjqxDropDownList();
-
     //截止时间/起始V时间选择通知
     var selector = {
         "timeSelectorStart": $('#input-daterange-start'),

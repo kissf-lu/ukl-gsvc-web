@@ -164,23 +164,23 @@ def getHoursFlower(imsi, Begintime, Endtime, Mcc, Plmn, FlowerKey):
     endLUnix = (datetime_timestamp(flowerEndtime)) * 1000
     matchStages = {}
     if queryPlmn and queryMcc:
-            matchStages = {'createtime': {'$gte': beginLUnix, '$lte': endLUnix},
+            matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
                            'imsi': {'$in': list_imsi},
                            'mcc': queryMcc,
                            'plmn': queryPlmn
                            }
     elif queryMcc and not queryPlmn:
-            matchStages = {'createtime': {'$gte': beginLUnix, '$lte': endLUnix},
+            matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
                            'imsi': {'$in': list_imsi},
                            'mcc': queryMcc
                            }
     elif not queryMcc and queryPlmn:
-            matchStages = {'createtime': {'$gte': beginLUnix, '$lte': endLUnix},
+            matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
                            'imsi': {'$in': list_imsi},
                            'plmn': queryPlmn
                            }
     else:
-        matchStages = {'createtime': {'$gte': beginLUnix, '$lte': endLUnix},
+        matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
                        'imsi': {'$in': list_imsi}
                        }
     pipeline = [
@@ -250,18 +250,18 @@ def getDaysFlower(imsi, Begintime, Endtime, Mcc, Plmn, FlowerKey):
     beginLUnix = (datetime_timestamp(flowerBegintime)) * 1000
     endLUnix = (datetime_timestamp(flowerEndtime)) * 1000
     if queryPlmn and queryMcc:
-            matchStages = {'createtime': {'$gte': beginLUnix, '$lte': endLUnix},
+            matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
                            'imsi': {'$in': list_imsi},
                            'mcc': queryMcc,
                            'plmn': queryPlmn
                            }
     elif queryMcc and not queryPlmn:
-            matchStages = {'createtime': {'$gte': beginLUnix, '$lte': endLUnix},
+            matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
                            'imsi': {'$in': list_imsi},
                            'mcc': queryMcc
                            }
     elif not queryMcc and queryPlmn:
-            matchStages = {'createtime': {'$gte': beginLUnix, '$lte': endLUnix},
+            matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
                            'imsi': {'$in': list_imsi},
                            'plmn': queryPlmn
                            }

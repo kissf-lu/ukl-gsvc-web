@@ -149,9 +149,7 @@ def get_FlowerQuery():
     :return:
     """
     # paramKeyFromRequest = ['querySort','begintime','endtime','mcc','plmn','imsi','agg_group_key','TimezoneOffset']
-
     Dic_data = request.get_json()
-
     try:
         querySort = str(Dic_data['querySort'])
         begintime = str(Dic_data['begintime'])
@@ -161,7 +159,6 @@ def get_FlowerQuery():
         queryImsi = str(Dic_data['imsi'])
         aggGroupKey = Dic_data['agg_group_key']
         TimezoneOffset = int(Dic_data['TimezoneOffset'])
-
     except KeyError:
         errinfo = '前端POST数据异常!'
         DicData = []

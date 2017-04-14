@@ -255,13 +255,13 @@ function excelExportAPI(item_jqxgrid,item_app_growl) {
     var pagesize = paginginformation.pagesize;
     // The number of all pages.
     var pagescount = paginginformation.pagescount;
-    if (alldatanum==0){
+    if (alldatanum===0){
         //alter
         alert_func(item_app_growl,'无输出数据！');
     }
     else{
         for(var i = 0; i < rows.length; i++){
-            if (i==pagenum*pagesize){
+            if (i===pagenum*pagesize){
                 for (var j = 0; j< pagesize; j++){
                     if (i+j< alldatanum){
                         view_data.push({
@@ -293,7 +293,7 @@ function excelExportAPI(item_jqxgrid,item_app_growl) {
  */
 function excelExport(data,item_app_growl) {
      var exportData = data;
-     if (exportData.data==[]){
+     if (exportData.data===[]){
          // alter
          alert_func(item_app_growl, '无输出数据！');
          }
@@ -331,7 +331,7 @@ function action140StaticAjaxAPI(jqxgrid_data, JqxGridSrcSource, post_data,item_g
     var EndTime = post_data.endTime;
     //alert
     $app_growl.children().detach();
-    if ((EndTime == '') && BeginTime == ''){
+    if ((EndTime === '') && BeginTime === ''){
         //alter
         alert_func($app_growl,'请设置查询条件!');
 
@@ -360,7 +360,7 @@ function action140StaticAjaxAPI(jqxgrid_data, JqxGridSrcSource, post_data,item_g
                 $jqxgrid.jqxGrid("clear");
                 //获取返回数据
                 var getData = data;
-                if (getData.data.length==0){
+                if (getData.data.length===0){
                     if (getData.info.err){
                         //delete old alter
                         alert_func($app_growl,getData.info.errinfo);
@@ -423,7 +423,7 @@ function getStartTime(set_package_update_time){
     var beginTime = nowTime.set(setPackageUpdateTime);
     if (nowDay >11){
         return (beginTime);
-    }else if ((nowDay ==11)&&( nowHour>=16)){
+    }else if ((nowDay ===11)&&( nowHour>=16)){
         return (beginTime);
     }else{
        beginTime.subtract(1, 'months');

@@ -32,6 +32,8 @@ vsimFlowerQuery_js = Bundle(
     output='js/vsim_flower/gsvc_vsimFlowerQuery.js'
 )
 probVsimFirstDict_js = Bundle(
+    # ("-- customer js --")
+    'js/main/demo/common.js',
     'js/prob_vsim_dic/probVsimFirstDict-demo.js',
     filters='jsmin',
     output='js/prob_vsim_dic/gsvc_probVsimFirstDict.js'
