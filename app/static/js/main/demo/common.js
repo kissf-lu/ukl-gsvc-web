@@ -3,6 +3,79 @@
  */
 
 
+
+/**=====================================================
+ *  -------FilterPanel set func-------
+ *======================================================
+ *JqxGrid columns FilterPanel setting;
+ * @param filterPanel panel to init;
+ * @param datafield : grid column datafield param;
+ * @param filterGrid : jquery type of grid DOC ID;
+ * @param SrcAdapter : grid SrcAdapter param ;
+ *=============================================================*/
+var buildFilterPanel = function (filterPanel, datafield,filterGrid,SrcAdapter) {
+    var textInput = $("<input style='margin:5px;'/>");
+    var applyinput = $("<div class='filter' style='height: 25px; margin-left: 20px; margin-top: 7px;'></div>");
+    var filterbutton = $('<span tabindex="0" style="padding: 4px 12px; margin-left: 2px;">筛选</span>');
+    applyinput.append(filterbutton);
+    var filterclearbutton = $('<span tabindex="0" style="padding: 4px 12px; margin-left: 5px;">清除筛选</span>');
+    applyinput.append(filterclearbutton);
+    filterPanel.append(textInput);
+    filterPanel.append(applyinput);
+    filterbutton.jqxButton({ height: 20 });
+    filterclearbutton.jqxButton({height: 20 });
+    var dataSource ={
+        localdata: SrcAdapter.records,
+        datatype: "json",
+        async: false
+    };
+    var dataadapter = new $.jqx.dataAdapter(dataSource,
+        {
+            autoBind: false,
+            autoSort: true,
+            autoSortField: datafield,
+            async: false,
+            uniqueDataFields: [datafield]
+        });
+    var column = filterGrid.jqxGrid('getcolumn', datafield);
+    textInput.jqxInput({ placeHolder: "Enter " + column.text, popupZIndex: 9999999, displayMember: datafield, source: dataadapter, height: 23, width: 175 });
+    textInput.keyup(function (event) {
+        if (event.keyCode === 13) {
+            filterbutton.trigger('click');
+        }
+    });
+    filterbutton.click(function () {
+        var filtergroup = new $.jqx.filter();
+        var filter_or_operator = 1;
+        var filtervalue = textInput.val();
+        var filtercondition = 'contains';
+        var filter1 = filtergroup.createfilter('stringfilter', filtervalue, filtercondition);
+        filtergroup.addfilter(filter_or_operator, filter1);
+        // add the filters.
+        filterGrid.jqxGrid('addfilter', datafield, filtergroup);
+        //apply the filters.
+        filterGrid.jqxGrid('applyfilters');
+        filterGrid.jqxGrid('closemenu');
+    });
+    filterbutton.keydown(function (event) {
+        if (event.keyCode === 13) {
+            filterbutton.trigger('click');
+        }
+    });
+    filterclearbutton.click(function () {
+        filterGrid.jqxGrid('removefilter', datafield);
+        // apply the filters.
+        filterGrid.jqxGrid('applyfilters');
+        filterGrid.jqxGrid('closemenu');
+    });
+    filterclearbutton.keydown(function (event) {
+        if (event.keyCode === 13) {
+            filterclearbutton.trigger('click');
+        }
+        textInput.val("");
+    });
+};
+
 /**=================================================
  *            Select2FuncBase
  * =================================================
@@ -76,6 +149,7 @@ function Mydaterange(number, time_type, timeSelector){
     * 设置日期，格式为{'date': 11,'hour': 16,'minute': 0, 'second': 0}
  *========================================================*/
 Mydaterange.prototype.initTime = function (set_time, set_format, if_hour) {
+    var time_picker = true;
     if((if_hour) || (if_hour ===undefined)){
         time_picker = true
     } else {
@@ -100,19 +174,25 @@ Mydaterange.prototype.initTime = function (set_time, set_format, if_hour) {
 /**=========================================================================================
  *
  * =========================================================================================
- * @param selector
- * @param appendContainer
- * @param autoCloseDelay
- * @param autoClose
- * @param content
- * @constructor
+ * @param selector : 通知栏id属性
+    * html页面的通知栏标签ID号,用于获取通知栏位置，为初始化参数
+ * @param appendContainer : 通知栏的内容显示容器id
+    *用于设置在指定位置容器中显示通知栏，为初始化参数
+ * @param autoCloseDelay : 自动关闭标签延时阈值 单位：毫秒级. 默认3秒
+    *
+ * @param autoClose : 是否自动关闭，  数据类型bool ：true/false . 默认true
+    *
+ * @param content : 通知内容， 数据类型 string: 默认：''
+    *
+ * @constructor :
+ *
  *==========================================================================================*/
 function Notificationbar(selector,appendContainer,autoCloseDelay,autoClose,content) {
     this.selector = selector;
     this.appendContainer = appendContainer;
-    this.autoCloseDelay = autoCloseDelay;
-    this.autoClose = autoClose;
-    this.content = content;
+    this.autoCloseDelay = autoCloseDelay||3000;
+    this.autoClose = autoClose||false;
+    this.content = content||'';
 }
 Notificationbar.prototype.init = function () {
    //初始化通知
@@ -130,22 +210,50 @@ Notificationbar.prototype.init = function () {
     });
    return this
 };
+/**=======================================================
+ *             notificationContent API
+ *             用于设置通知内容的接口
+ * =======================================================
+ * @param notifi_content : 用于设置通知内容， 数据类型 string
+ * @returns {Notificationbar}
+ *========================================================*/
 Notificationbar.prototype.notificationContent = function (notifi_content) {
     //通知内容设置
     this.content.children().detach();
     this.content.append(notifi_content);
     return this
 };
+/**=================================================
+ *                notificationAction API
+ *                用于jqxNotification设置方法接口
+ * =================================================
+ *
+ * @param action_flag : jqxNotification 方法接口: 'closeLast':清除最近通知，'open'：打开通知
+ */
 Notificationbar.prototype.notificationAction = function (action_flag) {
     //可视化操作
     this.selector.jqxNotification(action_flag);
 };
 
-function AjaxJsonFunc(ajax_param, ajax_id) {
-    this.ajaxParam = ajax_param;
-    this.id = ajax_id;
+function dic_list(data, list_key) {
+    var key_item = list_key||[];
+    var rt_dic = {};
+    key_item.forEach(function (item) {
+        rt_dic[item] = data[item] === undefined ? '' : data[item];
+    });
+    return rt_dic
 }
-AjaxJsonFunc.prototype.core = function () {
+
+/**
+ *
+ * @param ajax_param
+ * @constructor
+ */
+function AjaxJsonFunc(ajax_param) {
+    this.ajaxParam = ajax_param;
+}
+AjaxJsonFunc.prototype.core = function (key_item, alert_id, get_bt_id, notification_obj, grid_obj, gird_id) {
+
     $.ajax({
         type: this.ajaxParam.type,
         //get方法url地址
@@ -165,49 +273,109 @@ AjaxJsonFunc.prototype.core = function () {
                     appendAlertInfo(
                         'danger',
                         ['Error:', getData.info.errinfo].join(' '),
-                        this.id.queryAlert);
+                        alert_id);
                 }
                 else {
                     appendAlertInfo(
                         'warning',
                         '无查询结果!',
-                        this.id.queryAlert);
+                        alert_id);
                 }
             }
             else {
-                var GridArrayData = [];
+                grid_obj.ClearGridData();
+                var tableData = [];
                 appendAlertInfo(
                     'success',
                     ['查询完成，', '结果如下：'].join(' '),
-                    this.id.queryAlert);
-                $.each(getData.data, function (i, item) {
-                     GridArrayData.push({
-                        country: item.country,
-                        imsi: item.imsi,
-                        iccid: item.iccid,
-                        package_type_name: item.package_type_name,
-                        next_update_time: item.next_update_time,
-                        bam: item.bam,
-                        imsi_con: item.imsi_con,
-                        imei_con: item.imei_con,
-                        Flower: item.Flower,
-                        err: item.err
-                    });
+                    alert_id);
+                getData.data.forEach(function (item) {
+                    var each_data = dic_list(item, key_item);
+                    tableData.push(each_data);
                 });//each函数完成
-                return GridArrayData;
+                grid_obj.ResetGridData(tableData);
+                gird_id.jqxGrid('updatebounddata');
+                return grid_obj;
             }
         })
         .fail(function (jqXHR, status) {
             appendAlertInfo(
                 'warning',
                 ['Servers False:', jqXHR, status].join(' '),
-                this.id.queryAlert);
+                alert_id);
         })
         .always(function () {
-            ProQueryjqxNotification.notificationAction('closeLast');
-            this.id.queryBt.attr("disabled", false);
+            get_bt_id.attr("disabled", false);
+            notification_obj.notificationAction('closeLast');
         });
 };
-AjaxJsonFunc.prototype.doneAjax = function (call_back_item) {
 
+AjaxJsonFunc.prototype.gridDataGet = function (grid_id) {
+    
+};
+
+/**
+ *
+ * @param id
+ * @param datafields
+ * @constructor
+ */
+function GgridInit(id, datafields){
+    this.girid_id = id;
+    this.GridArrayData = [];
+    this.GridSource = {
+        localdata: this.GridArrayData,
+        datatype: "json",
+        datafields: datafields||[]
+    };
+    this.GridAdapter = new $.jqx.dataAdapter(this.GridSource);
+}
+GgridInit.prototype.set = function (set_param) {
+    var gridSetParam = {
+        width: (set_param.width !== undefined) ? set_param.width : '99.8%',
+        height: (set_param.height !== undefined) ? set_param.height : 500,
+        filterable: set_param.filterable ? set_param.filterable : true,
+        pageSize: (set_param.pageSize !== undefined) ? set_param.pageSize : 1000,
+        pagesizeoptions: (
+            (set_param.pagesizeoptions !== undefined) ? set_param.pagesizeoptions : ['1000', '5000', '10000']
+        ),
+        columns:(set_param.columns !== undefined) ? set_param.columns : []
+    };
+    var idGrid = this.girid_id;
+    idGrid.jqxGrid({
+        width: gridSetParam.width,
+        height: gridSetParam.height,
+        source: this.GridAdapter,
+        filterable: true,
+        columnsresize: true,
+        enablebrowserselection: true,
+        selectionmode: 'multiplerows',
+        altrows: true,
+        sortable: true,
+        pageable: true,
+        pageSize: gridSetParam.pageSize,
+        pagesizeoptions: gridSetParam.pagesizeoptions,
+        localization: getLocalization('zh-CN'),
+        ready: function () {
+        },
+        autoshowfiltericon: true,
+        columnmenuopening: function (menu, datafield, height) {
+            var column = idGrid.jqxGrid('getcolumn', datafield);
+            if (column.filtertype === "custom") {
+                menu.height(155);
+                setTimeout(function () {
+                    menu.find('input').focus();
+                }, 25);
+            }
+            else menu.height(height);
+        },
+        columns: gridSetParam.columns
+    });
+    return this;
+};
+GgridInit.prototype.ClearGridData = function () {
+    this.GridSource.localdata = [];
+};
+GgridInit.prototype.ResetGridData = function (array_data) {
+    this.GridSource.localdata = array_data;
 };

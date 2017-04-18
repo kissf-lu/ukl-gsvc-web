@@ -260,7 +260,6 @@ $("#probDicExcelExport").click(function () {
             if (i === pagenum * pagesize) {
                 for (var j = 0; j < pagesize; j++) {
                     if (i + j < alldatanum) {
-                        alert(typeof (rows[i + j].imsi));
                         view_data.push({
                             country: rows[i + j].country,
                             imsi: rows[i + j].imsi,
@@ -286,7 +285,6 @@ $("#probDicExcelExport").click(function () {
 //post函数导出excel
 function excelExport(data) {
     var exportdata = data;
-
     if (exportdata.data == []) {
         //delete old alter
         $("#app-growl").children().detach();
@@ -420,7 +418,7 @@ $("#ProbDic_dataGet").click(function () {
                     idItem.grid.jqxGrid('showloadelement');
                     // 禁用查询按钮
                     idItem.queryBt.attr("disabled", true);
-                    var ajaxJson = new AjaxJsonFunc();
+                    //var ajaxJson = new AjaxJsonFunc();
                     $.ajax({
                         type: "POST",
                         //get方法url地址
