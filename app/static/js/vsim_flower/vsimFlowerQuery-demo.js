@@ -3,10 +3,92 @@
  * @type {Array}
  */
 
+function GridColumnsSet(grid_id, grid_src_adapter) {
+    this.dateFormat = 'yyyy-MM-dd HH:mm:ss';
+    this.gridColumns = [
+        {
+            text: 'num',
+            sortable: true,
+            filterable: false,
+            editable: false,
+            groupable: false,
+            draggable: false,
+            resizable: false,
+            datafield: '',
+            width: 50,
+            columntype: 'number',
+            cellsrenderer: function (row, column, value) {
+                return "<div style='margin:4px;'>" + (value + 1) + "</div>";
+            }
+        },
+        {
+            text: 'imsi', datafield: 'imsi', width: 150,
+            filtertype: "custom",
+            createfilterpanel: function (datafield, filterPanel) {
+                buildFilterPanel(filterPanel, datafield, grid_id, grid_src_adapter);
+            }
+        },
+        {
+            text: 'time(GMT0)', datafield: 'time', cellsformat: this.dateFormat, width: 200,
+            filtertype: 'date', hidden: true
+        },
+        {text: 'mcc', datafield: 'mcc', filtertype: "range", width: 100, hidden: true},
+        {text: 'plmn', datafield: 'plmn', filtertype: "range", width: 100, hidden: true},
+        {text: 'lac', datafield: 'lac', filtertype: "range", width: 100, hidden: true},
+        {text: 'Flower/MB', datafield: 'Flower', width: 300}
+    ];
+}
+GridColumnsSet.prototype.dateFormatSet = function (format_date) {
+    this.dateFormat = format_date;
+};
 
+function gridFieldsSet() {
+    return [
+            {name: 'imsi', type: 'string'},
+            {name: 'time', type: 'date'},
+            {name: 'mcc', type: 'string'},
+            {name: 'plmn', type: 'string'},
+            {name: 'lac', type: 'string'},
+            {name: 'Flower', type: 'number'}
+        ];
+}
+function gridColumnsSet(grid_id, grid_src_adapter, grid_date_format) {
+    return [
+        {
+            text: 'num',
+            sortable: true,
+            filterable: false,
+            editable: false,
+            groupable: false,
+            draggable: false,
+            resizable: false,
+            datafield: '',
+            width: 50,
+            columntype: 'number',
+            cellsrenderer: function (row, column, value) {
+                return "<div style='margin:4px;'>" + (value + 1) + "</div>";
+            }
+        },
+        {
+            text: 'imsi', datafield: 'imsi', width: 150,
+            filtertype: "custom",
+            createfilterpanel: function (datafield, filterPanel) {
+                buildFilterPanel(filterPanel, datafield, grid_id, grid_src_adapter);
+            }
+        },
+        {
+            text: 'time(GMT0)', datafield: 'time', cellsformat: grid_date_format, width: 200,
+            filtertype: 'date', hidden: true
+        },
+        {text: 'mcc', datafield: 'mcc', filtertype: "range", width: 100, hidden: true},
+        {text: 'plmn', datafield: 'plmn', filtertype: "range", width: 100, hidden: true},
+        {text: 'lac', datafield: 'lac', filtertype: "range", width: 100, hidden: true},
+        {text: 'Flower/MB', datafield: 'Flower', width: 300}
+    ];
+}
 
 function GridSetObj(grid_id, grid_src_adapter) {
-    return {
+    var returnData = {
         fields:[
             {name: 'imsi', type: 'string'},
             {name: 'time', type: 'date'},
@@ -48,6 +130,7 @@ function GridSetObj(grid_id, grid_src_adapter) {
             {text: 'Flower/MB', datafield: 'Flower', width: 300}
         ]
     };
+    return returnData;
 }
 //-------------------------------------------------------显示选择菜单设置----------------------------------------
 var jqxDropDownList = [
@@ -94,8 +177,9 @@ $('#FlowerQueryFlash').click(function () {
 $("#FlowerQueryExcelExport").click(function () {
     var rows = $('#FlowerQueryjqxGrid').jqxGrid('getdisplayrows');
     var alldatanum = rows.length;
+    //alert(alldatanum);
     var view_data = [];
-    var json_data = {'data': view_data}
+    var json_data = {'data': view_data};
     var paginginformation =
         $('#FlowerQueryjqxGrid').jqxGrid('getpaginginformation');
     // The page's number.
@@ -213,7 +297,7 @@ $('#timeDim').change(function () {
     }
 });
 
-function getFlowerAjax(option_data, option_id, ajax_set, table_item, grid_data) {
+function getFlowerAjax(option_data, option_id, ajax_set, grid_obj) {
     var TimeDim =option_data.TimeDim;
     var Mcc = option_data.Mcc;
     var Plmn = option_data.Plmn;
@@ -232,7 +316,7 @@ function getFlowerAjax(option_data, option_id, ajax_set, table_item, grid_data) 
     //
     var QueryjqxNotification = new Notificationbar(
         id_item.id_JqxNotification,
-        "#Querycontainer",
+        id_item.id_JqxNotificationContainer,
         3000,
         false,
         id_item.id_JqxNotificationContent
@@ -289,6 +373,7 @@ function getFlowerAjax(option_data, option_id, ajax_set, table_item, grid_data) 
         else {
             var notifi_content = '';
             if ((TimeDim === 'hours') && (HourGap > 48)) {
+
                 alert_str = ['时常超过48小时，', '请重新设置时间!'].join(' ');
                 appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
             } else if ((TimeDim === 'days') && (DayGap > 93)) {
@@ -296,41 +381,42 @@ function getFlowerAjax(option_data, option_id, ajax_set, table_item, grid_data) 
                 appendAlertInfo(alertClass, alert_str, id_item.id_Alert);
             }
             else {
-                if (TimeDim === 'hours'){
-                    notifi_content = ['<strong>', '查询时差为：', HourGap, '  数据获取中......', '</strong>'].join('');
-                }else {
-                    notifi_content = ['<strong>', '查询天数为：', DayGap, '  数据获取中......', '</strong>'].join('');
+                var ajaxOption = {
+                    ajaxParam: {
+                        type: ajax_set.type,
+                        url: ajax_set.url,
+                        postData: queryPost
+                    },
+                    idTag: {
+                        id_Alert: id_item.id_Alert,
+                        id_GetDataBt: id_item.id_GetDataButtonAjax,
+                        id_Grid: id_item.id_JqxGrid
+                    },
+                    objClass: {
+                        objGrid: grid_obj.gridObj,
+                        objNotification: QueryjqxNotification
+                    }
+                };
+                var ajaxRT = new AjaxJsonFunc(ajaxOption.ajaxParam);
+                var checkIf = ajaxRT.ajaxParamCheck(['url']);
+                if(!(checkIf)){
+                    QueryjqxNotification.notificationAction('closeLast');
+                } else {
+                    if (TimeDim === 'hours'){
+                        notifi_content = ['<strong>', '查询时差为：', HourGap, '  数据获取中......', '</strong>'].join('');
+                    }else {
+                        grid_obj.gridColObj.dateFormatSet('yyyy-MM-dd');
+                        notifi_content = ['<strong>', '查询天数为：', DayGap, '  数据获取中......', '</strong>'].join('');
+                    }
+                    QueryjqxNotification.notificationContent(notifi_content);
+                    QueryjqxNotification.notificationAction('open');
+                    //做表格数据清空操作
+                    id_item.id_JqxGrid.jqxGrid("clear");
+                    //禁用查询按钮,防止多次点击，造成重复查询
+                    id_item.id_GetDataButtonAjax.attr("disabled", true);
+                    ajaxRT.core({idTag:ajaxOption.idTag, objClass: ajaxOption.objClass});
                 }
-                QueryjqxNotification.notificationContent(notifi_content);
-                QueryjqxNotification.notificationAction('open');
-                //重置表格历史数据
-                FlowerQueryGridArrayData = [];
-                //做表格数据清空操作
-                id_item.id_JqxGrid.jqxGrid("clear");
-                //禁用查询按钮,防止多次点击，造成重复查询
-                id_item.id_GetDataButtonAjax.attr("disabled", true);
-                var ajaxParam = {
-                    type: ajax_set.type,
-                    url: ajax_set.url,
-                    postData: queryPost
-                };
-                var ajax_id = {
-                    queryAlert: id_item.id_Alert,
-                    queryBt: id_item.id_GetDataButtonAjax
-                };
-                var ajaxRT = new AjaxJsonFunc(ajaxParam).core(
-                    table_item,
-                    id_item.id_Alert,
-                    id_item.id_GetDataButtonAjax,
-                    QueryjqxNotification,
-                    grid_data,
-                    id_item.id_JqxGrid
-                );
-                //grid_data=[];
-                //alert(ajaxRT.length);
-                //id_item.id_JqxGrid.jqxGrid('updatebounddata');
             }
-
         }
     }
     return false;
@@ -366,54 +452,65 @@ function checkplmnReg(str) {
 //--------------------------------------------------------main-初始化主程序-----------------------------------------
 $(function () {
     //--------------------------初始化统计表单
-    //FlowerQueryjqxGrid($("#FlowerQueryjqxGrid"));
-    //a();
-    var FlowerJqxGrid = new GgridInit($("#FlowerQueryjqxGrid"), GridSetObj().fields);
-    FlowerJqxGrid.set({columns: GridSetObj($("#FlowerQueryjqxGrid"), FlowerJqxGrid.GridAdapter).columns});
+    var GlobeIdSet = {
+        flowerGrid: $("#FlowerQueryjqxGrid"),
+        flowerDataGet: $("#FlowerQuery_dataGet"),
+        timeDim: $('#timeDim'),
+        timeStart:  $('#input-daterange-start'),
+        timeEnd: $('#input-daterange-end'),
+        notificationSecLayer: $("#FlowerQueryNotification"),
+        notificationSecLayerContent: $("#FlowerQueryNotificationContent"),
+        notificationSecLayerContainer: ("#Querycontainer"),
+        chosenFlowerKey: $("#chosenFlowerQueryKey"),
+        mcc: $('#FlowerQueryMCC'),
+        plmn: $('#FlowerQueryPlmn'),
+        imsi: $('#inputimsi'),
+        alertSecLayer: $("#queryQlert")
+
+    };
+    var FlowerJqxGrid = new GridInit(GlobeIdSet.flowerGrid, gridFieldsSet());
+    var GridColumnSet = new GridColumnsSet(GlobeIdSet.flowerGrid, FlowerJqxGrid.GridAdapter);
+    FlowerJqxGrid.set({columns: GridColumnSet.gridColumns});
     //初始化显示栏
     initjqxDropDownList();
     //截止时间/起始V时间选择通知
-    var selector = {
-        "timeSelectorStart": $('#input-daterange-start'),
-        "timeSelectorEnd": $('#input-daterange-end'),
-        "flowerNot": $("#FlowerQueryNotification"),
-        "flowerContent": $("#FlowerQueryNotificationContent"),
-        "flowerQueryDataGet": $("#FlowerQuery_dataGet")
-    };
     //初始化小时颗粒日期栏
-    var daterange_hour_begin = new Mydaterange(6, 'h', selector.timeSelectorStart);
+    var daterange_hour_begin = new Mydaterange(6, 'h', GlobeIdSet.timeStart);
     daterange_hour_begin.initTime();
-    var daterange_hour_end = new Mydaterange(0, 'h', selector.timeSelectorEnd);
+    var daterange_hour_end = new Mydaterange(0, 'h', GlobeIdSet.timeEnd);
     daterange_hour_end.initTime();
     //初始化chosen
-    $("#chosenFlowerQueryKey").chosen({width: "100%"});
+    GlobeIdSet.chosenFlowerKey.chosen({width: "100%"});
 
-    selector.flowerQueryDataGet.click( function (){
+    GlobeIdSet.flowerDataGet.click( function (){
         var option = {
             data:{
-                TimeDim: $('#timeDim').val(),
-                Mcc: $('#FlowerQueryMCC').val(),
-                Plmn : $('#FlowerQueryPlmn').val(),
-                Begintime : $('#input-daterange-start').val(),
-                Endtime: $('#input-daterange-end').val(),
-                Imsi : $('#inputimsi').val(),
-                AddKey : $('#chosenFlowerQueryKey').val()
+                TimeDim: GlobeIdSet.timeDim.val(),
+                Mcc: GlobeIdSet.mcc.val(),
+                Plmn : GlobeIdSet.plmn.val(),
+                Begintime : GlobeIdSet.timeStart.val(),
+                Endtime: GlobeIdSet.timeEnd.val(),
+                Imsi : GlobeIdSet.imsi.val(),
+                AddKey : GlobeIdSet.chosenFlowerKey.val()
             },
             id:{
-                id_JqxNotification: $("#QueryingQueryjqxNotification"),
-                id_JqxNotificationContent: $("#QueryingNotificationContent"),
-                id_Alert: $("#queryQlert"),
-                id_JqxGrid: $("#FlowerQueryjqxGrid"),
-                id_GetDataButtonAjax: $("#FlowerQuery_dataGet")
+                id_JqxNotification: GlobeIdSet.notificationSecLayer,
+                id_JqxNotificationContent: GlobeIdSet.notificationSecLayerContent,
+                id_JqxNotificationContainer: GlobeIdSet.notificationSecLayerContainer,
+                id_Alert: GlobeIdSet.alertSecLayer,
+                id_JqxGrid: GlobeIdSet.flowerGrid,
+                id_GetDataButtonAjax: GlobeIdSet.flowerDataGet
             },
             ajaxSet:{
                 type: 'POST',
                 url: $SCRIPT_ROOT + "/api/v1.0/get_FlowerQuery/"
             },
-            gridData: FlowerJqxGrid,
-            table_key: ['imsi', 'time', 'mcc', 'plmn', 'lac', 'Flower']
+            gridObj: {
+                gridObj: FlowerJqxGrid,
+                gridColObj: GridColumnSet
+            }
         };
-        getFlowerAjax(option.data, option.id, option.ajaxSet, option.table_key, option.gridData);
+        getFlowerAjax(option.data, option.id, option.ajaxSet, option.gridObj);
     });
 });
 //-----------------------------------------------------end main 函数-----------------------------------------------------

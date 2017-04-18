@@ -8,10 +8,12 @@
  *  -------FilterPanel set func-------
  *======================================================
  *JqxGrid columns FilterPanel setting;
- * @param filterPanel panel to init;
- * @param datafield : grid column datafield param;
- * @param filterGrid : jquery type of grid DOC ID;
- * @param SrcAdapter : grid SrcAdapter param ;
+ * @param filterPanel
+ * panel to init;
+ * @param datafield -grid column datafield param;
+ * @param filterGrid id html tag- jquery type of grid DOC ID;
+ * @param SrcAdapter
+    * grid SrcAdapter param ;
  *=============================================================*/
 var buildFilterPanel = function (filterPanel, datafield,filterGrid,SrcAdapter) {
     var textInput = $("<input style='margin:5px;'/>");
@@ -174,15 +176,19 @@ Mydaterange.prototype.initTime = function (set_time, set_format, if_hour) {
 /**=========================================================================================
  *
  * =========================================================================================
- * @param selector : 通知栏id属性
+ * @param selector :
     * html页面的通知栏标签ID号,用于获取通知栏位置，为初始化参数
- * @param appendContainer : 通知栏的内容显示容器id
+ * @param appendContainer :
+    * 通知栏的内容显示容器id
     *用于设置在指定位置容器中显示通知栏，为初始化参数
- * @param autoCloseDelay : 自动关闭标签延时阈值 单位：毫秒级. 默认3秒
+ * @param autoCloseDelay :
+    * 自动关闭标签延时阈值 单位：毫秒级. 默认3秒
     *
- * @param autoClose : 是否自动关闭，  数据类型bool ：true/false . 默认true
+ * @param autoClose :
+    * 是否自动关闭，  数据类型bool ：true/false . 默认true
     *
- * @param content : 通知内容， 数据类型 string: 默认：''
+ * @param content :
+    * 通知内容， 数据类型 string: 默认：''
     *
  * @constructor :
  *
@@ -214,7 +220,8 @@ Notificationbar.prototype.init = function () {
  *             notificationContent API
  *             用于设置通知内容的接口
  * =======================================================
- * @param notifi_content : 用于设置通知内容， 数据类型 string
+ * @param notifi_content :
+    * 用于设置通知内容， 数据类型 string
  * @returns {Notificationbar}
  *========================================================*/
 Notificationbar.prototype.notificationContent = function (notifi_content) {
@@ -228,32 +235,51 @@ Notificationbar.prototype.notificationContent = function (notifi_content) {
  *                用于jqxNotification设置方法接口
  * =================================================
  *
- * @param action_flag : jqxNotification 方法接口: 'closeLast':清除最近通知，'open'：打开通知
+ * @param action_flag :
+    * jqxNotification 方法接口: 'closeLast':清除最近通知，'open'：打开通知
  */
 Notificationbar.prototype.notificationAction = function (action_flag) {
     //可视化操作
     this.selector.jqxNotification(action_flag);
 };
-
-function dic_list(data, list_key) {
-    var key_item = list_key||[];
-    var rt_dic = {};
-    key_item.forEach(function (item) {
-        rt_dic[item] = data[item] === undefined ? '' : data[item];
-    });
-    return rt_dic
-}
-
 /**
  *
  * @param ajax_param
  * @constructor
  */
 function AjaxJsonFunc(ajax_param) {
-    this.ajaxParam = ajax_param;
+    this.ajaxParam = {
+        type: ajax_param.type === undefined ? 'Get' : ajax_param.type,
+        url:  ajax_param.url === undefined ? undefined : ajax_param.url,
+        postData:  ajax_param.postData === undefined ? [] : ajax_param.postData
+    };
 }
-AjaxJsonFunc.prototype.core = function (key_item, alert_id, get_bt_id, notification_obj, grid_obj, gird_id) {
-
+AjaxJsonFunc.prototype.ajaxParamCheck = function (check_item) {
+    var checkData = this.ajaxParam;
+    //  标记是否有未设置变量 有返回false
+    var ifCheck = true;
+    // 调用forEach函数对象，用于遍历设置参数是否设置
+    // 注意：对象内部用return只会退出对象函数本身并返回返回值到外部调用对象！
+    check_item.forEach(function (item) {
+        if (checkData[item] === undefined){
+            alert('Please Set Ajax Param:'+item);
+            ifCheck = false;
+        }
+    });
+    return ifCheck;
+};
+AjaxJsonFunc.prototype.core = function (ajax_option) {
+    var Option = {
+        idTag: {
+            id_Alert: ajax_option.idTag.id_Alert === undefined ? '#' : ajax_option.idTag.id_Alert,
+            id_GetDataBt: ajax_option.idTag.id_GetDataBt === undefined ? '#' : ajax_option.idTag.id_GetDataBt,
+            id_Grid: ajax_option.idTag.id_Grid === undefined ? '#' : ajax_option.idTag.id_Grid
+        },
+        objClass: {
+            objGrid: ajax_option.objClass.objGrid === undefined ? undefined : ajax_option.objClass.objGrid,
+            objNotification: ajax_option.objClass.objNotification === undefined ? undefined : ajax_option.objClass.objNotification
+        }
+    };
     $.ajax({
         type: this.ajaxParam.type,
         //get方法url地址
@@ -273,54 +299,46 @@ AjaxJsonFunc.prototype.core = function (key_item, alert_id, get_bt_id, notificat
                     appendAlertInfo(
                         'danger',
                         ['Error:', getData.info.errinfo].join(' '),
-                        alert_id);
+                        Option.idTag.id_Alert);
                 }
                 else {
                     appendAlertInfo(
                         'warning',
                         '无查询结果!',
-                        alert_id);
+                        Option.idTag.id_Alert);
                 }
             }
             else {
-                grid_obj.ClearGridData();
-                var tableData = [];
+                Option.objClass.objGrid.ClearGridData();
                 appendAlertInfo(
                     'success',
                     ['查询完成，', '结果如下：'].join(' '),
-                    alert_id);
-                getData.data.forEach(function (item) {
-                    var each_data = dic_list(item, key_item);
-                    tableData.push(each_data);
-                });//each函数完成
-                grid_obj.ResetGridData(tableData);
-                gird_id.jqxGrid('updatebounddata');
-                return grid_obj;
+                    Option.idTag.id_Alert);
+                // getData.data 为[{},{},{},...]结构的json数据，数据的key值必须同grid的datafield值相同
+                // getData.data key的值和后台导出的excel表头至一样.
+                Option.objClass.objGrid.ResetGridData(getData.data);
+                Option.idTag.id_Grid.jqxGrid('updatebounddata');
             }
         })
         .fail(function (jqXHR, status) {
             appendAlertInfo(
                 'warning',
                 ['Servers False:', jqXHR, status].join(' '),
-                alert_id);
+                Option.idTag.id_Alert);
         })
         .always(function () {
-            get_bt_id.attr("disabled", false);
-            notification_obj.notificationAction('closeLast');
+            Option.idTag.id_GetDataBt.attr("disabled", false);
+            Option.objClass.objNotification.notificationAction('closeLast');
         });
 };
-
-AjaxJsonFunc.prototype.gridDataGet = function (grid_id) {
-    
-};
-
-/**
+/**============================================================
  *
+ * ============================================================
  * @param id
  * @param datafields
  * @constructor
  */
-function GgridInit(id, datafields){
+function GridInit(id, datafields){
     this.girid_id = id;
     this.GridArrayData = [];
     this.GridSource = {
@@ -330,7 +348,7 @@ function GgridInit(id, datafields){
     };
     this.GridAdapter = new $.jqx.dataAdapter(this.GridSource);
 }
-GgridInit.prototype.set = function (set_param) {
+GridInit.prototype.set = function (set_param) {
     var gridSetParam = {
         width: (set_param.width !== undefined) ? set_param.width : '99.8%',
         height: (set_param.height !== undefined) ? set_param.height : 500,
@@ -373,9 +391,9 @@ GgridInit.prototype.set = function (set_param) {
     });
     return this;
 };
-GgridInit.prototype.ClearGridData = function () {
+GridInit.prototype.ClearGridData = function () {
     this.GridSource.localdata = [];
 };
-GgridInit.prototype.ResetGridData = function (array_data) {
+GridInit.prototype.ResetGridData = function (array_data) {
     this.GridSource.localdata = array_data;
 };

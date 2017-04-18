@@ -249,6 +249,7 @@ def getDaysFlower(imsi, Begintime, Endtime, Mcc, Plmn, FlowerKey):
     # Unix Time Make
     beginLUnix = (datetime_timestamp(flowerBegintime)) * 1000
     endLUnix = (datetime_timestamp(flowerEndtime)) * 1000
+    # print (beginLUnix,endLUnix)
     if queryPlmn and queryMcc:
             matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
                            'imsi': {'$in': list_imsi},
@@ -355,6 +356,7 @@ def getFlowers(querySort, begintime, endtime, mcc, plmn, imsi, flower_query_key,
                     return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
         else:
             try:
+                # print (queryBegintime)
                 DicData = getDaysFlower(imsi=queryImsi,
                                         Begintime=queryBegintime,
                                         Endtime=queryEndtime,

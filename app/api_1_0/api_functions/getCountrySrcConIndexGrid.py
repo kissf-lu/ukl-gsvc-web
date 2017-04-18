@@ -126,6 +126,7 @@ def qureyNcountrySrcCon(sys_str, database, country, org_name):
         "COUNT(DISTINCT (CASE WHEN ((a.`available_status` = '0') "
         "                     AND b.`next_update_time` IS NOT NULL "
         "                     AND b.`next_update_time` > DATE(NOW())) "
+        "                     AND b.`package_status` IN (0,1) "
         "                THEN a.`imsi` END)) AS 'ava_num', "
         "CAST(c.`warning_flow`/1024/1024 AS UNSIGNED) AS 'warning_flow', "
         "CAST(SUM(CASE WHEN `activate_status` = 0 "
