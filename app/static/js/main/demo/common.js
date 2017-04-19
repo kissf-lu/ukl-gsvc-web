@@ -360,19 +360,23 @@ GridInit.prototype.set = function (set_param) {
         columns:(set_param.columns !== undefined) ? set_param.columns : []
     };
     var idGrid = this.girid_id;
-    idGrid.jqxGrid({
-        width: gridSetParam.width,
-        height: gridSetParam.height,
+    this.jqxGridSet(idGrid, gridSetParam);
+    return this;
+};
+GridInit.prototype.jqxGridSet =function (grid_id, grid_set_param) {
+    grid_id.jqxGrid({
+        width: grid_set_param.width,
+        height: grid_set_param.height,
         source: this.GridAdapter,
-        filterable: true,
+        filterable: grid_set_param.filterable,
         columnsresize: true,
         enablebrowserselection: true,
         selectionmode: 'multiplerows',
         altrows: true,
         sortable: true,
         pageable: true,
-        pageSize: gridSetParam.pageSize,
-        pagesizeoptions: gridSetParam.pagesizeoptions,
+        pageSize: grid_set_param.pageSize,
+        pagesizeoptions: grid_set_param.pagesizeoptions,
         localization: getLocalization('zh-CN'),
         ready: function () {
         },
@@ -387,9 +391,8 @@ GridInit.prototype.set = function (set_param) {
             }
             else menu.height(height);
         },
-        columns: gridSetParam.columns
+        columns: grid_set_param.columns
     });
-    return this;
 };
 GridInit.prototype.ClearGridData = function () {
     this.GridSource.localdata = [];
@@ -397,3 +400,48 @@ GridInit.prototype.ClearGridData = function () {
 GridInit.prototype.ResetGridData = function (array_data) {
     this.GridSource.localdata = array_data;
 };
+
+function ChosenView(grid_id) {
+    this.gridID = grid_id;
+}
+ChosenView.prototype.GridAction = function (action_id, action_param) {
+    this.gridID.jqxGrid('beginupdate');
+    if (action_param.selected){
+        // 当选择后,在表格中显示相关输出信息
+        this.gridID.jqxGrid('showcolumn', action_param.selected);
+        // 当选择后,在DropDownList中显示相关输出信息
+        action_id.DropDownListID.jqxDropDownList('checkItem', action_param.selected);
+    }
+    if (action_param.deselected) {
+        // 当取消了选择，在Grid中隐藏输出栏显示
+        this.gridID.jqxGrid('hidecolumn', action_param.deselected);
+        // 当取消了选择，在DropDownList中隐藏输出栏显示
+        action_id.DropDownListID.jqxDropDownList('uncheckItem', action_param.deselected);
+    }
+    this.gridID.jqxGrid('endupdate');
+};
+//验证imsi格式
+function checkImsiReg(str) {
+    var stringTest = str;
+    var RegExp1 = /^([0-9]+)$/;
+    var RegExp2 = /^([0-9]+[,])*([0-9]+)$/;
+    //plmn非空时监测输入格式是否合法
+    if ((RegExp1.exec(stringTest) || (RegExp2.exec(stringTest)) ) && (str !== '')) {
+        return ((RegExp1.exec(stringTest) || (RegExp2.exec(stringTest)) ) && (str !== ''));
+    }
+    else {
+        return ((RegExp1.exec(stringTest) || (RegExp2.exec(stringTest)) ) && (str !== ''));
+    }
+}
+//验证plmn格式
+function checkplmnReg(str) {
+    var RegExp1 = /^([0-9]+)$/;  //plmn非空时监测输入格式是否合法-规则为以数组开头结尾
+    if ((RegExp1.exec(str) ) && (str !== '')) {
+        return true;
+    } else if (str === '') {
+        return (str === '');
+    }
+    else {
+        return false;
+    }
+}
