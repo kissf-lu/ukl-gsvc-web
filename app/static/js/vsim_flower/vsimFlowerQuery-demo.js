@@ -114,6 +114,7 @@ $("#FlowerQueryExcelExport").click(function () {
             if (i == pagenum * pagesize) {
                 for (var j = 0; j < pagesize; j++) {
                     if (i + j < alldatanum) {
+                        alert(rows[i + j].time);
                         view_data.push({
                             imsi: rows[i + j].imsi,
                             time: rows[i + j].time,
@@ -157,62 +158,72 @@ function excelExport(data) {
     return false;
 
 }
-//------------------------------------------chosen selected deselected Functions---
-$("#").on('change', function (evt, params) {
-    $("#FlowerQueryjqxGrid").jqxGrid('beginupdate');
-    if (params.selected) {
-        $("#FlowerQueryjqxGrid").jqxGrid('showcolumn', params.selected);//当选择后显示相关输出信息
-        $("#jqxDropDownList").jqxDropDownList('checkItem', params.selected);
-    }
-    else if (params.deselected) {
-        $("#FlowerQueryjqxGrid").jqxGrid('hidecolumn', params.deselected);//取消输出栏显示
-        $("#jqxDropDownList").jqxDropDownList('uncheckItem', params.deselected);
-    }
-    else {
-        var con = '';
-    }
-    $("#FlowerQueryjqxGrid").jqxGrid('endupdate');
-});
-
 //时间维度选择通知timeDim
-$('#timeDim').change(function () {
-    // Do something
+function TimeDimChange(param) {
+    var timeChange = {
+        days:{
+            columnsCellsFormat: 'yyyy-MM-dd',
+            dateRangeBeginTOEndGap: 15,
+            dateRangeBeginTOEndGapUnit: 'days',
+            dateRangeTimeBeginID: param.TimeBegin,
+            dateRangeBeginInitTime: {'hour':0,'minute': 0, 'second': 0},
+            dateRangeBeginFormat: "YYYY-MM-DD",
+            dateRangeBeginIfHourView: false,
+            dateRangeEndTONowGap: 0,
+            dateRangeEndTONowGapUnit: 'days',
+            dateRangeTimeEndID: param.TimeEnd,
+            dateRangeEndInitTime: {'hour':0,'minute': 0, 'second': 0},
+            dateRangeEndFormat: "YYYY-MM-DD",
+            dateRangeEndIfHourView: false
+        },
+        hours:{
+            columnsCellsFormat: 'yyyy-MM-dd HH',
+            dateRangeBeginTOEndGap: 6,
+            dateRangeBeginTOEndGapUnit: 'h',
+            dateRangeTimeBeginID: param.TimeBegin,
+            dateRangeEndTONowGap: 0,
+            dateRangeEndTONowGapUnit: 'h',
+            dateRangeTimeEndID: param.TimeEnd
+        }
+    };
     var NotificationTimeDim = new Notificationbar(
-        $("#FlowerQueryNotification"),
-        "#container",
+        param.Notification,
+        param.NotificationContainer,
         2000,
         true,
-        $("#FlowerQueryNotificationContent")
-    );
-    NotificationTimeDim.init();
-    var timeDimVar = $('#timeDim').val();
-    if (timeDimVar !== '') {
-        var html_notif = '<strong>' + '时间颗粒度设置为：' + timeDimVar + '</strong>';
-        //选择通知栏
-        NotificationTimeDim.notificationContent(html_notif);
+        param.NotificationContent
+    ).init();
+    var TimeDimVar = param.TimeDim.val();
+    var HtmlNotification = ['<strong>', '时间颗粒度设置为：', TimeDimVar, '</strong>'].join('');
+    if (TimeDimVar) {
+        NotificationTimeDim.notificationContent(HtmlNotification);
         NotificationTimeDim.notificationAction('open');
-        if (timeDimVar === 'days') {
-            $("#FlowerQueryjqxGrid").jqxGrid('setcolumnproperty', 'time', 'cellsformat', 'yyyy-MM-dd');
-            // $("#FlowerQueryjqxGrid").dateFormatSet('yyyy-MM-dd');
-            var daterange_day_begin = new Mydaterange(15, 'days', $('#input-daterange-start'));
-            daterange_day_begin.initTime({'hour':0,'minute': 0, 'second': 0},"YYYY-MM-DD", false);
-            var daterange_day_end = new Mydaterange(0, 'days', $('#input-daterange-end'));
-            daterange_day_end.initTime({'hour':0,'minute': 0, 'second': 0},"YYYY-MM-DD", false);
-        }
-        else {
-            $("#FlowerQueryjqxGrid").jqxGrid('setcolumnproperty', 'time', 'cellsformat', 'yyyy-MM-dd HH:mm:ss');
-            var daterange_hour_begin = new Mydaterange(6, 'h', $('#input-daterange-start'));
-            daterange_hour_begin.initTime();
-            var daterange_hour_end = new Mydaterange(0, 'h', $('#input-daterange-end'));
-            daterange_hour_end.initTime();
-        }
-    }
-    else {
-        var html_notif = '<strong>' + '请设置时间颗粒度！' + '</strong>';
-        NotificationTimeDim.notificationContent(html_notif);
+        param.Grid.jqxGrid('setcolumnproperty', 'time', 'cellsformat', timeChange[TimeDimVar].columnsCellsFormat);
+        var daterange_day_begin = new Mydaterange(
+            timeChange[TimeDimVar].dateRangeBeginTOEndGap,
+            timeChange[TimeDimVar].dateRangeBeginTOEndGapUnit,
+            timeChange[TimeDimVar].dateRangeTimeBeginID);
+        daterange_day_begin.initTime(
+            timeChange[TimeDimVar].dateRangeBeginInitTime,
+            timeChange[TimeDimVar].dateRangeBeginFormat,
+            timeChange[TimeDimVar].dateRangeBeginIfHourView
+        );
+        var daterange_day_end = new Mydaterange(
+            timeChange[TimeDimVar].dateRangeEndTONowGap,
+            timeChange[TimeDimVar].dateRangeEndTONowGapUnit,
+            timeChange[TimeDimVar].dateRangeTimeEndID
+        );
+        daterange_day_end.initTime(
+            timeChange[TimeDimVar].dateRangeEndInitTime,
+            timeChange[TimeDimVar].dateRangeEndFormat,
+            timeChange[TimeDimVar].dateRangeEndIfHourView
+        );
+    } else {
+        HtmlNotification = ['<strong>', '请设置时间颗粒度！', '</strong>'].join('');
+        NotificationTimeDim.notificationContent(HtmlNotification);
         NotificationTimeDim.notificationAction('open');
     }
-});
+}
 
 function getFlowerAjax(option_data, option_id, ajax_set, grid_obj) {
     var momentBegin = moment(option_data.Begintime, "YYYY-MM-DD HH:mm:ss");
@@ -257,7 +268,6 @@ function getFlowerAjax(option_data, option_id, ajax_set, grid_obj) {
     else if (option_data.Begintime === "") {
         alert_str = ['请选择要查询的起始时间!', '完成输入！'].join(' ');
         appendAlertInfo(alertClass, alert_str, option_id.id_Alert);
-
     }
     else if (option_data.Endtime === "") {
         alert_str = ['请选择要查询的截止时间!', '完成输入！'].join(' ');
@@ -315,10 +325,11 @@ function getFlowerAjax(option_data, option_id, ajax_set, grid_obj) {
                     }
                     QueryjqxNotification.notificationContent(notifi_content);
                     QueryjqxNotification.notificationAction('open');
-                    //做表格数据清空操作
+                    // 做表格数据清空操作
                     option_id.id_JqxGrid.jqxGrid("clear");
-                    //禁用查询按钮,防止多次点击，造成重复查询
+                    // 禁用查询按钮,防止多次点击，造成重复查询
                     option_id.id_GetDataButtonAjax.attr("disabled", true);
+                    option_id.id_JqxGrid.jqxGrid("showloadelement");
                     ajaxRT.core({idTag:ajaxOption.idTag, objClass: ajaxOption.objClass});
                 }
             }
@@ -335,17 +346,18 @@ $(function () {
         timeDim: $('#timeDim'),
         timeStart:  $('#input-daterange-start'),
         timeEnd: $('#input-daterange-end'),
-        notificationSecLayer: $("#FlowerQueryNotification"),
-        notificationSecLayerContent: $("#FlowerQueryNotificationContent"),
-        notificationSecLayerContainer: ("#Querycontainer"),
+        notificationFirLayer: $("#FlowerNotification"),
+        notificationFirLayerContent: $("#FlowerNotificationContent"),
+        notificationFirLayerContainer: ("#NotificationContainerFirst"),
+        notificationSecLayer: $("#QueryingQueryjqxNotification"),
+        notificationSecLayerContent: $("#QueryingNotificationContent"),
+        notificationSecLayerContainer: ("#QuerycontainerSecond"),
         chosenFlowerKey: $("#chosenFlowerQueryKey"),
         mcc: $('#FlowerQueryMCC'),
         plmn: $('#FlowerQueryPlmn'),
         imsi: $('#inputimsi'),
         alertSecLayer: $("#queryQlert"),
         dropDownList: $("#jqxDropDownList")
-
-
     };
     GlobeIdSet.chosenFlowerKey.on('change', function (evt, params) {
         var ChosenAction = new ChosenView(GlobeIdSet.flowerGrid);
@@ -365,8 +377,21 @@ $(function () {
     daterange_hour_begin.initTime();
     var daterange_hour_end = new Mydaterange(0, 'h', GlobeIdSet.timeEnd);
     daterange_hour_end.initTime();
-    //初始化chosen
+    // 初始化chosen
     GlobeIdSet.chosenFlowerKey.chosen({width: "100%"});
+    GlobeIdSet.timeDim.change(function () {
+        var Param = {
+            Grid: GlobeIdSet.flowerGrid,
+            Notification: GlobeIdSet.notificationFirLayer,
+            NotificationContent: GlobeIdSet.notificationFirLayerContent,
+            NotificationContainer: GlobeIdSet.notificationFirLayerContainer,
+            TimeDim: GlobeIdSet.timeDim,
+            TimeBegin: GlobeIdSet.timeStart,
+            TimeEnd: GlobeIdSet.timeEnd
+        };
+        TimeDimChange(Param);
+    });
+    // ajax 函数
     GlobeIdSet.flowerDataGet.click( function (){
         var option = {
             data:{
@@ -397,5 +422,7 @@ $(function () {
         };
         getFlowerAjax(option.data, option.id, option.ajaxSet, option.gridObj);
     });
+    // tooltip init
+    $('[data-toggle="tooltip"]').tooltip();
 });
 //-----------------------------------------------------end main 函数-----------------------------------------------------
