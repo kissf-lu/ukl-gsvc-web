@@ -32,7 +32,7 @@ def timestamp_datetime(value):
     format1 = '%Y-%m-%d %H:%M:%S'
     format2 = '%Y-%m-%d'
     # value为传入的值为时间戳(整形)，如：1332888820
-    structFormate = time.localtime(value)
+    structFormate = time.gmtime(value)
     # 经过localtime转换后变成结构型时间
     # 最后再经过strftime函数转换为字符型正常日期格式。
     try:
@@ -160,8 +160,8 @@ def getHoursFlower(imsi, Begintime, Endtime, Mcc, Plmn, FlowerKey):
 
     # Match Stages Set
     # Unix Time Make
-    beginLUnix = (datetime_timestamp(flowerBegintime)) * 1000
-    endLUnix = (datetime_timestamp(flowerEndtime)) * 1000
+    beginLUnix = int(flowerBegintime)*1000  # (datetime_timestamp(flowerBegintime)) * 1000
+    endLUnix = int(flowerEndtime)*1000      # (datetime_timestamp(flowerEndtime)) * 1000
     matchStages = {}
     if queryPlmn and queryMcc:
             matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
@@ -247,9 +247,8 @@ def getDaysFlower(imsi, Begintime, Endtime, Mcc, Plmn, FlowerKey):
 
     # Match Stages Set---------------------------------------------------
     # Unix Time Make
-    beginLUnix = (datetime_timestamp(flowerBegintime)) * 1000
-    endLUnix = (datetime_timestamp(flowerEndtime)) * 1000
-    # print (beginLUnix,endLUnix)
+    beginLUnix = int(flowerBegintime)*1000   # (datetime_timestamp(flowerBegintime)) * 1000
+    endLUnix = int(flowerEndtime)*1000       # (datetime_timestamp(flowerEndtime)) * 1000
     if queryPlmn and queryMcc:
             matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
                            'imsi': {'$in': list_imsi},
@@ -320,8 +319,8 @@ def getFlowers(querySort, begintime, endtime, mcc, plmn, imsi, flower_query_key,
     queryFlowerKey = flower_query_key
     queryTimezoneOffset = int(TimezoneOffset)
     # 部署服务器是时间为GMT0时间
-    queryGMTOBeginTime = getGMT0StrTime(strTime=queryBegintime, offSet=queryTimezoneOffset)
-    queryGMTOEndTime = getGMT0StrTime(strTime=queryEndtime, offSet=queryTimezoneOffset)
+    # queryGMTOBeginTime = getGMT0StrTime(strTime=queryBegintime, offSet=queryTimezoneOffset)
+    # queryGMTOEndTime = getGMT0StrTime(strTime=queryEndtime, offSet=queryTimezoneOffset)
     errInfo = ''
     DicData = []
     if (not querysort) or (not queryImsi) or (not queryBegintime) or (not queryEndtime):
@@ -356,7 +355,6 @@ def getFlowers(querySort, begintime, endtime, mcc, plmn, imsi, flower_query_key,
                     return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
         else:
             try:
-                # print (queryBegintime)
                 DicData = getDaysFlower(imsi=queryImsi,
                                         Begintime=queryBegintime,
                                         Endtime=queryEndtime,

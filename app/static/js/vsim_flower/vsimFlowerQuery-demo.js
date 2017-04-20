@@ -114,21 +114,18 @@ $("#FlowerQueryExcelExport").click(function () {
             if (i == pagenum * pagesize) {
                 for (var j = 0; j < pagesize; j++) {
                     if (i + j < alldatanum) {
-                        alert(rows[i + j].time);
                         view_data.push({
                             imsi: rows[i + j].imsi,
-                            time: rows[i + j].time,
+                            time: new MomentTime(rows[i + j].time).getAddUTCTime(),    // UTC时间协调
                             mcc: rows[i + j].mcc,
                             plmn: rows[i + j].plmn,
                             lac: rows[i + j].lac,
                             Flower: rows[i + j].Flower
                         })
                     }
-
                 }
             }
         }
-        //$("#FlowerQueryjqxGrid").jqxGrid('exportdata', 'xls', 'FlowerQueryExcelExport', true, view_data);
         excelExport(json_data);
     }
     return false;
@@ -253,8 +250,8 @@ function getFlowerAjax(option_data, option_id, ajax_set, grid_obj) {
     var alertClass = 'warning';
     var queryPost = {
         querySort: option_data.TimeDim,
-        begintime: option_data.Begintime,
-        endtime: option_data.Endtime,
+        begintime: new UnixTime(option_data.Begintime).getUCTUnix(),
+        endtime: new UnixTime(option_data.Endtime).getUCTUnix(),
         mcc: option_data.Mcc,
         plmn: option_data.Plmn,
         imsi: option_data.Imsi,
@@ -371,11 +368,10 @@ $(function () {
     FlowerJqxGrid.set({columns: GridColumnSet.gridColumns});
     //初始化显示栏
     initjqxDropDownList();
-    //截止时间/起始V时间选择通知
     //初始化小时颗粒日期栏
-    var daterange_hour_begin = new Mydaterange(6, 'h', GlobeIdSet.timeStart);
+    var daterange_hour_begin = new Mydaterange(6, 'h', GlobeIdSet.timeStart).UTCTime();
     daterange_hour_begin.initTime();
-    var daterange_hour_end = new Mydaterange(0, 'h', GlobeIdSet.timeEnd);
+    var daterange_hour_end = new Mydaterange(0, 'h', GlobeIdSet.timeEnd).UTCTime();
     daterange_hour_end.initTime();
     // 初始化chosen
     GlobeIdSet.chosenFlowerKey.chosen({width: "100%"});
@@ -391,8 +387,10 @@ $(function () {
         };
         TimeDimChange(Param);
     });
-    // ajax 函数
+    // ajax 函数 .add(moment().utcOffset(),'m').unix()
+
     GlobeIdSet.flowerDataGet.click( function (){
+        //alert(moment(GlobeIdSet.timeStart.val()).add(moment().utcOffset(),'m').unix());
         var option = {
             data:{
                 TimeDim: GlobeIdSet.timeDim.val(),

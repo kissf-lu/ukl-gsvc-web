@@ -380,6 +380,7 @@ def getProbFisrtDic(querySort, queryPram, queryPlmn, begintime, endtime, Timezon
                                                         begintime=queryGMTOBeginTime,
                                                         endtime=queryGMTOEndTime,
                                                         DispatchThreshold=queyDispatchThreshold)
+                print (queryGMTOBeginTime, queryGMTOEndTime, len(DicData))
             except ValueError:
                 errInfo = "NDatabase input Date Time ValueError"  # 'Database Error!'
             except pymongo.errors.OperationFailure:

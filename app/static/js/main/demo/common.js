@@ -142,7 +142,9 @@ function appendAlertInfo(alert_type, info_str, alert_id){
  * @constructor initTime() 初始化函数,
  *====================================================*/
 function Mydaterange(number, time_type, timeSelector){
-    this.begintime = moment().subtract(number, time_type);
+    this.number = number;
+    this.timeType = time_type;
+    this.TimeSet = moment().subtract(this.number, this.timeType);
     this.timeSelector = timeSelector;
 }
 /**
@@ -162,7 +164,7 @@ Mydaterange.prototype.initTime = function (set_time, set_format, if_hour) {
         timePicker: time_picker,
         timePicker24Hour: true,
         singleDatePicker: true,
-        startDate: this.begintime.set(set_time||{'minute': 0, 'second': 0}),
+        startDate: this.TimeSet.set(set_time||{'minute': 0, 'second': 0}),
         locale: {
         format: set_format||"YYYY-MM-DD HH:mm:ss",
         applyLabel: "确定",
@@ -172,6 +174,10 @@ Mydaterange.prototype.initTime = function (set_time, set_format, if_hour) {
         firstDay: 1
     }
     });
+};
+Mydaterange.prototype.UTCTime = function () {
+    this.TimeSet = moment().utc().subtract(this.number, this.timeType);
+    return this;
 };
 /**=========================================================================================
  *
@@ -327,6 +333,7 @@ AjaxJsonFunc.prototype.core = function (ajax_option) {
                 Option.idTag.id_Alert);
         })
         .always(function () {
+            Option.idTag.id_Grid.jqxGrid('hideloadelement');
             Option.idTag.id_GetDataBt.attr("disabled", false);
             Option.objClass.objNotification.notificationAction('closeLast');
         });
@@ -445,3 +452,64 @@ function checkplmnReg(str) {
         return false;
     }
 }
+/**===========================================
+ *
+ * ===========================================
+ * @param str_time
+ * @constructor
+ *============================================*/
+function UnixTime(str_time) {
+    this.strTime = str_time;
+}
+/**=====================
+ * 返回strTime对应的时间戳
+ * =====================
+ * @returns {*}
+ *============================================*/
+UnixTime.prototype.getLocalUnix = function () {
+    return moment(this.strTime).unix();
+};
+/**==========================
+ *
+ * ==========================
+ * @returns {undefined}
+ *  返回strTimeUTC时间对应的时间戳：
+ * 此处strTime为UTC时间字符，add 函数自动增量添加时区分钟值，在调用unix函数返回对应的unix时间戳
+ * ===================================================================================
+ *====================================================================================*/
+UnixTime.prototype.getUCTUnix = function () {
+    return this.strTime === undefined ? undefined : moment(this.strTime).add(moment().utcOffset(),'m').unix();
+};
+/**============================================
+ *         StringTime Structure API
+ *
+ * ============================================
+ *
+ * @param str_time
+ * @constructor
+ *=============================================*/
+function MomentTime(date_time) {
+    this.dateTime = date_time;
+}
+/**===========================================================================
+ *            getAddUTCString func
+ *            实现字符串时间/标准时间数据自动增加时区值
+ *            目的是使后台获取原始时间值（前端返回到后台的时间会自动归算为UTC0时间）
+ * ============================================================================
+ * @returns {undefined}
+ * 返回undefined值时，js 会忽略该key，实现返回后台数据不包含undefined数据对应的key
+ * 返回数非undefined时， js 会将该值作为有效值返回后台
+ *============================================================================*/
+MomentTime.prototype.getAddUTCTime = function () {
+    // 使后台获取的时间字符串为前端所见字符串
+    return this.dateTime === undefined ? undefined : moment(this.dateTime).add(moment().utcOffset(), 'm');
+};
+/**=======================================
+ *
+ * ========================================
+ * @returns {undefined}
+ *=========================================*/
+MomentTime.prototype.getSubUTCTime = function () {
+    // 使后台获取的时间字符串为前端所见字符串
+    return this.dateTime === undefined ? undefined : moment(this.dateTime).subtract(moment().utcOffset(), 'm');
+};

@@ -12,7 +12,6 @@
     :copyright: (c) 2015 by Armin kissf lu.
     :license: ukl, see LICENSE for more details.
 """
-import datetime as dt
 from datetime import datetime
 
 
@@ -283,7 +282,6 @@ def get_excelFlowerDataAndSorted(dic_data):
                unicode('plmn'),
                unicode('lac'),
                unicode('Flower')]
-
     dateTimeKey = [unicode('time')]
     sorted_list_data = getListExcelData(dic_data=dicData,
                                         sort_key=sortKey,

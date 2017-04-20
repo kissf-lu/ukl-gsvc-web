@@ -523,8 +523,8 @@ $(function () {
         var BeginTime = globeVar140country.ID.dateRangeStartID.val();
         var TimezoneOffset = moment().utcOffset();
         var postData = {
-            beginTime: BeginTime,
-            endTime: EndTime,
+            beginTime: new UnixTime(BeginTime).getLocalUnix(),
+            endTime: new UnixTime(EndTime).getLocalUnix(),
             TimezoneOffset: TimezoneOffset
         };
         action140StaticAjaxAPI(

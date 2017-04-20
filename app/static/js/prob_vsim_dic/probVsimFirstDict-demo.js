@@ -475,6 +475,7 @@ $("#ProbDic_dataGet").click(function () {
                                 idItem.queryAlert);
                         })
                         .always(function () {
+                            idItem.grid.jqxGrid('hideloadelement');
                             ProQueryjqxNotification.notificationAction('closeLast');
                             idItem.queryBt.attr("disabled", false);
                         });

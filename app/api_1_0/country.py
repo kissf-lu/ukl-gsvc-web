@@ -131,7 +131,7 @@ def get_countryProbVsimDic():
         TimezoneOffset = int(Dic_data['TimezoneOffset'])
         DispatchThreshold = int(Dic_data['DispatchThreshold'])
         FlowerThreshold = int(Dic_data['FlowerThreshold'])
-
+        # print begintime, endtime
         return getProbFisrtDic(querySort=querySort,
                                queryPram=queryPram,
                                queryPlmn=queryPlmn,
