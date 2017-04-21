@@ -226,6 +226,7 @@ def get_excelCountrySrcStaticDataAndSorted(dic_data):
                unicode('归属机构'),
                unicode('在架卡数'),
                unicode('可用卡数'),
+               unicode('停用卡数'),
                unicode('流量不足卡数'),
                unicode('未激活卡数'),
                unicode('流量预警阀值_MB'),

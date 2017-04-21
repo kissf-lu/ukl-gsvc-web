@@ -166,7 +166,7 @@ Mydaterange.prototype.initTime = function (set_time, set_format, if_hour) {
         singleDatePicker: true,
         startDate: this.TimeSet.set(set_time||{'minute': 0, 'second': 0}),
         locale: {
-        format: set_format||"YYYY-MM-DD HH:mm:ss",
+        format: set_format||"YYYY-MM-DD HH:mm:ss",    // "YYYY-MM-DD HH:mm:ss"
         applyLabel: "确定",
         cancelLabel: "取消",
         daysOfWeek: ["周日","周一","周二","周三","周四","周五","周六"],
@@ -485,7 +485,7 @@ UnixTime.prototype.getUCTUnix = function () {
  *
  * ============================================
  *
- * @param str_time
+ * @param date_time
  * @constructor
  *=============================================*/
 function MomentTime(date_time) {
@@ -513,3 +513,4 @@ MomentTime.prototype.getSubUTCTime = function () {
     // 使后台获取的时间字符串为前端所见字符串
     return this.dateTime === undefined ? undefined : moment(this.dateTime).subtract(moment().utcOffset(), 'm');
 };
+
