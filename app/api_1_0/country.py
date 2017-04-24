@@ -98,18 +98,27 @@ def get_mutiLine_maxUser():
         return getindexHtmlMutiLineData(country, begintime, endtime, butype=butype, timedim=timedim)
 
 
-@api.route('/get_countrySrcCon/', methods=['POST'])
+@api.route('/get_countrySrcCon/', methods=['GET', 'POST'])
 def get_countrySrcCon():
     """
     本API为主页国家概述面板获取国家不同套餐卡状态统计数据接口
     :return:
     """
+    #print request.args.get('country', 'ad', type=str)
     if request.method == 'POST':
         DicData = request.get_json()
         country = str(DicData['country'])
         orgName = str(DicData['org'])
+        vsimType= str(DicData['vsim_type'])
 
-        return qurycountrySrcCon(country, orgName)
+        return qurycountrySrcCon(country, orgName, vsimType)
+
+    if request.method == 'GET':
+        country = request.args.get('country', 'ad', type=str)
+        orgName = request.args.get('org', 'gtbu', type=str)
+        vsimType = request.args.get('vsim_type', '', type=str)
+
+        return qurycountrySrcCon(country, orgName, vsimType)
 
     return False
 

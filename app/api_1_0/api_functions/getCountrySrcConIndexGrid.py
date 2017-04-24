@@ -58,20 +58,23 @@ def mergeDataFunc(sourData, mergeData, mergekey, mergeindex):
     return sourData
 
 
-def qureyNcountrySrcCon(sys_str, database, country, org_name):
+def qureyNcountrySrcCon(sys_str, database, country, org_name, vsim_type):
     """
-
-    :param sys_str:
-    :param database:
-    :param country:
-    :param org_name:
-    :return:
+    
+    :param sys_str: 
+    :param database: 
+    :param country: 
+    :param org_name: 
+    :param vsim_type: 
+    :return: 
     """
 
     Country = country
     OrgName = org_name
+    VsimType = vsim_type
     countrySet = ''
     orgNameSet = ''
+    VsimTypSet = ''
     errInfo = ''
     qurey_result = []
     if Country:
@@ -81,6 +84,8 @@ def qureyNcountrySrcCon(sys_str, database, country, org_name):
             orgNameSet = " "
         else:
             orgNameSet = "AND e.`org_name` = '" + OrgName + "' "
+    if VsimType:
+        VsimTypSet = "AND a.`vsim_type` = '" + VsimType + "' "
     query_str = (
         "(SELECT "
         "a.`iso2`              AS 'Country', "
@@ -125,8 +130,7 @@ def qureyNcountrySrcCon(sys_str, database, country, org_name):
         "LEFT  JOIN `t_css_group`         AS e  ON a.`group_id`= e.`id` "
         "LEFT  JOIN `t_css_package_type`  AS c  ON c.`id` = b.`package_type_id` "
         "WHERE   a.`bam_status` = '0' "
-        "        AND a.`slot_status` = '0'  " + countrySet + orgNameSet + " "
-        "        AND a.`vsim_type`='0'"
+        "        AND a.`slot_status` = '0'  " + countrySet + orgNameSet + VsimTypSet + " "
         "        AND b.`package_type_name` IS NOT NULL "
         "        AND b.`init_flow` is not null "
         "GROUP BY a.`iso2`,e.`org_name` "
@@ -176,8 +180,7 @@ def qureyNcountrySrcCon(sys_str, database, country, org_name):
         "LEFT  JOIN `t_css_group`         AS e  ON a.`group_id`= e.`id` "
         "LEFT  JOIN `t_css_package_type`  AS c  ON c.`id` = b.`package_type_id` "
         "WHERE   a.`bam_status` = '0' "
-        "        AND a.`slot_status` = '0'  " + countrySet + orgNameSet + " "
-        "        AND a.`vsim_type`='0'"
+        "        AND a.`slot_status` = '0'  " + countrySet + orgNameSet + VsimTypSet + " "
         "        AND b.`package_type_name` IS NOT NULL "
         "        AND b.`init_flow` is not null "
         "GROUP BY a.`iso2`,b.`package_type_name`,DATE_FORMAT(b.`next_update_time`,'%Y-%m-%d %H'), e.`org_name` "
@@ -216,7 +219,7 @@ def qureyNcountrySrcCon(sys_str, database, country, org_name):
             return DicResults
 
 
-def qurycountrySrcCon(country, org_name):
+def qurycountrySrcCon(country, org_name, vsim_type):
     """
 
     :param country:
@@ -228,6 +231,7 @@ def qurycountrySrcCon(country, org_name):
     N_countrySrcCon = qureyNcountrySrcCon('config_N',
                                           'glocalme_css',
                                           country,
-                                          org_name)
+                                          org_name,
+                                          vsim_type)
 
     return json.dumps(N_countrySrcCon, sort_keys=True, indent=4, default=json_util.default)

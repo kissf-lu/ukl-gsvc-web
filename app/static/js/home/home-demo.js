@@ -210,13 +210,13 @@ function countrySrcConAjaxApi(options_param) {
     //disable query button
     options_param.getDataBtID.attr("disabled", true);
     var AjaxRequest = $.ajax({
-        type: "POST",
+        type: "GET",
         //get方法url地址
         url: $SCRIPT_ROOT + "/api/v1.0/get_countrySrcCon/",
         //request set
         contentType: "application/json",
         //data参数
-        data: JSON.stringify(queryPost),
+        data: queryPost,                                          // POST 推送json 方法JSON.stringify(queryPost),
         //server back data type
         dataType: "json"
     })
@@ -701,7 +701,7 @@ function initSelectView(select_class){
     // select buType views
     initSelect(select_class.timeDim, {data: timedim_data}, {placeholder: "时间维度", allowClear: true});
     // select vsim type views
-    initSelect(select_class.vsimType, {data: vsim_type_data}, {placeholder: "本国卡", allowClear: true});
+    initSelect(select_class.vsimType, {data: vsim_type_data}, {placeholder: "多国/本国", allowClear: true});
 }
 /**================================
  *  -------初始化显示选择函数
@@ -774,10 +774,11 @@ $(function () {
             orgSelectClass: $('.form-org'),
             buSelectClass: $('.form-butype'),
             timeDimClass: $('.form-timedim'),
-            vsimType: $('.form-vsim-type'),
+            vsimTypeClass: $('.form-vsim-type'),
             grid:{
                 countryStatic: $('#countrySrcConSelect'),
                 orgStatic: $('#OrgSelect'),
+                vsimType: $('#VsimType'),
                 gridID: $('#con-countrySRC-jqxgrid'),
                 dropDownListID: $('#jqxDropDownList'),
                 getGridDataID: $('#countrySrcCondataGet'),
@@ -824,7 +825,7 @@ $(function () {
         org: VarGsvcHome.item.orgSelectClass,
         buType: VarGsvcHome.item.buSelectClass,
         timeDim: VarGsvcHome.item.timeDimClass,
-        vsimType: VarGsvcHome.item.vsimType
+        vsimType: VarGsvcHome.item.vsimTypeClass
     };
     // 初始化 select
     initSelectView(selectClass);
@@ -847,7 +848,9 @@ $(function () {
             },
             postData:{
                 country: VarGsvcHome.item.grid.countryStatic.val(),
-                org: VarGsvcHome.item.grid.orgStatic.val()
+                org: VarGsvcHome.item.grid.orgStatic.val(),
+                vsim_type: VarGsvcHome.item.grid.vsimType.val() === '' ? '' :
+                    (VarGsvcHome.item.grid.vsimType.val() === '本国卡' ? '0' : '1')
             },
             queryAlert:{
                 alertID: VarGsvcHome.item.grid.alertID,
