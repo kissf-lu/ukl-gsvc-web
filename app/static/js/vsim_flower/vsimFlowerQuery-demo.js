@@ -310,7 +310,7 @@ function getFlowerAjax(option_data, option_id, ajax_set, grid_obj) {
                         objNotification: QueryjqxNotification
                     }
                 };
-                var ajaxRT = new AjaxPOSTGridFunc(ajaxOption.ajaxParam);
+                var ajaxRT = new AjaxFunc(ajaxOption.ajaxParam);
                 var checkIf = ajaxRT.ajaxParamCheck(['url']);
                 if(!(checkIf)){
                     QueryjqxNotification.notificationAction('closeLast');
@@ -327,7 +327,7 @@ function getFlowerAjax(option_data, option_id, ajax_set, grid_obj) {
                     // 禁用查询按钮,防止多次点击，造成重复查询
                     option_id.id_GetDataButtonAjax.attr("disabled", true);
                     option_id.id_JqxGrid.jqxGrid("showloadelement");
-                    ajaxRT.core({idTag:ajaxOption.idTag, objClass: ajaxOption.objClass});
+                    ajaxRT.GridPostAjax({idTag:ajaxOption.idTag, objClass: ajaxOption.objClass});
                 }
             }
         }

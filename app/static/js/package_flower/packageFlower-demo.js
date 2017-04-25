@@ -7,9 +7,47 @@ function getPackageInfoAjax(option_data, option_id, ajax_set) {
 
     var country = option_data.Country;
     var packageTypeName = option_data.PackageTypeName;
-    alert('进入套餐查询'+country+packageTypeName);
+    var alertClass = 'warning';
 
-
+    if (!country){
+        alert_str = ['查询国家未设置，', '请选择需要查询的国家！'].join(' ');
+        appendAlertInfo(alertClass, alert_str, option_id.Warn);
+    } else if(!packageTypeName){
+        alert_str = ['查询套餐未设置，', '请选输入要查询的套餐名！'].join(' ');
+        appendAlertInfo(alertClass, alert_str, option_id.Warn);
+    } else {
+        var Notification = new Notificationbar(
+            option_id.Notification,
+            option_id.NotificationContainer,
+            3000,
+            false,
+            option_id.NotificationContent
+        );
+        //
+        Notification.init();
+        //隐藏上次通知
+        Notification.notificationAction('closeLast');
+        var ajaxOption = {
+            ajaxParam: {
+                type: ajax_set.type,
+                url: ajax_set.url,
+                postData: ajax_set.data
+            },
+            idTag: {
+                id_Alert: option_id.Warn,
+                id_GetDataBt: option_id.DataGetButtonAjax
+            },
+            objClass: {
+                objNotification: Notification
+            }
+        };
+        var packageInfoAjax = new AjaxFunc(ajaxOption.ajaxParam);
+        var notifi_content = ['<strong>', '查询信息：', country, '。  数据获取中......', '</strong>'].join('');
+        Notification.notificationContent(notifi_content);
+        Notification.notificationAction('open');
+        packageInfoAjax.GetAjax({idTag: ajaxOption.idTag, objClass: ajaxOption.objClass});
+    }
+    return false;
 }
 //main-初始化主程序
 $(function () {
@@ -25,7 +63,7 @@ $(function () {
             orgSelectID: $("#id-select-org"),
             simTypeSelectID: $("#id-select-sim-type"),
             packageTypeNameInputID: $("#id-package-type-name"),
-            warnFirLayerID: $("#fir-layer-warn"),
+            warnFirLayerID: $("#id-warn-fir-layer"),
             notificationFirID: $("#id-notification-fir"),
             notificationContentFirID: $("#id-notification-content-fir"),
             notificationContainerFirID: $("#id-notification-container-fir")
@@ -57,8 +95,6 @@ $(function () {
         var option = {
             data:{
                 Country: globParam.id.countrySelectID.val(),
-                Org: globParam.id.orgSelectID.val(),
-                SimType : globParam.id.simTypeSelectID.val(),
                 PackageTypeName : globParam.id.packageTypeNameInputID.val()
             },
             id:{
@@ -71,7 +107,13 @@ $(function () {
             ajaxSet:{
                 type: 'GET',
                 url: $SCRIPT_ROOT + "/api/v1.0/get_package_flower/",
-                data: this.data
+                data: {
+                    Country: globParam.id.countrySelectID.val(),
+                    Org: globParam.id.orgSelectID.val(),
+                    SimType : globParam.id.simTypeSelectID.val() ?
+                        ((globParam.id.simTypeSelectID.val() === '本国卡') ? '0' : '1') : '',
+                    PackageTypeName : globParam.id.packageTypeNameInputID.val()
+                }
             }
         };
         getPackageInfoAjax(option.data, option.id, option.ajaxSet);

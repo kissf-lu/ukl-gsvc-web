@@ -253,14 +253,14 @@ Notificationbar.prototype.notificationAction = function (action_flag) {
  * @param ajax_param
  * @constructor
  */
-function AjaxPOSTGridFunc(ajax_param) {
+function AjaxFunc(ajax_param) {
     this.ajaxParam = {
         type: ajax_param.type === undefined ? 'Get' : ajax_param.type,
         url:  ajax_param.url === undefined ? undefined : ajax_param.url,
         postData:  ajax_param.postData === undefined ? [] : ajax_param.postData
     };
 }
-AjaxPOSTGridFunc.prototype.ajaxParamCheck = function (check_item) {
+AjaxFunc.prototype.ajaxParamCheck = function (check_item) {
     var checkData = this.ajaxParam;
     //  标记是否有未设置变量 有返回false
     var ifCheck = true;
@@ -274,7 +274,8 @@ AjaxPOSTGridFunc.prototype.ajaxParamCheck = function (check_item) {
     });
     return ifCheck;
 };
-AjaxPOSTGridFunc.prototype.core = function (ajax_option) {
+AjaxFunc.prototype.GridPostAjax = function (ajax_option) {
+    this.ajaxParam.type='POST';
     var Option = {
         idTag: {
             id_Alert: ajax_option.idTag.id_Alert === undefined ? '#' : ajax_option.idTag.id_Alert,
@@ -334,6 +335,66 @@ AjaxPOSTGridFunc.prototype.core = function (ajax_option) {
         })
         .always(function () {
             Option.idTag.id_Grid.jqxGrid('hideloadelement');
+            Option.idTag.id_GetDataBt.attr("disabled", false);
+            Option.objClass.objNotification.notificationAction('closeLast');
+        });
+};
+AjaxFunc.prototype.GetAjax = function (ajax_option) {
+    this.ajaxParam.type='GET';
+    var Option = {
+        idTag: {
+            id_Alert: ajax_option.idTag.id_Alert === undefined ? '#' : ajax_option.idTag.id_Alert,
+            id_GetDataBt: ajax_option.idTag.id_GetDataBt === undefined ? '#' : ajax_option.idTag.id_GetDataBt
+        },
+        objClass: {
+            objNotification: ajax_option.objClass.objNotification === undefined ? undefined : ajax_option.objClass.objNotification
+        }
+    };
+    $.ajax({
+        type: this.ajaxParam.type,
+        //get方法url地址
+        url: this.ajaxParam.url,
+        //request set
+        contentType: "application/json",
+        //data参数
+        data: this.ajaxParam.postData,
+        //server back data type
+        dataType: "json"
+    })
+        .done(function (data) {
+            var getData = data;
+            if (getData.data.length === 0) {
+                if (getData.info.err) {
+                    //delete old alter
+                    appendAlertInfo(
+                        'danger',
+                        ['Error:', getData.info.errinfo].join(' '),
+                        Option.idTag.id_Alert);
+                }
+                else {
+                    appendAlertInfo(
+                        'warning',
+                        '无查询结果!',
+                        Option.idTag.id_Alert);
+                }
+            }
+            else {
+                appendAlertInfo(
+                    'success',
+                    ['查询完成，', '结果如下：'].join(' '),
+                    Option.idTag.id_Alert);
+                // getData.data 为[{},{},{},...]结构的json数据，数据的key值必须同grid的datafield值相同
+                // getData.data key的值和后台导出的excel表头值一样.
+                return getData.data;
+            }
+        })
+        .fail(function (jqXHR, status) {
+            appendAlertInfo(
+                'warning',
+                ['Servers False', '!'].join(' '),
+                Option.idTag.id_Alert);
+        })
+        .always(function () {
             Option.idTag.id_GetDataBt.attr("disabled", false);
             Option.objClass.objNotification.notificationAction('closeLast');
         });

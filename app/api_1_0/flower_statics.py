@@ -45,7 +45,15 @@ def get_package_flower():
     :return:
     """
     if request.method == 'GET':
-        country = request.args.get('country', 'ae', type=str)
-        orgName = request.args.get('org', 'gtbu', type=str)
-        vsimType = request.args.get('vsim_type', '0', type=str)
-        packageTypeName = request.args.get('package_type_name', '', type=str)
+        country = request.args.get('Country', 'ae', type=str)
+        orgName = request.args.get('Org', 'gtbu', type=str)
+        vsimType = request.args.get('SimType', '0', type=str)
+        packageTypeName = request.args.get('PackageTypeName', '', type=str)
+
+        errinfo = '前端后端API测试： get args ->' + country + '-' + orgName + '-' + vsimType + '-' + packageTypeName
+        dic_data = []
+        dic_results = {'info': {'err': True, 'errinfo': errinfo}, 'data': dic_data}
+
+        return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
+
+    return False
