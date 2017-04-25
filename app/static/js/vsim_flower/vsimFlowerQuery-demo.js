@@ -310,7 +310,7 @@ function getFlowerAjax(option_data, option_id, ajax_set, grid_obj) {
                         objNotification: QueryjqxNotification
                     }
                 };
-                var ajaxRT = new AjaxJsonFunc(ajaxOption.ajaxParam);
+                var ajaxRT = new AjaxPOSTGridFunc(ajaxOption.ajaxParam);
                 var checkIf = ajaxRT.ajaxParamCheck(['url']);
                 if(!(checkIf)){
                     QueryjqxNotification.notificationAction('closeLast');
@@ -387,8 +387,6 @@ $(function () {
         };
         TimeDimChange(Param);
     });
-    // ajax 函数 .add(moment().utcOffset(),'m').unix()
-
     GlobeIdSet.flowerDataGet.click( function (){
         //alert(moment(GlobeIdSet.timeStart.val()).add(moment().utcOffset(),'m').unix());
         var option = {

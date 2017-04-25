@@ -102,7 +102,7 @@ Select2FuncBase.prototype.init = function () {
 Select2FuncBase.prototype.set = function (placeholder_str, if_allow_clear) {
     this.selectClass.select2({
         placeholder: placeholder_str||' ',
-        allowClear: if_allow_clear||true
+        allowClear: if_allow_clear ===undefined ? false : if_allow_clear
     });
 };
 /**=======================================================
@@ -253,14 +253,14 @@ Notificationbar.prototype.notificationAction = function (action_flag) {
  * @param ajax_param
  * @constructor
  */
-function AjaxJsonFunc(ajax_param) {
+function AjaxPOSTGridFunc(ajax_param) {
     this.ajaxParam = {
         type: ajax_param.type === undefined ? 'Get' : ajax_param.type,
         url:  ajax_param.url === undefined ? undefined : ajax_param.url,
         postData:  ajax_param.postData === undefined ? [] : ajax_param.postData
     };
 }
-AjaxJsonFunc.prototype.ajaxParamCheck = function (check_item) {
+AjaxPOSTGridFunc.prototype.ajaxParamCheck = function (check_item) {
     var checkData = this.ajaxParam;
     //  标记是否有未设置变量 有返回false
     var ifCheck = true;
@@ -274,7 +274,7 @@ AjaxJsonFunc.prototype.ajaxParamCheck = function (check_item) {
     });
     return ifCheck;
 };
-AjaxJsonFunc.prototype.core = function (ajax_option) {
+AjaxPOSTGridFunc.prototype.core = function (ajax_option) {
     var Option = {
         idTag: {
             id_Alert: ajax_option.idTag.id_Alert === undefined ? '#' : ajax_option.idTag.id_Alert,

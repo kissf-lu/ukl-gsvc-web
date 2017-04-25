@@ -3,8 +3,11 @@
 {% block head %}
 {{ super() }}
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker3.min.css" rel="stylesheet" type="text/css">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/2.1.25/daterangepicker.min.css" rel="stylesheet" type="text/css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker3.min.css"
+      rel="stylesheet" type="text/css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/2.1.25/daterangepicker.min.css"
+      rel="stylesheet" type="text/css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" type="text/css">
 {% assets "jqwidgets_globle_css" %}
 <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
 {% endassets %}
@@ -16,93 +19,144 @@
     </a>
 </li>
 {% endblock %}
-
 {% block row %}
-<!-- 虚拟机手工表资源 -->
-<!--筛选告警栏-->
+<!-- 套餐流量查询设置区 -->
+<!--筛选告警栏-1-->
 <div class="anp" id="fir-layer-warn"></div>
+<div id="id-notification-fir">
+    <div id="id-notification-content-fir">
+    </div>
+</div>
+<div id="id-notification-container-fir">
+</div>
 <div class="row">
     <div class="col-lg-12">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <i class="fa fa-wrench"> 设置</i>
+                <i class="fa fa-wrench"> 1-套餐流量查询初始化设置-套餐设置 </i>
             </div>
             <div class="ibox-content">
                 <div class="row">
-                    <div class="col-sm-2 m-b-xs">
-                        <select class="select-country" id="sys_form_country" style="width:120px;">
+                    <div class="col-sm-5 m-b-xs">
+                        <select class="select-country" id="id-select-country" style="width:120px;">
+                            <option></option>
+                        </select>
+                        <select class="select-org" title="org" id="id-select-org" style="width:120px;">
+                            <option value="GTBU" selected="selected">GTBU</option>
+                        </select>
+                        <select class="form-sim-type" title="org" id="id-select-sim-type" style="width:120px;">
                             <option ></option>
                         </select>
                     </div>
-                    <div class="col-sm-3">
-                        <div class="form-group" id="vsim_test_table_imsi">
-                            <div class="input-group input-daterange">
+                    <div class="col-sm-4">
+                        <div class="form-group" id="id-package-type-div">
+                            <div class="input-group">
                                 <span class="input-group-addon"><strong>套餐名称</strong></span>
                                 <input type="text" data-toggle="tooltip" class="input-sm form-control"
-                                       id="id-input-package"
-                                       title='套餐名称支持开头模糊查询' />
-                            </div>
-                            <div class="input-group input-daterange" id="datepicker">
-                                <span class="input-group-addon"><strong>begin</strong></span>
-                                <input type="text" class="input-sm form-control" name="start" id="input-daterange-start"/>
-                                <span class="input-group-addon"><strong>end</strong></span>
-                                <input type="text" class="input-sm form-control" name="end" id="input-daterange-end"/>
+                                       id="id-package-type-name"
+                                       title='套餐名称支持模糊查询'/>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-10">
-                        <div class="form-group" id="vsim_test_table_imsi">
-                            <div class="input-group input-daterange">
-                                <span class="input-group-addon"><strong>套餐名称</strong></span>
-                                <input type="text" data-toggle="tooltip" class="input-sm form-control"
-                                       id="id-input-package"
-                                       title='套餐名称支持开头模糊查询' />
-                            </div>
-                            <div class="input-group input-daterange" id="datepicker">
-                                <span class="input-group-addon"><strong>begin</strong></span>
-                                <input type="text" class="input-sm form-control" name="start" id="input-daterange-start"/>
-                                <span class="input-group-addon"><strong>end</strong></span>
-                                <input type="text" class="input-sm form-control" name="end" id="input-daterange-end"/>
-                            </div>
-                        </div>
+                    <div style="text-align:center" class="col-sm-3 m-b-xs">
+                        <button id="id-get-sim-package-info" type="button" class="btn btn-sm btn-primary pull-right m-t-n-xs ">
+                            查询
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
                     </div>
                 </div>
-                <br/>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-8">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>套餐卡状态统计</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>num</th>
+                        <th>套餐名称</th>
+                        <th>套餐更新时间</th>
+                        <th>总计卡数</th>
+                        <th>在架卡数</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>阿联酋DU-5GB（5月6号到期）(可能转为长期卡)</td>
+                        <td>2017-5-1 05:22:00</td>
+                        <td>500</td>
+                        <td>450</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>套餐流量统计</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>num</th>
+                        <th>套餐更新时间</th>
+                        <th>流量使用率(%)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>2017-5-1 05:22:00</td>
+                        <td class="text-navy"> 40 </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <i class="fa fa-wrench"> 2-套餐流量查询初始化设置-流量查询设置</i>
+            </div>
+            <div class="ibox-content">
+                <div class="row">
+
+                </div>
                 <div align="center" class="row">
-                    <div class="form-group" id="status">
-                        <div class="input-group input-daterange">
-                            <span class="input-group-addon"><strong>可用状态</strong></span>
-                            <input type="text" value="0" data-toggle="tooltip" class="input-sm form-control"
-                                   id="sys_status"
-                                   title='支持多状态查询：
-                                   可用状态：0,2,4,8,16'/>
-                            <span class="input-group-addon"><strong>业务状态</strong></span>
-                            <input type="text" value="0" data-toggle="tooltip" class="input-sm form-control"
-                                   id="sys_business_status"
-                                   title='支持多状态查询：
-                                   0-卡未停用，1-卡已停用，2-卡预停用 （手工），3-流量不足，停用，
-                                   4 -卡pending， 5-待测试卡（只能定向分配），6-待下架卡，7-流量封顶停用'/>
-                            <span class="input-group-addon"><strong>套餐状态</strong></span>
-                            <input type="text" value="0,1" data-toggle="tooltip" class="input-sm form-control"
-                                   id="sys_package_status"
-                                   title='支持多状态查询：
-                                   0正常，1限速，2不可用，3套餐过期'/>
-                            <span class="input-group-addon"><strong>卡位状态</strong></span>
-                            <input type="text" value="0,1" data-toggle="tooltip" class="input-sm form-control"
-                                   id="sys_slot_status"
-                                   title='支持多状态查询：
-                                   0未拔出，1已拔出 ,2卡槽异常' />
-                            <span class="input-group-addon"><strong>bam状态</strong></span>
-                            <input type="text" value="0,1" data-toggle="tooltip" class="input-sm form-control"
-                                   id="sys_bam_status"
-                                   title='支持多状态查询：
-                                   0 BAM正常，1 BAM异常' />
-                            <span class="input-group-addon"><strong>占用状态</strong></span>
-                            <input type="text" value="0,1" data-toggle="tooltip" class="input-sm form-control"
-                                   id="sys_ocupy_status"
-                                   title='支持多状态查询：
-                                   0未占用，1已占用'/>
-                        </div>
+                    <div class="col-sm-12">
+
                     </div>
                 </div>
             </div>
@@ -110,7 +164,6 @@
     </div>
 </div>
 <div align="center" class="row">
-
     <div data-toggle="buttons" class="btn-group">
         <button id="package-flower-flash" type="button" class="btn btn-sm btn-default ">
             刷新
@@ -130,12 +183,16 @@
 {% endblock %}
 {% block scripts %}
 {{ super() }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/2.1.25/daterangepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/locales/bootstrap-datepicker.zh-CN.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 {% assets "jqwidgets_globle_js" %}
+<script src="{{ ASSET_URL }}" type="text/javascript"></script>
+{% endassets %}
+{% assets "packageFlowerQuery_js" %}
 <script src="{{ ASSET_URL }}" type="text/javascript"></script>
 {% endassets %}
 {% endblock %}

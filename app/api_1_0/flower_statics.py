@@ -38,3 +38,14 @@ def get_FlowerQuery():
                       imsi=queryImsi,
                       flower_query_key=aggGroupKey,
                       TimezoneOffset=TimezoneOffset)
+
+@api.route('/get_package_flower/', methods=['GET'])
+def get_package_flower():
+    """
+    :return:
+    """
+    if request.method == 'GET':
+        country = request.args.get('country', 'ae', type=str)
+        orgName = request.args.get('org', 'gtbu', type=str)
+        vsimType = request.args.get('vsim_type', '0', type=str)
+        packageTypeName = request.args.get('package_type_name', '', type=str)
