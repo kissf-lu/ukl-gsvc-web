@@ -82,7 +82,7 @@
                             <ul class="nav nav-third-level">
                                 {% if  current_user.username != "TechSupport"%}
                                 <li>
-                                    <a href="#">多国卡统计</a>
+                                    <a href="#">卡统计</a>
                                 </li>
                                 {% endif %}
                                 <li>
@@ -90,7 +90,17 @@
                                 </li>
                             </ul>
                         </li>
-                        <li><a href="/vsimFlowerQuery">流查询专项</a></li>
+                        <li>
+                            <a href="#">流查询专项</a>
+                            <ul class="nav nav-third-level">
+                                <li>
+                                    <a href="/vsimFlowerQuery">卡流查询</a>
+                                </li>
+                                <li>
+                                    <a href="/vsimFlowerQuery">套餐流查询</a>
+                                </li>
+                            </ul>
+                        </li>
                         <li>
                             <a href="#">新卡测试专项<span class="fa arrow"></span></a>
                             <ul class="nav nav-third-level">
