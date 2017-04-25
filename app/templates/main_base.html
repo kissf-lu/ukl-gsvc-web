@@ -48,7 +48,7 @@
                 </li>
                 <li >
                     <a href="#">
-                        <i class="fa fa-bar-chart-o"></i>
+                        <i class="fa fa-database"></i>
                         <span class="nav-label">卡资源数据</span><span class="fa arrow"></span>
                     </a>
                     <ul class="nav nav-second-level">
@@ -64,11 +64,12 @@
                 </li>
                 <li >
                     <a href="#">
-                        <i class="fa fa-sitemap"></i>
-                        <span class="nav-label">问题卡诊断</span><span class="fa arrow"></span>
+                        <i class="fa fa-medkit"></i>
+                        <span class="nav-label">卡诊断</span><span class="fa arrow"></span>
                     </a>
                     <ul class="nav nav-second-level collapse">
-                        <li><a href="/probVsimFirstDict">国家问题卡查询</a></li>
+                        <li><a href="/probVsimFirstDict">问题卡诊断</a></li>
+                        <li><a href="#">脱板卡诊断</a></li>
                     </ul>
                 </li>
                 <li >
@@ -82,7 +83,7 @@
                             <ul class="nav nav-third-level">
                                 {% if  current_user.username != "TechSupport"%}
                                 <li>
-                                    <a href="#">卡统计</a>
+                                    <a href="#">多国卡统计</a>
                                 </li>
                                 {% endif %}
                                 <li>
@@ -91,13 +92,13 @@
                             </ul>
                         </li>
                         <li>
-                            <a href="#">流查询专项</a>
+                            <a href="#">流查询专项<span class="fa arrow"></span></a>
                             <ul class="nav nav-third-level">
                                 <li>
                                     <a href="/vsimFlowerQuery">卡流查询</a>
                                 </li>
                                 <li>
-                                    <a href="/vsimFlowerQuery">套餐流查询</a>
+                                    <a href="/packageFlowerQuery">套餐流查询</a>
                                 </li>
                             </ul>
                         </li>
@@ -184,7 +185,6 @@
         </div>
         <div class="footer">
             <div class="pull-right">
-                10GB of <strong>250GB</strong> Free.
             </div>
             <div>
                 <strong>Copyright</strong> UcloudLink GSVC &copy; 2014-2017
