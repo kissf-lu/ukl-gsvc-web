@@ -30,7 +30,7 @@ function staticTable1View(table_id, table_data) {
                         '</tr>'
                     ].join('');
                 } else {
-                    var bt_id ='bt'+(i+1);
+                    var bt_id = ('bt'+i);
                     tbButtonID.push(bt_id);
                     this.td= [
                         '<tr>',
@@ -41,7 +41,7 @@ function staticTable1View(table_id, table_data) {
                         '<td>', this.ava_num, '</td>',
                         '<td ', 'class="', (this.Percentage >=60 ? 'text-navy' : 'text-warning'), '"',
                         '>', this.Percentage, '</td>',
-                        '<td>','<button type="button"  onclick="onClickBtn(this)" ' +
+                        '<td>','<button type="button" ' +
                         'class="btn btn-sm btn-primary pull-right m-t-n-xs"',
                         'id="', bt_id,'"','>','点击查询流量',
                         '<span class="glyphicon glyphicon-search" aria-hidden="true"></span>', '</button>',
@@ -53,30 +53,29 @@ function staticTable1View(table_id, table_data) {
             this.TableMake();
             return this.td
         }).call(table_data[i], i);
-
         tbHTML += td_i;
     }
     // remove old form html
     table_id.simPackage.children().remove();
     // append new form html
     table_id.simPackage.append(tbHTML);
+    //
+    addTableButtonAction(table_data,tbButtonID);
 }
 function ButtonAction(bt_id, bt_num) {
     this.btID=bt_id;
     this.btNum=bt_num;
 }
-ButtonAction.prototype.BTClick = function () {
+ButtonAction.prototype.BTClick = function (get__row_package_data) {
     this.btID.click(function () {
-        alert('您敲击的是第:'+this.btNum);
-    })
+        console.log(get__row_package_data.NextUpdateTime);
+    });
 };
 function addTableButtonAction(table_data, bt_list_id) {
     if (bt_list_id){
         for (var i = 0; i < bt_list_id.length; i++){
-            var bt_num = (bt_list_id[i]).slice(2);
-            console.log(bt_num);
-            //var bta = new ButtonAction($(["#",bt_list_id[i]].join('')), bt_num);
-            //bta.BTClick();
+            var bt_num = Number((bt_list_id[i]).slice(2));
+            new ButtonAction($(["#",bt_list_id[i]].join('')), bt_num).BTClick(table_data[bt_num]);
         }
     }
 }
@@ -124,6 +123,7 @@ function getPackageInfoAjax(option_data, option_id, ajax_set) {
         var notifi_content = ['<strong>', '查询信息：', country, '。  数据获取中......', '</strong>'].join('');
         Notification.notificationContent(notifi_content);
         Notification.notificationAction('open');
+        option_id.DataGetButtonAjax.attr("disabled", true);
         var packageInfoData = packageInfoAjax.GetAjax({idTag: ajaxOption.idTag, objClass: ajaxOption.objClass});
     }
     return false;

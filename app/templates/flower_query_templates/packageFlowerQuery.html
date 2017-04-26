@@ -45,7 +45,7 @@
                             <option value="GTBU" selected="selected">GTBU</option>
                         </select>
                         <select class="form-sim-type" title="org" id="id-select-sim-type" style="width:120px;">
-                            <option ></option>
+                            <option></option>
                         </select>
                     </div>
                     <div class="col-sm-4">
@@ -59,10 +59,50 @@
                         </div>
                     </div>
                     <div style="text-align:center" class="col-sm-3 m-b-xs">
-                        <button id="id-get-sim-package-info" type="button" class="btn btn-sm btn-primary pull-right m-t-n-xs ">
+                        <button id="id-get-sim-package-info" type="button"
+                                class="btn btn-sm btn-primary pull-right m-t-n-xs ">
                             查询
                             <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                         </button>
+                    </div>
+                </div>
+                <div align="center" class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group" id="vsim_test">
+                            <div class="input-group">
+                                <span class="input-group-addon"><strong>卡状态筛选： 可用状态</strong></span>
+                                <input type="text" value="0" data-toggle="tooltip" class="input-sm form-control"
+                                       id="sys_status"
+                                       title='支持多状态查询：
+                                   可用状态：0,2,4,8,16'/>
+                                <span class="input-group-addon"><strong>业务状态</strong></span>
+                                <input type="text" value="0" data-toggle="tooltip" class="input-sm form-control"
+                                       id="sys_business_status"
+                                       title='支持多状态查询：
+                                   0-卡未停用，1-卡已停用，2-卡预停用 （手工），3-流量不足，停用，
+                                   4 -卡pending， 5-待测试卡（只能定向分配），6-待下架卡，7-流量封顶停用'/>
+                                <span class="input-group-addon"><strong>套餐状态</strong></span>
+                                <input type="text" value="0,1" data-toggle="tooltip" class="input-sm form-control"
+                                       id="sys_package_status"
+                                       title='支持多状态查询：
+                                   0正常，1限速，2不可用，3套餐过期'/>
+                                <span class="input-group-addon"><strong>卡位状态</strong></span>
+                                <input type="text" value="0,1" data-toggle="tooltip" class="input-sm form-control"
+                                       id="sys_slot_status"
+                                       title='支持多状态查询：
+                                   0未拔出，1已拔出 ,2卡槽异常'/>
+                                <span class="input-group-addon"><strong>bam状态</strong></span>
+                                <input type="text" value="0,1" data-toggle="tooltip" class="input-sm form-control"
+                                       id="sys_bam_status"
+                                       title='支持多状态查询：
+                                   0 BAM正常，1 BAM异常'/>
+                                <span class="input-group-addon"><strong>占用状态</strong></span>
+                                <input type="text" value="0,1" data-toggle="tooltip" class="input-sm form-control"
+                                       id="sys_ocupy_status"
+                                       title='支持多状态查询：
+                                   0未占用，1已占用'/>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

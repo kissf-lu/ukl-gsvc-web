@@ -64,7 +64,7 @@ def getSimPackageStatic(dic_param):
         if simType:
             simTypeStr = " AND a.`vsim_type` = '" + simType + "' "
         if packageTypeName:
-            packageTypeNameStr = " AND b.`package_type_name` = ('" + packageTypeName + "') "
+            packageTypeNameStr = " AND b.`package_type_name` LIKE  '" + packageTypeName + "%' "
 
         str_query = (
 
