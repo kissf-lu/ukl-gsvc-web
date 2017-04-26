@@ -254,6 +254,7 @@ Notificationbar.prototype.notificationAction = function (action_flag) {
  * @constructor
  */
 function AjaxFunc(ajax_param) {
+    this.callbackData = [];
     this.ajaxParam = {
         type: ajax_param.type === undefined ? 'Get' : ajax_param.type,
         url:  ajax_param.url === undefined ? undefined : ajax_param.url,
@@ -368,7 +369,7 @@ AjaxFunc.prototype.GetAjax = function (ajax_option) {
                     //delete old alter
                     appendAlertInfo(
                         'danger',
-                        ['Error:', getData.info.errinfo].join(' '),
+                        ['Error:', getData.info.errInfo].join(' '),
                         Option.idTag.id_Alert);
                 }
                 else {
@@ -385,7 +386,7 @@ AjaxFunc.prototype.GetAjax = function (ajax_option) {
                     Option.idTag.id_Alert);
                 // getData.data 为[{},{},{},...]结构的json数据，数据的key值必须同grid的datafield值相同
                 // getData.data key的值和后台导出的excel表头值一样.
-                return getData.data;
+                staticTable1View(ajax_option.idTag.idTableSimPackage, getData.data);
             }
         })
         .fail(function (jqXHR, status) {
@@ -399,6 +400,7 @@ AjaxFunc.prototype.GetAjax = function (ajax_option) {
             Option.objClass.objNotification.notificationAction('closeLast');
         });
 };
+
 /**============================================================
  *
  * ============================================================

@@ -3,6 +3,83 @@
  */
 
 
+function onClickBtn(o,data_package){
+    this.id = o.id;
+    alert(this.id);
+}
+function staticTable1View(table_id, table_data) {
+    var tbHTML='';
+    var tbButtonID = [];
+    for (var i = 0; i < table_data.length; i++) {
+        var td_i = '';
+        td_i= (function (i) {
+            this.td = '';
+            this.TableMake = function () {
+                if (i ===0){
+                    this.td= [
+                        '<tr>',
+                        '<td>', (i+1), '</td>',
+                        '<td>', this.PackageName, '</td>',
+                        '<td>', this.NextUpdateTime, '</td>',
+                        '<td>', this.all_num, '</td>',
+                        '<td>', this.ava_num, '</td>',
+                        '<td ', 'class="', (this.Percentage >=60 ? 'text-navy' : 'text-warning'), '"',
+                        '>', this.Percentage,
+                        '</td>',
+                        '<td>','','</td>',
+                        '</tr>'
+                    ].join('');
+                } else {
+                    var bt_id ='bt'+(i+1);
+                    tbButtonID.push(bt_id);
+                    this.td= [
+                        '<tr>',
+                        '<td>', (i+1), '</td>',
+                        '<td>', this.PackageName, '</td>',
+                        '<td>', this.NextUpdateTime, '</td>',
+                        '<td>', this.all_num, '</td>',
+                        '<td>', this.ava_num, '</td>',
+                        '<td ', 'class="', (this.Percentage >=60 ? 'text-navy' : 'text-warning'), '"',
+                        '>', this.Percentage, '</td>',
+                        '<td>','<button type="button"  onclick="onClickBtn(this)" ' +
+                        'class="btn btn-sm btn-primary pull-right m-t-n-xs"',
+                        'id="', bt_id,'"','>','点击查询流量',
+                        '<span class="glyphicon glyphicon-search" aria-hidden="true"></span>', '</button>',
+                        '</td>',
+                        '</tr>'
+                    ].join('');
+                }
+            };
+            this.TableMake();
+            return this.td
+        }).call(table_data[i], i);
+
+        tbHTML += td_i;
+    }
+    // remove old form html
+    table_id.simPackage.children().remove();
+    // append new form html
+    table_id.simPackage.append(tbHTML);
+}
+function ButtonAction(bt_id, bt_num) {
+    this.btID=bt_id;
+    this.btNum=bt_num;
+}
+ButtonAction.prototype.BTClick = function () {
+    this.btID.click(function () {
+        alert('您敲击的是第:'+this.btNum);
+    })
+};
+function addTableButtonAction(table_data, bt_list_id) {
+    if (bt_list_id){
+        for (var i = 0; i < bt_list_id.length; i++){
+            var bt_num = (bt_list_id[i]).slice(2);
+            console.log(bt_num);
+            //var bta = new ButtonAction($(["#",bt_list_id[i]].join('')), bt_num);
+            //bta.BTClick();
+        }
+    }
+}
 function getPackageInfoAjax(option_data, option_id, ajax_set) {
 
     var country = option_data.Country;
@@ -27,6 +104,7 @@ function getPackageInfoAjax(option_data, option_id, ajax_set) {
         Notification.init();
         //隐藏上次通知
         Notification.notificationAction('closeLast');
+        option_id.TableSimPackage.simPackage.children().remove();
         var ajaxOption = {
             ajaxParam: {
                 type: ajax_set.type,
@@ -35,7 +113,8 @@ function getPackageInfoAjax(option_data, option_id, ajax_set) {
             },
             idTag: {
                 id_Alert: option_id.Warn,
-                id_GetDataBt: option_id.DataGetButtonAjax
+                id_GetDataBt: option_id.DataGetButtonAjax,
+                idTableSimPackage: option_id.TableSimPackage
             },
             objClass: {
                 objNotification: Notification
@@ -45,7 +124,7 @@ function getPackageInfoAjax(option_data, option_id, ajax_set) {
         var notifi_content = ['<strong>', '查询信息：', country, '。  数据获取中......', '</strong>'].join('');
         Notification.notificationContent(notifi_content);
         Notification.notificationAction('open');
-        packageInfoAjax.GetAjax({idTag: ajaxOption.idTag, objClass: ajaxOption.objClass});
+        var packageInfoData = packageInfoAjax.GetAjax({idTag: ajaxOption.idTag, objClass: ajaxOption.objClass});
     }
     return false;
 }
@@ -66,7 +145,9 @@ $(function () {
             warnFirLayerID: $("#id-warn-fir-layer"),
             notificationFirID: $("#id-notification-fir"),
             notificationContentFirID: $("#id-notification-content-fir"),
-            notificationContainerFirID: $("#id-notification-container-fir")
+            notificationContainerFirID: $("#id-notification-container-fir"),
+            tableSimPackageID: $("#id-package-table"),
+            tableSimFlowerStaticID: $("#id-package-flower-static-table")
         }
     };
     //select 下拉列表筛选数据-国家：
@@ -102,7 +183,11 @@ $(function () {
                 NotificationContent: globParam.id.notificationContentFirID,
                 NotificationContainer: globParam.id.notificationContainerFirID,
                 Warn: globParam.id.warnFirLayerID,
-                DataGetButtonAjax: globParam.id.getSimPackageID
+                DataGetButtonAjax: globParam.id.getSimPackageID,
+                TableSimPackage: {
+                    simPackage:globParam.id.tableSimPackageID,
+                    simFlowerStatic: globParam.id.tableSimFlowerStaticID
+                }
             },
             ajaxSet:{
                 type: 'GET',

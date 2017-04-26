@@ -3,10 +3,14 @@
 from bson import json_util
 from flask import json
 from flask import request
+# api 模块添加
+from . import api
 
 # Python get Flower Model
 from app.api_1_0.api_functions.flowerPackage.get_vsim_hour_day_flower import getFlowers
-from . import api
+# sim_package_flower get Model
+
+from api_functions.flowerPackage.get_sim_package_flower import getSimPackageFlowerAPI
 
 
 @api.route('/get_FlowerQuery/', methods=['POST', 'GET'])
@@ -40,6 +44,7 @@ def get_FlowerQuery():
                       flower_query_key=aggGroupKey,
                       TimezoneOffset=TimezoneOffset)
 
+
 @api.route('/get_package_flower/', methods=['GET'])
 def get_package_flower():
     """
@@ -50,11 +55,13 @@ def get_package_flower():
         orgName = request.args.get('Org', 'gtbu', type=str)
         vsimType = request.args.get('SimType', '0', type=str)
         packageTypeName = request.args.get('PackageTypeName', '', type=str)
+        simPackageParam = {
+            'country': country,
+            'orgName': orgName,
+            'simType': vsimType,
+            'packageTypeName': packageTypeName
+        }
 
-        errinfo = '前端后端API测试： get args ->' + country + '-' + orgName + '-' + vsimType + '-' + packageTypeName
-        dic_data = []
-        dic_results = {'info': {'err': True, 'errinfo': errinfo}, 'data': dic_data}
-
-        return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
+        return getSimPackageFlowerAPI(sim_package_param=simPackageParam)
 
     return False

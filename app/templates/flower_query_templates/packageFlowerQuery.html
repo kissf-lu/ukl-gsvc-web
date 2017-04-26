@@ -54,7 +54,7 @@
                                 <span class="input-group-addon"><strong>套餐名称</strong></span>
                                 <input type="text" data-toggle="tooltip" class="input-sm form-control"
                                        id="id-package-type-name"
-                                       title='套餐名称支持模糊查询'/>
+                                       title='输入要查询的准确套餐名称'/>
                             </div>
                         </div>
                     </div>
@@ -70,7 +70,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-lg-8">
+    <div class="col-lg-12">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <h5>套餐卡状态统计</h5>
@@ -90,56 +90,17 @@
                     <tr>
                         <th>num</th>
                         <th>套餐名称</th>
-                        <th>套餐更新时间</th>
+                        <th>套餐更新时间(GMT0)</th>
                         <th>总计卡数</th>
-                        <th>在架卡数</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>阿联酋DU-5GB（5月6号到期）(可能转为长期卡)</td>
-                        <td>2017-5-1 05:22:00</td>
-                        <td>500</td>
-                        <td>450</td>
-                    </tr>
-                    </tbody>
-                </table>
-
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-                <h5>套餐流量统计</h5>
-                <div class="ibox-tools">
-                    <a class="collapse-link">
-                        <i class="fa fa-chevron-up"></i>
-                    </a>
-                    <a class="close-link">
-                        <i class="fa fa-times"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="ibox-content">
-
-                <table class="table table-bordered">
-                    <thead>
-                    <tr>
-                        <th>num</th>
-                        <th>套餐更新时间</th>
+                        <th>可用卡数</th>
                         <th>流量使用率(%)</th>
+                        <th>流量查询选择</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>2017-5-1 05:22:00</td>
-                        <td class="text-navy"> 40 </td>
-                    </tr>
+                    <tbody id="id-package-table">
                     </tbody>
                 </table>
+
             </div>
         </div>
     </div>
