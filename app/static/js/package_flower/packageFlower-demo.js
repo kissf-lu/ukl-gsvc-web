@@ -39,8 +39,9 @@ function staticTable1View(table_id, table_data) {
                         '<td>', this.NextUpdateTime, '</td>',
                         '<td>', this.all_num, '</td>',
                         '<td>', this.ava_num, '</td>',
-                        '<td ', 'class="', (this.Percentage >=60 ? 'text-navy' : 'text-warning'), '"',
-                        '>', this.Percentage, '</td>',
+                        '<td ', 'class="',
+                        (this.Percentage >=60 ? 'text-navy' : 'text-warning'),
+                        '"', '>', this.Percentage, '</td>',
                         '<td>','<button type="button" ' +
                         'class="btn btn-sm btn-primary pull-right m-t-n-xs"',
                         'id="', bt_id,'"','>','点击查询流量',
@@ -147,7 +148,11 @@ $(function () {
             notificationContentFirID: $("#id-notification-content-fir"),
             notificationContainerFirID: $("#id-notification-container-fir"),
             tableSimPackageID: $("#id-package-table"),
-            tableSimFlowerStaticID: $("#id-package-flower-static-table")
+            avaStatusID: $("#id-ava-status"),
+            businessStatusID: $("#id-business-status"),
+            packageStatusID: $("#id-package-status"),
+            slotStatusID: $("#id-slot-status"),
+            bamStatusID: $("#id-bam-status")
         }
     };
     //select 下拉列表筛选数据-国家：
@@ -185,8 +190,7 @@ $(function () {
                 Warn: globParam.id.warnFirLayerID,
                 DataGetButtonAjax: globParam.id.getSimPackageID,
                 TableSimPackage: {
-                    simPackage:globParam.id.tableSimPackageID,
-                    simFlowerStatic: globParam.id.tableSimFlowerStaticID
+                    simPackage:globParam.id.tableSimPackageID
                 }
             },
             ajaxSet:{
