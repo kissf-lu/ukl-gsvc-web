@@ -6,6 +6,6 @@ from . import (getVsimCardCountryInfo,
                getCountrySrcConIndexGrid,
                get140countryFlowerStatics,
                getCountryProbDic,
-               get_FlowerQueryFunction,
                exportExcelFunc,
                newVsimTest)
+
