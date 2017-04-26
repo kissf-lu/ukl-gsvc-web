@@ -7,5 +7,6 @@ from . import (getVsimCardCountryInfo,
                get140countryFlowerStatics,
                getCountryProbDic,
                exportExcelFunc,
-               newVsimTest)
+               newVsimTest,
+               flowerPackage)
 
