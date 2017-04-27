@@ -35,11 +35,11 @@ function appendManulForm(modal_title_id, modal_body_id, modal_head_name, temple_
     //idModalbody.append(manulForm);
     return false;
 }
-function FlowerBtClickAction(modal_id) {
+function SetPanelView(modal_id){
     this.clickBtId = modal_id;
 
 }
-FlowerBtClickAction.prototype.SetPanelInit = function (panel_param, panel_data) {
+SetPanelView.prototype.SetPanelInit = function (panel_param, panel_data) {
     //$("#progressAjax").jqxLoader({ text: "提交更新数据中...", width: 100, height: 60 });
     var actionParam = panel_param;
     // 套餐流量设置
@@ -53,4 +53,7 @@ FlowerBtClickAction.prototype.SetPanelInit = function (panel_param, panel_data) 
     // show modal
     this.clickBtId.modal();
 };
-
+// 点击查询构造ajax
+function PackageFlowerGetAjax(id_bt_get ) {
+    //this.PostData =
+}

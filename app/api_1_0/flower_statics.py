@@ -29,10 +29,10 @@ def get_FlowerQuery():
         queryImsi = str(Dic_data['imsi'])
         aggGroupKey = Dic_data['agg_group_key']
         TimezoneOffset = int(Dic_data['TimezoneOffset'])
-    except KeyError:
-        errinfo = '前端POST数据异常!'
+    except KeyError as keyerr:
+        errInfo = ("前端POST数据异常,KeyError:{}".format(keyerr))
         DicData = []
-        DicResults = {'info': {'err': True, 'errinfo': errinfo}, 'data': DicData}
+        DicResults = {'info': {'err': True, 'errinfo': errInfo}, 'data': DicData}
         return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
 
     return getFlowers(querySort=querySort,
@@ -64,5 +64,46 @@ def get_package_flower():
         }
 
         return getSimPackageFlowerAPI(sim_package_param=simPackageParam)
+
+    return False
+
+
+@api.route('/get_package_flower_next/', methods=['GET', 'POST'])
+def get_package_flower_next():
+    """
+    :return:
+    """
+    if request.method == 'POST':
+        Dic_data = request.get_json()
+        try:
+            country = str(Dic_data['Country'])
+            org = str(Dic_data['Org'])
+            sim_type = str(Dic_data['SimType'])
+            package_type_name = str(Dic_data['PackageTypeName'])
+            next_update_time = str(Dic_data['NextUpdateTime'])
+            ava_status = str(Dic_data['AvaStatus'])
+            business_status = str(Dic_data['BusinessStatus'])
+            package_status = str(Dic_data['PackageStatus'])
+            slot_status = str(Dic_data['SlotStatus'])
+            bam_status = str(Dic_data['BamStatus'])
+            flower_begin_time = str(Dic_data['FlowerBeginTime'])
+            flower_end_time = str(Dic_data['FlowerEndTime'])
+            add_group_key = Dic_data['addGroupKey']
+
+        except KeyError as keyerr:
+            errInfo = ("前端POST数据异常,KeyError:{}".format(keyerr))
+            DicData = []
+            DicResults = {'info': {'err': True, 'errinfo': errInfo}, 'data': DicData}
+
+            return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+
+        errInfo = country+'-'+org+'-'+sim_type+'-'+package_type_name+'-'+next_update_time+'-'+ava_status+'-'+\
+               business_status+'-'+package_status+'-'+slot_status+'-'+bam_status+'-'+flower_begin_time+'-'+ \
+                  flower_end_time+'-'+add_group_key
+        print (errInfo)
+        DicData = []
+        DicResults = {'info': {'err': True, 'errinfo': errInfo}, 'data': DicData}
+
+        return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
 
     return False

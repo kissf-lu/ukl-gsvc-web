@@ -19,7 +19,6 @@ function staticTable1View(panel_param,next_ajax_data, table_id, table_data) {
                         '<td>', this.PackageName, '</td>',
                         '<td>', this.NextUpdateTime, '</td>',
                         '<td>', this.all_num, '</td>',
-                        '<td>', this.ava_num, '</td>',
                         '<td ', 'class="', (this.Percentage >=60 ? 'text-navy' : 'text-warning'), '"',
                         '>', this.Percentage,
                         '</td>',
@@ -35,7 +34,6 @@ function staticTable1View(panel_param,next_ajax_data, table_id, table_data) {
                         '<td>', this.PackageName, '</td>',
                         '<td>', this.NextUpdateTime, '</td>',
                         '<td>', this.all_num, '</td>',
-                        '<td>', this.ava_num, '</td>',
                         '<td ', 'class="',
                         (this.Percentage >=60 ? 'text-navy' : 'text-warning'),
                         '"', '>', this.Percentage, '</td>',
@@ -101,10 +99,69 @@ function ButtonAction(bt_id, bt_num) {
 ButtonAction.prototype.BTClick = function (first_set_param, get__row_package_data, panel_param) {
     this.btID.click(function () {
         var panelData = {
-            LastUpdateTime: get__row_package_data.LastUpdateTime,
-            NextUpdateTime: get__row_package_data.NextUpdateTime
+            LastUpdateTime: (
+                get__row_package_data.LastUpdateTime === null ?
+                    moment().set({'minute': 0, 'second': 0}) : get__row_package_data.LastUpdateTime),
+            NextUpdateTime: (
+                get__row_package_data.NextUpdateTime === null ?
+                moment().set({'minute': 0, 'second': 0}) : get__row_package_data.NextUpdateTime)
         };
-        new FlowerBtClickAction(panel_param.modalID).SetPanelInit(panel_param, panelData);
+        // 显示流量查询控制面板
+        new SetPanelView(panel_param.modalID).SetPanelInit(panel_param, panelData);
+        //
+        var notifi_content = '';
+        panel_param.queryFlowerID.click(function () {
+            //隐藏上次通知
+            var ajaxParam = {
+                type: 'POST',
+                url: $SCRIPT_ROOT + "/api/v1.0/get_package_flower_next/",
+                postData: {
+                    Country: first_set_param.Country,
+                    Org: first_set_param.Org,
+                    SimType : first_set_param.SimType,
+                    PackageTypeName : get__row_package_data.PackageName,
+                    NextUpdateTime: get__row_package_data.NextUpdateTime,
+                    AvaStatus: first_set_param.AvaStatus,
+                    BusinessStatus: first_set_param.BusinessStatus,
+                    PackageStatus: first_set_param.PackageStatus,
+                    SlotStatus: first_set_param.SlotStatus,
+                    BamStatus: first_set_param.BamStatus,
+                    FlowerBeginTime: panel_param.beginTimeID.val(),
+                    FlowerEndTime: panel_param.endTimeID.val(),
+                    addGroupKey: panel_param.queryFlowerID.val()
+                }
+            };
+            var ajaxOption = {
+                idTag: {
+                    id_Alert: panel_param.getAjaxOption.WarnSecID,
+                    id_GetDataBt: panel_param.queryFlowerID,
+                    id_Grid: panel_param.getAjaxOption.GridID
+                },
+                objClass: {
+                    objGrid: panel_param.getAjaxOption.GridObj,
+                    objNotification: panel_param.getAjaxOption.NotificationObj
+                }
+            };
+            var GetPackageFlowerNextAjax = new AjaxFunc(ajaxParam);
+            var ifUrl = GetPackageFlowerNextAjax.ajaxParamCheck(['url']);
+            if(!ifUrl){
+            } else {
+                panel_param.modalID.modal('hide');
+                notifi_content = ['<strong>', '查询天套餐：', ajaxParam.postData.PackageTypeName,
+                    '查询时间范围：', panel_param.beginTimeID.val(), '-', panel_param.endTimeID.val(),
+                    '  数据获取中......', '</strong>'].join('');
+                //
+                panel_param.getAjaxOption.NotificationObj.notificationContent(notifi_content);
+                panel_param.getAjaxOption.NotificationObj.notificationAction('open');
+                // 做表格数据清空操作
+                panel_param.getAjaxOption.GridID.jqxGrid("clear");
+                // 禁用查询按钮,防止多次点击，造成重复查询
+
+                panel_param.queryFlowerID.attr("disabled", true);
+                panel_param.getAjaxOption.GridID.jqxGrid("showloadelement");
+                GetPackageFlowerNextAjax.GridPostAjax(ajaxOption);
+            }
+        });
     });
     return this;
 };
@@ -137,10 +194,12 @@ function getPackageInfoAjax(option_data, option_id, ajax_set, panel_set) {
             false,
             option_id.NotificationContent
         );
+        option_id.Warn.children().remove();
         //
         Notification.init();
-        //隐藏上次通知
+        // 隐藏上次通知
         Notification.notificationAction('closeLast');
+        // 清空历史表单
         option_id.TableSimPackage.simPackage.children().remove();
         var ajaxOption = {
             ajaxParam: {
@@ -175,7 +234,7 @@ function GridColumnsSet() {
  * @param grid_id
  * @param grid_src_adapter
  * @returns {GridColumnsSet}
- *======================================================*/
+ *====================================================*/
 GridColumnsSet.prototype.setColumns = function (grid_id, grid_src_adapter) {
     this.gridColumns = [
         {
@@ -263,7 +322,12 @@ $(function () {
             chosenID:　$("#id-chosen-panel"),
             queryFlowerID: $("#id-package-flower-bt"),
             gridID: $("#id-package-flower-grid"),
-            dropDownListID: $("#jqxDropDownList")
+            dropDownListID: $("#jqxDropDownList"),
+            warnSecID: $("#id-warn-sec-layer"),
+            notificationSecID: $("#id-notification-sec"),
+            notificationContentSecID: $("#id-notification-content-sec"),
+            notificationContainerSecID: $("#id-notification-container-sec"),
+            gridSecID: $("#id-package-flower-grid") ,
         }
     };
     //select 下拉列表筛选数据-国家：
@@ -303,6 +367,13 @@ $(function () {
         };
         ChosenAction.GridAction(ActionID, params);
     });
+    var NotificationSec = new Notificationbar(
+        globParam.id.gridSecID,
+        globParam.id.notificationContainerSecID,
+        3000,
+        false,
+        globParam.id.notificationContentSecID
+    ).init();
     // 套餐统计ajax
     globParam.id.getSimPackageID.click( function (){
         //alert(moment(GlobeIdSet.timeStart.val()).add(moment().utcOffset(),'m').unix());
@@ -345,7 +416,16 @@ $(function () {
                 beginTimeID: globParam.id.beginTimeID,
                 endTimeID: globParam.id.endTimeID,
                 queryFlowerID: globParam.id.queryFlowerID,
-                modalHeadTitle: '流量查询设置窗口'
+                modalHeadTitle: '流量查询设置窗口',
+                getAjaxOption: {
+                    WarnSecID: globParam.id.warnSecID,
+                    NotificationSecID: globParam.id.notificationSecID,
+                    NotificationContentSecID: globParam.id.notificationContentSecID,
+                    NotificationContainerSecID: globParam.id.notificationContainerSecID,
+                    GridID: globParam.id.gridSecID ,
+                    GridObj: FlowerJqxGrid,
+                    NotificationObj: NotificationSec
+                }
             }
         };
         getPackageInfoAjax(option.data, option.id, option.ajaxSet, option.panelSet);
