@@ -51,15 +51,16 @@ def get_package_flower():
     :return:
     """
     if request.method == 'GET':
-        country = request.args.get('Country', 'ae', type=str)
-        orgName = request.args.get('Org', 'gtbu', type=str)
-        vsimType = request.args.get('SimType', '0', type=str)
-        packageTypeName = request.args.get('PackageTypeName', '', type=str)
         simPackageParam = {
-            'country': country,
-            'orgName': orgName,
-            'simType': vsimType,
-            'packageTypeName': packageTypeName
+            'country': request.args.get('Country', 'ae', type=str),
+            'orgName': request.args.get('Org', 'gtbu', type=str),
+            'simType': request.args.get('SimType', '0', type=str),
+            'packageTypeName': request.args.get('PackageTypeName', '', type=str),
+            'avaStatus': request.args.get('AvaStatus', '', type=str),
+            'businessStatus': request.args.get('BusinessStatus', '', type=str),
+            'packageStatus': request.args.get('PackageStatus', '', type=str),
+            'slotStatus': request.args.get('SlotStatus', '', type=str),
+            'bamStatus': request.args.get('BamStatus', '', type=str)
         }
 
         return getSimPackageFlowerAPI(sim_package_param=simPackageParam)

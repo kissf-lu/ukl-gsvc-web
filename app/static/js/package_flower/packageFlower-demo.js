@@ -3,11 +3,8 @@
  */
 
 
-function onClickBtn(o,data_package){
-    this.id = o.id;
-    alert(this.id);
-}
-function staticTable1View(table_id, table_data) {
+//
+function staticTable1View(panel_param,next_ajax_data, table_id, table_data) {
     var tbHTML='';
     var tbButtonID = [];
     for (var i = 0; i < table_data.length; i++) {
@@ -60,28 +57,68 @@ function staticTable1View(table_id, table_data) {
     table_id.simPackage.children().remove();
     // append new form html
     table_id.simPackage.append(tbHTML);
-    //
-    addTableButtonAction(table_data,tbButtonID);
+    /**======================================
+     * 后续添加button按钮对应的数据及动作函数
+     *======================================*/
+    addTableButtonAction(panel_param, next_ajax_data,table_data,tbButtonID);
 }
+/**==========================================================================
+ * 动态添加批量button动作
+ *
+ * @param panel_param        设置面板参数
+ * @param package_set_data   套餐查询设置条件
+ * @param table_data         套餐表数据
+ * @param bt_list_id         按钮列表
+ */
+function addTableButtonAction(panel_param, package_set_data,table_data, bt_list_id) {
+    if (bt_list_id){
+        for (var i = 0; i < bt_list_id.length; i++){
+            var bt_num = Number((bt_list_id[i]).slice(2));
+            // 实例button动作函数
+            new ButtonAction($(["#",bt_list_id[i]].join('')), bt_num).BTClick(package_set_data, table_data[bt_num], panel_param);
+        }
+    }
+}
+/**====================================================
+ *
+ * 单一按钮实例化构造方法
+ *
+ * @param bt_id     button对应的id
+ * @param bt_num    button对应行数
+ * @constructor
+ *====================================================*/
 function ButtonAction(bt_id, bt_num) {
     this.btID=bt_id;
     this.btNum=bt_num;
 }
-ButtonAction.prototype.BTClick = function (get__row_package_data) {
+/**
+ *
+ * @param first_set_param        首次ajax设置条件
+ * @param get__row_package_data  归属button行的数据
+ * @param panel_param            流量查询面板设置参数
+ * @constructor
+ */
+ButtonAction.prototype.BTClick = function (first_set_param, get__row_package_data, panel_param) {
     this.btID.click(function () {
-        console.log(get__row_package_data.NextUpdateTime);
+        var panelData = {
+            LastUpdateTime: get__row_package_data.LastUpdateTime,
+            NextUpdateTime: get__row_package_data.NextUpdateTime
+        };
+        new FlowerBtClickAction(panel_param.modalID).SetPanelInit(panel_param, panelData);
     });
+    return this;
 };
-function addTableButtonAction(table_data, bt_list_id) {
-    if (bt_list_id){
-        for (var i = 0; i < bt_list_id.length; i++){
-            var bt_num = Number((bt_list_id[i]).slice(2));
-            new ButtonAction($(["#",bt_list_id[i]].join('')), bt_num).BTClick(table_data[bt_num]);
-        }
-    }
-}
-function getPackageInfoAjax(option_data, option_id, ajax_set) {
-
+/**===============================================================================
+ *
+ * 套餐统计ajax请求函数
+ *
+ * @param option_data
+ * @param option_id
+ * @param ajax_set
+ * @param panel_set
+ * @returns {boolean}
+ */
+function getPackageInfoAjax(option_data, option_id, ajax_set, panel_set) {
     var country = option_data.Country;
     var packageTypeName = option_data.PackageTypeName;
     var alertClass = 'warning';
@@ -125,10 +162,75 @@ function getPackageInfoAjax(option_data, option_id, ajax_set) {
         Notification.notificationContent(notifi_content);
         Notification.notificationAction('open');
         option_id.DataGetButtonAjax.attr("disabled", true);
-        var packageInfoData = packageInfoAjax.GetAjax({idTag: ajaxOption.idTag, objClass: ajaxOption.objClass});
+        var packageInfoData = packageInfoAjax.GetAjax({idTag: ajaxOption.idTag, objClass: ajaxOption.objClass, panelSet: panel_set});
     }
     return false;
 }
+function GridColumnsSet() {
+    this.dateFormat = 'yyyy-MM-dd HH:mm:ss';
+    this.gridColumns = [];
+}
+/**===================================================
+ *     ----------------套餐列设置初始化-----
+ * @param grid_id
+ * @param grid_src_adapter
+ * @returns {GridColumnsSet}
+ *======================================================*/
+GridColumnsSet.prototype.setColumns = function (grid_id, grid_src_adapter) {
+    this.gridColumns = [
+        {
+            text: 'num', sortable: true, filterable: false, editable: false, groupable: false, draggable: false,
+            resizable: false, datafield: '', width: 50, columntype: 'number',
+            cellsrenderer: function (row, column, value) {
+                return "<div style='margin:4px;'>" + (value + 1) + "</div>";
+            }
+        },
+        {text: '国家', datafield: 'country', filtertype: "range", width: 100, hidden: true},
+        {
+            text: 'imsi', datafield: 'imsi', width: 150,
+            filtertype: "custom",
+            createfilterpanel: function (datafield, filterPanel) {
+                buildFilterPanel(filterPanel, datafield, grid_id, grid_src_adapter);
+            }
+        },
+        {text: '套餐名称', datafield: 'package_name', filtertype: "range", width: 200, hidden: false},
+        {text: 'iccid', datafield: 'iccid', filtertype: "range", width: 200, hidden: true},
+        {text: 'time(GMT0)', datafield: 'time', cellsformat: this.dateFormat, width: 200,
+            filtertype: 'date', hidden: true},
+        {text: '累计流量/MB', datafield: 'flower', width: 300}
+    ];
+    return this;
+};
+/**
+ *
+ * @param format_date
+ */
+GridColumnsSet.prototype.dateFormatSet = function (format_date) {
+    this.dateFormat = format_date;
+};
+/**
+ *
+ * @returns {[*,*,*,*,*,*]}
+ */
+function gridFieldsSet() {
+    return [
+        {name: 'country', type: 'string'},
+        {name: 'imsi', type: 'string'},
+        {name: 'package_name', type: 'string'},
+        {name: 'iccid', type: 'date'},
+        {name: 'time', type: 'string'},
+        {name: 'flower', type: 'number'}
+    ];
+}
+//-显示选择菜单设置
+var jqxDropDownList = [
+    {label: '国家', value: 'country', checked: false},
+    {label: 'imsi', value: 'imsi', checked: true},
+    {label: '套餐名称', value: 'package_name', checked: true},
+    {label: 'iccid', value: 'iccid', checked: false},
+    {label: 'time(GMT0)', value: 'time', checked: false},
+    {label: '累计流量/MB', value: 'flower', checked: true}
+];
 //main-初始化主程序
 $(function () {
     var globParam = {
@@ -152,7 +254,16 @@ $(function () {
             businessStatusID: $("#id-business-status"),
             packageStatusID: $("#id-package-status"),
             slotStatusID: $("#id-slot-status"),
-            bamStatusID: $("#id-bam-status")
+            bamStatusID: $("#id-bam-status"),
+            modalID:$("#id-package-flower-modal"),
+            modalTitleID: $("#id-modal-title"),
+            modalBodyID: $("#id-modal-body"),
+            beginTimeID: $("#input-daterange-start"),
+            endTimeID: $("#input-daterange-end"),
+            chosenID:　$("#id-chosen-panel"),
+            queryFlowerID: $("#id-package-flower-bt"),
+            gridID: $("#id-package-flower-grid"),
+            dropDownListID: $("#jqxDropDownList")
         }
     };
     //select 下拉列表筛选数据-国家：
@@ -176,14 +287,31 @@ $(function () {
     select2SimType.set('多国/本国', true);
     // tooltip init
     $('[data-toggle="tooltip"]').tooltip();
+    // 初始画grid
+    var FlowerJqxGrid = new GridInit(globParam.id.gridID, gridFieldsSet());
+    var GridColumnSet = new GridColumnsSet().setColumns(globParam.id.gridID, FlowerJqxGrid.GridAdapter);
+    FlowerJqxGrid.set({columns: GridColumnSet.gridColumns});
+    // 初始化drop down list 模块
+    var DropDownList1 =  new DropDownList(globParam.id.dropDownListID).Init({sourceList:jqxDropDownList});
+    DropDownList1.OnClick(globParam.id.gridID);
+    // 初始化chosen 模块
+    globParam.id.chosenID.chosen({width: "100%"});
+    globParam.id.chosenID.on('change', function (evt, params) {
+        var ChosenAction = new ChosenView(globParam.id.gridID);
+        var ActionID = {
+            DropDownListID: globParam.id.dropDownListID
+        };
+        ChosenAction.GridAction(ActionID, params);
+    });
+    // 套餐统计ajax
     globParam.id.getSimPackageID.click( function (){
         //alert(moment(GlobeIdSet.timeStart.val()).add(moment().utcOffset(),'m').unix());
         var option = {
-            data:{
+            data: {
                 Country: globParam.id.countrySelectID.val(),
                 PackageTypeName : globParam.id.packageTypeNameInputID.val()
             },
-            id:{
+            id: {
                 Notification: globParam.id.notificationFirID,
                 NotificationContent: globParam.id.notificationContentFirID,
                 NotificationContainer: globParam.id.notificationContainerFirID,
@@ -193,7 +321,7 @@ $(function () {
                     simPackage:globParam.id.tableSimPackageID
                 }
             },
-            ajaxSet:{
+            ajaxSet: {
                 type: 'GET',
                 url: $SCRIPT_ROOT + "/api/v1.0/get_package_flower/",
                 data: {
@@ -201,10 +329,25 @@ $(function () {
                     Org: globParam.id.orgSelectID.val(),
                     SimType : globParam.id.simTypeSelectID.val() ?
                         ((globParam.id.simTypeSelectID.val() === '本国卡') ? '0' : '1') : '',
-                    PackageTypeName : globParam.id.packageTypeNameInputID.val()
+                    PackageTypeName : globParam.id.packageTypeNameInputID.val(),
+                    AvaStatus: globParam.id.avaStatusID.val(),
+                    BusinessStatus: globParam.id.businessStatusID.val(),
+                    PackageStatus: globParam.id.packageStatusID.val(),
+                    SlotStatus: globParam.id.slotStatusID.val(),
+                    BamStatus: globParam.id.bamStatusID.val()
                 }
+            },
+            panelSet: {
+                modalID:globParam.id.modalID,
+                modalTitleID: globParam.id.modalTitleID,
+                modalBodyID: globParam.id.modalBodyID,
+                chosenID: globParam.id.chosenID,
+                beginTimeID: globParam.id.beginTimeID,
+                endTimeID: globParam.id.endTimeID,
+                queryFlowerID: globParam.id.queryFlowerID,
+                modalHeadTitle: '流量查询设置窗口'
             }
         };
-        getPackageInfoAjax(option.data, option.id, option.ajaxSet);
+        getPackageInfoAjax(option.data, option.id, option.ajaxSet, option.panelSet);
     });
 });

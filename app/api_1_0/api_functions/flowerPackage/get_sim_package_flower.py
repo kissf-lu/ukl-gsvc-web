@@ -36,20 +36,35 @@ def getSimPackageStatic(dic_param):
     :return: 
     """
     errInfo = ''
+    SimPackageInfoData = []
     countryStr = ''
     orgStr = ''
     simTypeStr = ''
     packageTypeNameStr = ''
+    avaStatusStr  = ''
+    businessStatusStr = ''
+    packageStatusStr = ''
+    slotStatusStr = ''
+    bamStatusStr = ''
     country = ''
     org = ''
     simType = ''
     packageTypeName = ''
-    SimPackageInfoData = []
+    avaStatus = ''
+    businessStatus = ''
+    packageStatus = ''
+    slotStatus = ''
+    bamStatus = ''
     try:
         country = dic_param['country']
         org = dic_param['orgName']
         simType = dic_param['simType']
         packageTypeName = dic_param['packageTypeName']
+        avaStatus = dic_param['avaStatus']
+        businessStatus = dic_param['businessStatus']
+        packageStatus = dic_param['packageStatus']
+        slotStatus = dic_param['slotStatus']
+        bamStatus = dic_param['bamStatus']
     except KeyError:
         errInfo = 'api simPackageInfo static param keyErr!'
     if errInfo:
@@ -65,14 +80,24 @@ def getSimPackageStatic(dic_param):
             simTypeStr = " AND a.`vsim_type` = '" + simType + "' "
         if packageTypeName:
             packageTypeNameStr = " AND b.`package_type_name` LIKE  '" + packageTypeName + "%' "
+        if avaStatus:
+            avaStatusStr = " AND a.`available_status` IN (" + avaStatus + ") "
+        if businessStatus:
+            businessStatusStr = " AND a.business_status IN (" + businessStatus + ") "
+        if packageStatus:
+            packageStatusStr = " AND b.`package_status`  IN (" + packageStatus + ") "
+        if slotStatus:
+            slotStatusStr = " AND a.`slot_status` IN (" + slotStatus + ") "
+        if bamStatus:
+            bamStatusStr = " AND a.`bam_status` IN (" + bamStatus + ") "
 
         str_query = (
-
             "( "
             "SELECT  "
             "a.`iso2`              AS 'Country',  "
             "CASE WHEN 1 THEN CONCAT('1-合计-',a.`iso2`,'-',e.`org_name` ) END  AS 'PackageName',  "
             "CASE WHEN 1 THEN '' END  AS 'NextUpdateTime',  "
+            "CASE WHEN 1 THEN '' END  AS 'LastUpdateTime', "
             "COUNT(DISTINCT a.`imsi`) AS 'all_num',  "
             "COUNT(DISTINCT (CASE WHEN ((a.`available_status` = '0')    "
             "                            AND b.`next_update_time` IS NOT NULL   "
@@ -103,7 +128,8 @@ def getSimPackageStatic(dic_param):
             "LEFT  JOIN `t_css_group` AS e          ON a.`group_id`= e.`id`  "
             "LEFT  JOIN `t_css_package_type`  AS c  ON c.`id` = b.`package_type_id`  "
             "WHERE  b.`package_type_name` IS NOT NULL "
-            "       AND b.`init_flow` IS NOT NULL  " + countryStr + orgStr + simTypeStr + packageTypeNameStr + " "
+            "       AND b.`init_flow` IS NOT NULL  " + countryStr + orgStr + simTypeStr + packageTypeNameStr +
+            avaStatusStr+businessStatusStr+packageStatusStr+ slotStatusStr + bamStatusStr + " "
             "GROUP BY a.`iso2`,e.`org_name`  "
             ") "
             "UNION "
@@ -112,6 +138,7 @@ def getSimPackageStatic(dic_param):
             "a.`iso2` AS 'Country',  "
             "b.`package_type_name` AS 'PackageName',  "
             "DATE_FORMAT(b.`next_update_time`,'%Y-%m-%d %H')  AS 'NextUpdateTime', "
+            "DATE_FORMAT(b.`last_update_time`,'%Y-%m-%d %H')  AS 'LastUpdateTime', "
             "COUNT(DISTINCT a.`imsi`) AS 'all_num',  "
             "COUNT(DISTINCT (CASE WHEN ((a.`available_status` = '0')    "
             "                            AND b.`next_update_time` IS NOT NULL   "
@@ -142,7 +169,8 @@ def getSimPackageStatic(dic_param):
             "LEFT  JOIN `t_css_group`         AS e  ON a.`group_id`= e.`id`  "
             "LEFT  JOIN `t_css_package_type`  AS c  ON c.`id` = b.`package_type_id`  "
             "WHERE  b.`package_type_name` IS NOT NULL "
-            "       AND b.`init_flow` IS NOT NULL  " + countryStr + orgStr + simTypeStr + packageTypeNameStr + " "
+            "       AND b.`init_flow` IS NOT NULL  " + countryStr + orgStr + simTypeStr + packageTypeNameStr +
+            avaStatusStr+businessStatusStr+packageStatusStr+ slotStatusStr + bamStatusStr + " "
             "GROUP BY a.`iso2`,b.`package_type_name`,DATE_FORMAT(b.`next_update_time`,'%Y-%m-%d %H'), e.`org_name`  "
             ") "
             "ORDER BY Country,NextUpdateTime,PackageName DESC "

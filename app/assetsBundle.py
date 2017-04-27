@@ -33,6 +33,7 @@ vsimFlowerQuery_js = Bundle(
 packageFlowerQuery_js = Bundle(
     # ("-- customer js --")
     'js/package_flower/packageFlower-demo.js',
+    'js/package_flower/packageFlowerSetPanel-demo.js',
     filters='jsmin',
     output='js/package_flower/gsvc_packageFlowerQuery.js'
 )

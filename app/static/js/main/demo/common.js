@@ -4,6 +4,34 @@
 
 
 
+function DropDownList(drop_down_id){
+    this.dropDownID = drop_down_id;
+}
+DropDownList.prototype.Init = function (set_data) {
+    this.dropDownID.jqxDropDownList({
+        checkboxes: true,
+        source: set_data.sourceList===undefined ? [] :  set_data.sourceList,
+        autoOpen: true,
+        animationType: 'fade',
+        filterable: true,
+        dropDownHeight: 300,
+        Width: 150
+    });
+    return this;
+};
+DropDownList.prototype.OnClick = function (grid_id) {
+    this.dropDownID.on('checkChange', function (event) {
+        grid_id.jqxGrid('beginupdate');
+        if (event.args.checked) {
+            grid_id.jqxGrid('showcolumn', event.args.value);
+
+        }
+        else {
+            grid_id.jqxGrid('hidecolumn', event.args.value);
+        }
+        grid_id.jqxGrid('endupdate');
+    });
+};
 /**=====================================================
  *  -------FilterPanel set func-------
  *======================================================
@@ -150,8 +178,14 @@ function Mydaterange(number, time_type, timeSelector){
 /**
  *
  * @param set_time :
-    * 设置日期，格式为{'date': 11,'hour': 16,'minute': 0, 'second': 0}
+    *
  *========================================================*/
+/**
+ *
+ * @param set_time       设置日期，格式为{'date': 11,'hour': 16,'minute': 0, 'second': 0}
+ * @param set_format     设置日期显示格式 "YYYY-MM-DD HH:mm:ss"
+ * @param if_hour        设置是否显示小时设置 false不显示，true显示
+ */
 Mydaterange.prototype.initTime = function (set_time, set_format, if_hour) {
     var time_picker = true;
     if((if_hour) || (if_hour ===undefined)){
@@ -177,6 +211,10 @@ Mydaterange.prototype.initTime = function (set_time, set_format, if_hour) {
 };
 Mydaterange.prototype.UTCTime = function () {
     this.TimeSet = moment().utc().subtract(this.number, this.timeType);
+    return this;
+};
+Mydaterange.prototype.SetTime = function (time) {
+    this.TimeSet = moment(time);
     return this;
 };
 /**=========================================================================================
@@ -258,7 +296,7 @@ function AjaxFunc(ajax_param) {
     this.ajaxParam = {
         type: ajax_param.type === undefined ? 'Get' : ajax_param.type,
         url:  ajax_param.url === undefined ? undefined : ajax_param.url,
-        postData:  ajax_param.postData === undefined ? [] : ajax_param.postData
+        postData:  ajax_param.postData === undefined ? {} : ajax_param.postData
     };
 }
 AjaxFunc.prototype.ajaxParamCheck = function (check_item) {
@@ -342,6 +380,7 @@ AjaxFunc.prototype.GridPostAjax = function (ajax_option) {
 };
 AjaxFunc.prototype.GetAjax = function (ajax_option) {
     this.ajaxParam.type='GET';
+    var nextAjaxData = this.ajaxParam.postData;
     var Option = {
         idTag: {
             id_Alert: ajax_option.idTag.id_Alert === undefined ? '#' : ajax_option.idTag.id_Alert,
@@ -386,7 +425,7 @@ AjaxFunc.prototype.GetAjax = function (ajax_option) {
                     Option.idTag.id_Alert);
                 // getData.data 为[{},{},{},...]结构的json数据，数据的key值必须同grid的datafield值相同
                 // getData.data key的值和后台导出的excel表头值一样.
-                staticTable1View(ajax_option.idTag.idTableSimPackage, getData.data);
+                staticTable1View(ajax_option.panelSet ,nextAjaxData , ajax_option.idTag.idTableSimPackage, getData.data);
             }
         })
         .fail(function (jqXHR, status) {
