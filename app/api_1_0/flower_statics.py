@@ -9,7 +9,7 @@ from . import api
 # Python get Flower Model
 from app.api_1_0.api_functions.flowerPackage.get_vsim_hour_day_flower import getFlowers
 # sim_package_flower get Model
-
+from api_functions.flowerPackage.get_sim_package_flower import getSimPackageFlowerNextAPI
 from api_functions.flowerPackage.get_sim_package_flower import getSimPackageFlowerAPI
 
 
@@ -76,19 +76,24 @@ def get_package_flower_next():
     if request.method == 'POST':
         Dic_data = request.get_json()
         try:
-            country = str(Dic_data['Country'])
-            org = str(Dic_data['Org'])
-            sim_type = str(Dic_data['SimType'])
-            package_type_name = str(Dic_data['PackageTypeName'])
-            next_update_time = str(Dic_data['NextUpdateTime'])
-            ava_status = str(Dic_data['AvaStatus'])
-            business_status = str(Dic_data['BusinessStatus'])
-            package_status = str(Dic_data['PackageStatus'])
-            slot_status = str(Dic_data['SlotStatus'])
-            bam_status = str(Dic_data['BamStatus'])
-            flower_begin_time = str(Dic_data['FlowerBeginTime'])
-            flower_end_time = str(Dic_data['FlowerEndTime'])
-            add_group_key = Dic_data['addGroupKey']
+            package_date ={
+                'country': str(Dic_data['Country']),
+                'org': str(Dic_data['Org']),
+                'sim_type': str(Dic_data['SimType']),
+                'package_type_name': str(Dic_data['PackageTypeName']),
+                'next_update_time': str(Dic_data['NextUpdateTime']),
+                'ava_status': str(Dic_data['AvaStatus']),
+                'business_status': str(Dic_data['BusinessStatus']),
+                'package_status': str(Dic_data['PackageStatus']),
+                'slot_status': str(Dic_data['SlotStatus']),
+                'bam_status': str(Dic_data['BamStatus']),
+                'add_group_key': Dic_data['addGroupKey']
+            }
+            flower_date = {
+                'query_type': Dic_data['queryType'],
+                'list_time': Dic_data['ListTime'],
+                'add_group_key': Dic_data['addGroupKey']
+            }
 
         except KeyError as keyerr:
             errInfo = ("前端POST数据异常,KeyError:{}".format(keyerr))
@@ -97,13 +102,8 @@ def get_package_flower_next():
 
             return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
 
-        errInfo = country+'-'+org+'-'+sim_type+'-'+package_type_name+'-'+next_update_time+'-'+ava_status+'-'+\
-               business_status+'-'+package_status+'-'+slot_status+'-'+bam_status+'-'+flower_begin_time+'-'+ \
-                  flower_end_time+'-'+add_group_key
-        print (errInfo)
-        DicData = []
-        DicResults = {'info': {'err': True, 'errinfo': errInfo}, 'data': DicData}
-
-        return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+        # errInfo = country+org+sim_type+package_type_name+next_update_time+'status'+ava_status+business_status+\
+        #           package_status+slot_status+bam_status
+        return getSimPackageFlowerNextAPI(package_data=package_date, flower_data=flower_date)
 
     return False

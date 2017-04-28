@@ -42,6 +42,12 @@ function SetPanelView(modal_id){
 SetPanelView.prototype.SetPanelInit = function (panel_param, panel_data) {
     //$("#progressAjax").jqxLoader({ text: "提交更新数据中...", width: 100, height: 60 });
     var actionParam = panel_param;
+    // 静态读取信息设置
+    actionParam.packageNameReadOnlyID.val(panel_data.PackageName);
+    //
+    actionParam.packageSimNumReadOnlyID.val(panel_data.SimNum);
+    //
+    actionParam.packageUpdateTimeReadOnlyID.val(panel_data.NextUpdateTime);
     // 套餐流量设置
     var dateBegin = new Mydaterange(0, 'h', panel_param.beginTimeID).SetTime(panel_data.LastUpdateTime);
     dateBegin.initTime({'minute': 0, 'second': 0}, "YYYY-MM-DD HH");
@@ -53,7 +59,3 @@ SetPanelView.prototype.SetPanelInit = function (panel_param, panel_data) {
     // show modal
     this.clickBtId.modal();
 };
-// 点击查询构造ajax
-function PackageFlowerGetAjax(id_bt_get ) {
-    //this.PostData =
-}

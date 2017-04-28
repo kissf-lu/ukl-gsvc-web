@@ -146,7 +146,7 @@ function initjqxGrid(initGrid, array){
                 autoshowfiltericon: true,
                 columnmenuopening: function (menu, datafield, height) {
                     var column = $jqGridItem.jqxGrid('getcolumn', datafield);
-                    if (column.filtertype == "custom") {
+                    if (column.filtertype === "custom") {
                         menu.height(155);
                         setTimeout(function () {
                             menu.find('input').focus();

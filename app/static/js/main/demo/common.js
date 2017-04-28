@@ -378,6 +378,73 @@ AjaxFunc.prototype.GridPostAjax = function (ajax_option) {
             Option.objClass.objNotification.notificationAction('closeLast');
         });
 };
+AjaxFunc.prototype.GridPostModalAjax = function (ajax_option) {
+    this.ajaxParam.type='POST';
+    var Option = {
+        idTag: {
+            id_Alert: ajax_option.idTag.id_Alert === undefined ? '#' : ajax_option.idTag.id_Alert,
+            id_GetDataBt: ajax_option.idTag.id_GetDataBt === undefined ? '#' : ajax_option.idTag.id_GetDataBt,
+            id_Grid: ajax_option.idTag.id_Grid === undefined ? '#' : ajax_option.idTag.id_Grid,
+            id_Modal: ajax_option.idTag.id_Modal === undefined ? '#' : ajax_option.idTag.id_Modal,
+            id_ModalProgress: ajax_option.idTag.id_ModalProgress === undefined ? "#" : ajax_option.idTag.id_ModalProgress
+        },
+        objClass: {
+            objGrid: ajax_option.objClass.objGrid === undefined ? undefined : ajax_option.objClass.objGrid
+        }
+    };
+    $.ajax({
+        type: this.ajaxParam.type,
+        //get方法url地址
+        url: this.ajaxParam.url,
+        //request set
+        contentType: "application/json",
+        //data参数
+        data: JSON.stringify(this.ajaxParam.postData),
+        //server back data type
+        dataType: "json"
+    })
+        .done(function (data) {
+            var getData = data;
+            if (getData.data.length === 0) {
+                if (getData.info.err) {
+                    //delete old alter
+                    appendAlertInfo(
+                        'danger',
+                        ['Error:', getData.info.errinfo].join(' '),
+                        Option.idTag.id_Alert);
+                }
+                else {
+                    appendAlertInfo(
+                        'warning',
+                        '无查询结果!',
+                        Option.idTag.id_Alert);
+                }
+            }
+            else {
+                Option.objClass.objGrid.ClearGridData();
+                appendAlertInfo(
+                    'success',
+                    ['查询完成，', '结果如下：'].join(' '),
+                    Option.idTag.id_Alert);
+                // getData.data 为[{},{},{},...]结构的json数据，数据的key值必须同grid的datafield值相同
+                // getData.data key的值和后台导出的excel表头至一样.
+                Option.objClass.objGrid.ResetGridData(getData.data);
+                Option.idTag.id_Grid.jqxGrid('updatebounddata');
+            }
+        })
+        .fail(function (jqXHR, status) {
+            appendAlertInfo(
+                'warning',
+                ['Servers False:', jqXHR, status].join(' '),
+                Option.idTag.id_Alert);
+        })
+        .always(function () {
+            Option.idTag.id_Grid.jqxGrid('hideloadelement');
+            Option.idTag.id_GetDataBt.attr("disabled", false);
+            Option.idTag.id_Modal.modal('hide');
+            Option.idTag.id_ModalProgress.modal('hide');
+        });
+};
 AjaxFunc.prototype.GetAjax = function (ajax_option) {
     this.ajaxParam.type='GET';
     var nextAjaxData = this.ajaxParam.postData;
@@ -509,7 +576,6 @@ GridInit.prototype.ClearGridData = function () {
 GridInit.prototype.ResetGridData = function (array_data) {
     this.GridSource.localdata = array_data;
 };
-
 function ChosenView(grid_id) {
     this.gridID = grid_id;
 }
@@ -616,3 +682,252 @@ MomentTime.prototype.getSubUTCTime = function () {
     return this.dateTime === undefined ? undefined : moment(this.dateTime).subtract(moment().utcOffset(), 'm');
 };
 
+function GetSplitTimeDay(begin_time, end_time, day_gap) {
+    this.begin_time = begin_time;
+    this.end_time = end_time;
+    this.day_gap = day_gap
+}
+GetSplitTimeDay.prototype.thirdPartListDic = function (tiem_type) {
+    var time_type = tiem_type ===undefined ? 'unix' : tiem_type;
+    var list_time = [];
+    var time_num = 3;
+    var node_1 = {
+        n_y: moment(this.begin_time).add((i),'d').get('year'),
+        n_m: moment(this.begin_time).add((i),'d').get('month'),
+        n_d: moment(this.begin_time).add((i),'d').get('date')
+    };
+    var node_2 = {
+        n_y: moment(this.begin_time).add((this.day_gap),'d').get('year'),
+        n_m: moment(this.begin_time).add((this.day_gap),'d').get('month'),
+        n_d: moment(this.begin_time).add((this.day_gap),'d').get('date')
+    };
+    for (var i =0; i<time_num; i++){
+        if (i==0) {
+            if (time_type === 'unix'){
+                list_time.push({
+                    begin: new UnixTime(this.begin_time).getUCTUnix(),
+                    end: new UnixTime(moment().set({
+                        'year': node_1.n_y,
+                        'month': node_1.n_m,
+                        'date': node_1.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    })).getUCTUnix()
+                });
+            } else {
+                list_time.push({
+                    begin: this.begin_time,
+                    end: moment().set({
+                        'year': node_1.n_y,
+                        'month': node_1.n_m,
+                        'date': node_1.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    }).format("YYYY-MM-DD HH")
+                });
+            }
+        } else if (i===time_num-1){
+            if (time_type === 'unix'){
+                list_time.push({
+                    begin: new UnixTime(moment().set({
+                        'year': node_2.n_y,
+                        'month': node_2.n_m,
+                        'date': node_2.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    })).getUCTUnix(),
+                    end: new UnixTime(this.end_time).getUCTUnix()
+                });
+            } else {
+                list_time.push({
+                    begin: moment().set({
+                        'year': node_2.n_y,
+                        'month': node_2.n_m,
+                        'date': node_2.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    }).format("YYYY-MM-DD HH"),
+                    end: this.end_time
+                });
+            }
+        } else {
+            if (time_type === 'unix'){
+                list_time.push({
+                    begin: new UnixTime(moment().set({
+                        'year': node_1.n_y,
+                        'month': node_1.n_m,
+                        'date': node_1.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    })).getUCTUnix(),
+                    end: new UnixTime(moment().set({
+                        'year': node_2.n_y,
+                        'month': node_2.n_m,
+                        'date': node_2.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    })).getUCTUnix()
+                });
+            } else {
+                list_time.push({
+                    begin: moment().set({
+                        'year': node_1.n_y,
+                        'month': node_1.n_m,
+                        'date': node_1.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    }).format("YYYY-MM-DD HH"),
+                    end: moment().set({
+                        'year': node_2.n_y,
+                        'month': node_2.n_m,
+                        'date': node_2.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    }).format("YYYY-MM-DD HH")
+                });
+            }
+        }
+    }
+    return list_time;
+};
+GetSplitTimeDay.prototype.EachDayListDic = function (tiem_type) {
+    var time_type = tiem_type ===undefined ? 'unix' : tiem_type;
+    var list_time = [];
+    var begin_item = {
+        year: moment(this.begin_time).get('year'),
+        month: moment(this.begin_time).get('month'),
+        day: moment(this.begin_time).get('date'),
+        hour: moment(this.begin_time).get('hour')
+    };
+    for (var i=0; i<=this.day_gap; i++){
+        var last_date_tiem = {
+            n_y: moment(this.begin_time).add((i),'d').get('year'),
+            n_m: moment(this.begin_time).add((i),'d').get('month'),
+            n_d: moment(this.begin_time).add((i),'d').get('date')
+        };
+        var next_date_time = {
+            n_y: moment(this.begin_time).add((i+1),'d').get('year'),
+            n_m: moment(this.begin_time).add((i+1),'d').get('month'),
+            n_d: moment(this.begin_time).add((i+1),'d').get('date')
+        };
+
+        if (i===0){
+            if (time_type === 'unix'){
+                list_time.push({
+                    begin: new UnixTime(this.begin_time).getUCTUnix(),
+                    end: new UnixTime(moment().set({
+                        'year': next_date_time.n_y,
+                        'month': next_date_time.n_m,
+                        'date': next_date_time.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    })).getUCTUnix()
+                });
+            } else {
+                list_time.push({
+                    begin: this.begin_time,
+                    end: moment().set({
+                        'year': next_date_time.n_y,
+                        'month': next_date_time.n_m,
+                        'date': next_date_time.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    }).format("YYYY-MM-DD HH")
+                });
+            }
+        } else if (i===this.day_gap) {
+            if (time_type === 'unix'){
+                list_time.push({
+                    begin: new UnixTime(moment().set({
+                        'year': last_date_tiem.n_y,
+                        'month': last_date_tiem.n_m,
+                        'date': last_date_tiem.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    })).getUCTUnix(),
+                    end: new UnixTime(this.end_time).getUCTUnix()
+                });
+            } else {
+                list_time.push({
+                    begin: moment().set({
+                        'year': last_date_tiem.n_y,
+                        'month': last_date_tiem.n_m,
+                        'date': last_date_tiem.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    }).format("YYYY-MM-DD HH"),
+                    end: this.end_time
+                });
+            }
+        } else {
+            if (time_type === 'unix'){
+                list_time.push({
+                    begin: new UnixTime(moment().set({
+                        'year': last_date_tiem.n_y,
+                        'month': last_date_tiem.n_m,
+                        'date': last_date_tiem.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    })).getUCTUnix(),
+                    end: new UnixTime(moment().set({
+                        'year': next_date_time.n_y,
+                        'month': next_date_time.n_m,
+                        'date': next_date_time.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    })).getUCTUnix()
+                });
+            } else {
+                list_time.push({
+                    begin: moment().set({
+                        'year': last_date_tiem.n_y,
+                        'month': last_date_tiem.n_m,
+                        'date': last_date_tiem.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    }).format("YYYY-MM-DD HH"),
+                    end: moment().set({
+                        'year': next_date_time.n_y,
+                        'month': next_date_time.n_m,
+                        'date': next_date_time.n_d,
+                        'hour': 0,
+                        'minute': 0,
+                        'second': 0,
+                        'millisecond':0
+                    }).format("YYYY-MM-DD HH")
+                });
+            }
+        }
+    }
+    return list_time;
+};

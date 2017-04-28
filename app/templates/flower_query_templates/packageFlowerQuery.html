@@ -29,33 +29,54 @@
             </div>
             <div class="modal-body" id="id-modal-body">
                 <div align="left" class="row">
-                    <div class="col-md-12">
-                        <p class="font-bold">
-                            <i class="fa fa-info-circle"></i>
-                            查询起止时间自动设置为套餐更新起止时间：begin <= t < end
-                        </p>
-                        <div class="form-group">
-                            <div class="input-group" style="width:500px;">
-                                <span class="input-group-addon"><strong>时间(GMT0)</strong></span>
-                                <span class="input-group-addon"><strong>begin</strong></span>
-                                <input type="text" class="input-sm form-control" name="start" id="input-daterange-start"/>
-                                <span class="input-group-addon"><strong>end</strong></span>
-                                <input type="text" class="input-sm form-control" name="end" id="input-daterange-end"/>
+                    <div class="col-sm-12">
+                        <div class="form-group"">
+                            <div class="input-group">
+                                <span class="input-group-addon">查询套餐名称</span>
+                                <input type="text" class="input-sm form-control"
+                                       id="id-package-type-name-readonly" readonly="readonly" />
+                                <span class="input-group-addon">查询套餐卡数</span>
+                                <input type="text" class="input-sm form-control"
+                                       id="id-package-sim-num-readonly" readonly="readonly" />
                             </div>
                         </div>
                     </div>
                 </div>
                 <div align="left" class="row">
                     <div class="col-sm-12">
-                        <p class="font-bold">
-                            <i class="fa fa-info-circle"></i>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">查询套餐更新日期</span>
+                                <input type="text" class="input-sm form-control"
+                                       id="id-package-next-update-readonly" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div align="left" class="row">
+                    <div class="col-md-12">
+                        <p><i class="fa fa-info-circle"></i>
+                            查询起止时间自动设置为套餐更新起止时间：begin <= t < end
+                        </p>
+                        <div class="form-group">
+                            <div class="input-group" style="width:500px;">
+                                <span class="input-group-addon">时间(GMT0)</span>
+                                <span class="input-group-addon">begin</span>
+                                <input type="text" class="input-sm form-control" name="start" id="input-daterange-start"/>
+                                <span class="input-group-addon">end</span>
+                                <input type="text" class="input-sm form-control" name="end" id="input-daterange-end"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div align="left" class="row">
+                    <div class="col-sm-7">
+                        <p><i class="fa fa-info-circle"></i>
                             添加流量查询附加输出信息
                         </p>
                         <select data-placeholder="选择附加信息!" multiple class="chosen-select" style="width:300px;"
                                 id="id-chosen-panel">
-                            <option value="iccid">iccid</option>
                             <option value="time">time</option>
-                            <option value="country">country</option>
                         </select>
                     </div>
                 </div>
@@ -75,11 +96,11 @@
     </div>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="progress-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="id-progress-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title" id="exampleModalLabel">请等待，数据提交中！</h3>
+                <h3 class="modal-title" id="exampleModalLabel">请等待，数据查询中！</h3>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -217,7 +238,7 @@
                         <th>num</th>
                         <th>套餐名称</th>
                         <th>套餐更新时间(GMT0)</th>
-                        <th>总计卡数</th>
+                        <th>卡数(对应卡状况)</th>
                         <th>流量使用率(%)</th>
                         <th>流量查询选择</th>
                     </tr>
