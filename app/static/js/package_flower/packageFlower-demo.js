@@ -242,7 +242,7 @@ function AjaxPackageFlowerGet(ajax_param, ajax_option) {
         appendAlertInfo(alertClass, alert_str, ajax_option.id.warn_sec_id);
         ajax_option.id.modal_id.modal('hide');
 
-    } else if (day_gap<=0){
+    } else if (day_gap<0){
         alert_str = ['查询时间设置有误，', '请重新设置！'].join(' ');
         appendAlertInfo(alertClass, alert_str, ajax_option.id.warn_sec_id);
         ajax_option.id.modal_id.modal('hide');
@@ -288,10 +288,14 @@ GridColumnsSet.prototype.setColumns = function (grid_id, grid_src_adapter) {
         {text: '套餐名称', datafield: 'package_name', filtertype: "range", width: 200, hidden: false},
         {text: 'iccid', datafield: 'iccid', filtertype: "range", width: 200, hidden: false},
         {
-            text: 'time(GMT0)', datafield: 'time', cellsformat: this.dateFormat, width: 200,
+            text: '下次套餐更新时间', datafield: 'next_update_time', cellsformat: this.dateFormat, width: 300,
+            filtertype: 'date', hidden: false
+        },
+        {
+            text: 'time(GMT0)', datafield: 'time', cellsformat: this.dateFormat, width: 300,
             filtertype: 'date', hidden: true
         },
-        {text: '累计流量/MB', datafield: 'flower', width: 300 , hidden: false }
+        {text: '累计流量/MB', datafield: 'flower', width: 200 , hidden: false }
     ];
     return this;
 };
@@ -312,6 +316,7 @@ function gridFieldsSet() {
         {name: 'imsi', type: 'string'},
         {name: 'package_name', type: 'string'},
         {name: 'iccid', type: 'string'},
+        {name: 'next_update_time', type: 'string'},
         {name: 'time', type: 'string'},
         {name: 'flower', type: 'number'}
     ];
@@ -322,6 +327,7 @@ var jqxDropDownList = [
     {label: 'imsi', value: 'imsi', checked: true},
     {label: '套餐名称', value: 'package_name', checked: true},
     {label: 'iccid', value: 'iccid', checked: true},
+    {label: '下次套餐更新时间(GMT0)', value: 'time', checked: true},
     {label: 'time(GMT0)', value: 'time', checked: false},
     {label: '累计流量/MB', value: 'flower', checked: true}
 ];

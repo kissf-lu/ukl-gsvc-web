@@ -410,7 +410,7 @@ AjaxFunc.prototype.GridPostModalAjax = function (ajax_option) {
                     //delete old alter
                     appendAlertInfo(
                         'danger',
-                        ['Error:', getData.info.errinfo].join(' '),
+                        ['Error:', getData.info.errInfo].join(' '),
                         Option.idTag.id_Alert);
                 }
                 else {
