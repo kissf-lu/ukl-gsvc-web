@@ -558,7 +558,7 @@ GridInit.prototype.jqxGridSet =function (grid_id, grid_set_param) {
         },
         autoshowfiltericon: true,
         columnmenuopening: function (menu, datafield, height) {
-            var column = idGrid.jqxGrid('getcolumn', datafield);
+            var column = grid_id.jqxGrid('getcolumn', datafield);
             if (column.filtertype === "custom") {
                 menu.height(155);
                 setTimeout(function () {
@@ -692,17 +692,27 @@ GetSplitTimeDay.prototype.thirdPartListDic = function (tiem_type) {
     var list_time = [];
     var time_num = 3;
     var node_1 = {
-        n_y: moment(this.begin_time).add((i),'d').get('year'),
-        n_m: moment(this.begin_time).add((i),'d').get('month'),
-        n_d: moment(this.begin_time).add((i),'d').get('date')
+        n_y: moment(this.begin_time).add((1),'d').get('year'),
+        n_m: moment(this.begin_time).add((1),'d').get('month'),
+        n_d: moment(this.begin_time).add((1),'d').get('date')
     };
+    var end_time_utc = new UnixTime(this.end_time).getUCTUnix();
+    var now_time_utc = moment().unix();
+    var now_gap = now_time_utc-end_time_utc;
     var node_2 = {
-        n_y: moment(this.begin_time).add((this.day_gap),'d').get('year'),
-        n_m: moment(this.begin_time).add((this.day_gap),'d').get('month'),
-        n_d: moment(this.begin_time).add((this.day_gap),'d').get('date')
+        n_y: moment().get('year'),
+        n_m: moment().get('month'),
+        n_d: moment().get('date')
     };
+    if (now_gap > 0){
+        node_2 = {
+            n_y: moment(this.begin_time).add((this.day_gap),'d').get('year'),
+            n_m: moment(this.begin_time).add((this.day_gap),'d').get('month'),
+            n_d: moment(this.begin_time).add((this.day_gap),'d').get('date')
+        };
+    }
     for (var i =0; i<time_num; i++){
-        if (i==0) {
+        if (i===0) {
             if (time_type === 'unix'){
                 list_time.push({
                     begin: new UnixTime(this.begin_time).getUCTUnix(),
@@ -732,18 +742,35 @@ GetSplitTimeDay.prototype.thirdPartListDic = function (tiem_type) {
             }
         } else if (i===time_num-1){
             if (time_type === 'unix'){
-                list_time.push({
-                    begin: new UnixTime(moment().set({
-                        'year': node_2.n_y,
-                        'month': node_2.n_m,
-                        'date': node_2.n_d,
-                        'hour': 0,
-                        'minute': 0,
-                        'second': 0,
-                        'millisecond':0
-                    })).getUCTUnix(),
-                    end: new UnixTime(this.end_time).getUCTUnix()
-                });
+                if (now_gap >0){
+                    list_time.push({
+                        begin: new UnixTime(moment().set({
+                            'year': node_2.n_y,
+                            'month': node_2.n_m,
+                            'date': node_2.n_d,
+                            'hour': 0,
+                            'minute': 0,
+                            'second': 0,
+                            'millisecond':0
+                        })).getUCTUnix(),
+                        end: new UnixTime(this.end_time).getUCTUnix()
+                    });
+                }else {
+                    list_time.push({
+                        begin: new UnixTime(moment().set({
+                            'year': node_2.n_y,
+                            'month': node_2.n_m,
+                            'date': node_2.n_d,
+                            'hour': 0,
+                            'minute': 0,
+                            'second': 0,
+                            'millisecond':0
+                        })).getUCTUnix(),
+                        //此处按道理应该设置为当前时间，但是设置成套餐截至时间也正常
+                        end: new UnixTime(this.end_time).getUCTUnix()
+                    });
+                }
+
             } else {
                 list_time.push({
                     begin: moment().set({

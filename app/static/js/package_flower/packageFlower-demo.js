@@ -190,13 +190,15 @@ function AjaxPackageFlowerGet(ajax_param, ajax_option) {
     var time_list =[];
     var query_type = 'day';
     var alertClass = 'warning';
+    // remove old form html
+    ajax_option.id.warn_sec_id.children().remove();
     if (day_gap > 3){
         time_list = new GetSplitTimeDay(
             ajax_param.data.FlowerBeginTime,
             ajax_param.data.FlowerEndTime,
             day_gap).thirdPartListDic();
     }
-    if (0<day_gap <= 3){
+    if (day_gap <= 3){
         query_type = 'hour';
         time_list.push({
             begin: new UnixTime(ajax_param.data.FlowerBeginTime).getUCTUnix(),
@@ -277,7 +279,7 @@ GridColumnsSet.prototype.setColumns = function (grid_id, grid_src_adapter) {
                 return "<div style='margin:4px;'>" + (value + 1) + "</div>";
             }
         },
-        {text: '国家', datafield: 'country', filtertype: "range", width: 100, hidden: false},
+        {text: '国家', datafield: 'country', filtertype: "range", width: 70, hidden: false},
         {
             text: 'imsi', datafield: 'imsi', width: 150,
             filtertype: "custom",
@@ -285,17 +287,20 @@ GridColumnsSet.prototype.setColumns = function (grid_id, grid_src_adapter) {
                 buildFilterPanel(filterPanel, datafield, grid_id, grid_src_adapter);
             }
         },
-        {text: '套餐名称', datafield: 'package_name', filtertype: "range", width: 200, hidden: false},
+        {text: '套餐名称', datafield: 'package_name', filtertype: "range", width: 220, hidden: false},
         {text: 'iccid', datafield: 'iccid', filtertype: "range", width: 200, hidden: false},
+        {text: '网络集名称', datafield: 'sim_agg', filtertype: "range", width: 150, hidden: true},
         {
-            text: '下次套餐更新时间', datafield: 'next_update_time', cellsformat: this.dateFormat, width: 300,
-            filtertype: 'date', hidden: false
-        },
-        {
-            text: 'time(GMT0)', datafield: 'time', cellsformat: this.dateFormat, width: 300,
+            text: '上次次套餐更新时间(GMT0)', datafield: 'last_update_time', cellsformat: this.dateFormat, width: 150,
             filtertype: 'date', hidden: true
         },
-        {text: '累计流量/MB', datafield: 'flower', width: 200 , hidden: false }
+        {
+            text: '下次套餐更新时间(GMT0)', datafield: 'next_update_time', cellsformat: this.dateFormat, width: 150,
+            filtertype: 'date', hidden: false
+        },
+        {text: '累计流量/MB', datafield: 'flower', width: 100 , hidden: false },
+        {text: '流量使用率(OSS)/%', datafield: 'percentage_f', width: 150 , hidden: false },
+        {text: '流量使用率(SAAS)/%', datafield: 'percentage_fs', width: 150 , hidden: false }
     ];
     return this;
 };
@@ -316,9 +321,12 @@ function gridFieldsSet() {
         {name: 'imsi', type: 'string'},
         {name: 'package_name', type: 'string'},
         {name: 'iccid', type: 'string'},
+        {name: 'sim_agg', type: 'string'},
+        {name: 'last_update_time', type: 'string'},
         {name: 'next_update_time', type: 'string'},
-        {name: 'time', type: 'string'},
-        {name: 'flower', type: 'number'}
+        {name: 'flower', type: 'number'},
+        {name: 'percentage_f', type: 'number'},
+        {name: 'percentage_fs', type: 'number'}
     ];
 }
 //-显示选择菜单设置
@@ -327,9 +335,12 @@ var jqxDropDownList = [
     {label: 'imsi', value: 'imsi', checked: true},
     {label: '套餐名称', value: 'package_name', checked: true},
     {label: 'iccid', value: 'iccid', checked: true},
-    {label: '下次套餐更新时间(GMT0)', value: 'time', checked: true},
-    {label: 'time(GMT0)', value: 'time', checked: false},
-    {label: '累计流量/MB', value: 'flower', checked: true}
+    {label: '网络集名称', value: 'sim_agg', checked: false},
+    {label: '上次次套餐更新时间(GMT0)', value: 'next_update_time', checked: false},
+    {label: '下次套餐更新时间(GMT0)', value: 'next_update_time', checked: true},
+    {label: '累计流量/MB', value: 'flower', checked: true},
+    {label: '流量使用率(OSS)/%', value: 'percentage_f', checked: true},
+    {label: '流量使用率(SAAS)/%', value: 'percentage_fs', checked: true}
 ];
 //main-初始化主程序
 $(function () {
