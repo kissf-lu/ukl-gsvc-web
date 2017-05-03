@@ -22,8 +22,7 @@ def get_FlowerQuery():
     Dic_data = request.get_json()
     try:
         querySort = str(Dic_data['querySort'])
-        begintime = str(Dic_data['begintime'])
-        endtime = str(Dic_data['endtime'])
+        timeList = Dic_data['timeList']
         queryMcc = str(Dic_data['mcc'])
         queryPlmn = str(Dic_data['plmn'])
         queryImsi = str(Dic_data['imsi'])
@@ -36,8 +35,7 @@ def get_FlowerQuery():
         return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
 
     return getFlowers(querySort=querySort,
-                      begintime=begintime,
-                      endtime=endtime,
+                      time_list=timeList,
                       mcc=queryMcc,
                       plmn=queryPlmn,
                       imsi=queryImsi,

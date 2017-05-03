@@ -3,7 +3,13 @@
  */
 
 
-//
+/**
+ *
+ * @param panel_param
+ * @param next_ajax_data
+ * @param table_id
+ * @param table_data
+ */
 function staticTable1View(panel_param, next_ajax_data, table_id, table_data) {
     var tbHTML = '';
     var tbButtonID = [];
@@ -336,12 +342,63 @@ var jqxDropDownList = [
     {label: '套餐名称', value: 'package_name', checked: true},
     {label: 'iccid', value: 'iccid', checked: true},
     {label: '网络集名称', value: 'sim_agg', checked: false},
-    {label: '上次次套餐更新时间(GMT0)', value: 'next_update_time', checked: false},
+    {label: '上次次套餐更新时间(GMT0)', value: 'last_update_time', checked: false},
     {label: '下次套餐更新时间(GMT0)', value: 'next_update_time', checked: true},
     {label: '累计流量/MB', value: 'flower', checked: true},
     {label: '流量使用率(OSS)/%', value: 'percentage_f', checked: true},
     {label: '流量使用率(SAAS)/%', value: 'percentage_fs', checked: true}
 ];
+/**====================================
+ *
+ * @param grid_item
+ * @param alert_item
+ * @param url_query
+ * @returns {boolean}
+ *=================================================================*/
+function manualGridExcelExport(grid_item, alert_item, url_query) {
+    var rows = grid_item.jqxGrid('getdisplayrows');
+    var alldatanum= rows.length;
+    var view_data=[];
+    var json_data={'data':view_data};
+    var paginginformation = grid_item.jqxGrid('getpaginginformation');
+    // The page's number.
+    var pagenum = paginginformation.pagenum;
+    // The page's size.
+    var pagesize = paginginformation.pagesize;
+    // The number of all pages.
+    var pagescount = paginginformation.pagescount;
+    var alertClass = 'warning';
+    var alert_str ='';
+    if (alldatanum==0){
+        alert_str = [' ', '无输出数据!'].join(' ');
+        appendAlertInfo(alertClass, alert_str, alert_item);
+    }
+    else{
+        for(var i = 0; i < rows.length; i++){
+            if (i==pagenum*pagesize){
+                for (var j = 0; j< pagesize; j++){
+                    if (i+j< alldatanum){
+                        view_data.push({
+                            国家: rows[i+j].country,
+                            imsi: rows[i+j].imsi,
+                            套餐名称: rows[i+j].package_name,
+                            iccid: rows[i+j].iccid,
+                            网络集名称: rows[i+j].sim_agg,
+                            上次次套餐更新时间: rows[i+j].last_update_time,
+                            下次套餐更新时间: rows[i+j].next_update_time,
+                            累计流量: rows[i+j].flower,
+                            流量使用率_OSS: rows[i+j].percentage_f,
+                            流量使用率_SASS: rows[i+j].percentage_fs
+                        })
+                    }
+
+                }
+            }
+        }
+        excelExport(json_data, alert_item, url_query);
+    }
+    return false;
+}
 //main-初始化主程序
 $(function () {
     var globParam = {
@@ -383,7 +440,9 @@ $(function () {
             warnSecID: $("#id-warn-sec-layer"),
             notificationSecID: $("#id-notification-sec"),
             notificationContentSecID: $("#id-notification-content-sec"),
-            notificationContainerSecID: $("#id-notification-container-sec")
+            notificationContainerSecID: $("#id-notification-container-sec"),
+            flashGridTableBtID: $("#package-flower-flash"),
+            excelExportBtID: $("#package-flower-excel-export")
         }
     };
     //select 下拉列表筛选数据-国家：
@@ -430,6 +489,14 @@ $(function () {
         false,
         globParam.id.notificationContentSecID
     ).init();
+    globParam.id.flashGridTableBtID.click(function () {
+        globParam.id.gridID.jqxGrid('updatebounddata');
+
+    });
+    globParam.id.excelExportBtID.click(function () {
+        var url_query = $SCRIPT_ROOT + "/api/v1.0/export_package_flower/";
+        manualGridExcelExport(globParam.id.gridID, globParam.id.warnSecID, url_query);
+    });
     // 套餐统计ajax
     globParam.id.getSimPackageID.click(function () {
         //alert(moment(GlobeIdSet.timeStart.val()).add(moment().utcOffset(),'m').unix());

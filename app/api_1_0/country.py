@@ -127,7 +127,6 @@ def get_countryProbVsimDic():
 
     :return:
     """
-
     if request.method == 'POST':
         Dic_data = request.get_json()
         querySort = str(Dic_data['querySort'])
@@ -135,18 +134,21 @@ def get_countryProbVsimDic():
         queryPlmn = str(Dic_data['queryPlmn'])
         begintime = str(Dic_data['begintime'])
         endtime = str(Dic_data['endtime'])
+        dispatch_begin_t = str(Dic_data['dispatchBeginTime'])
+        dispatch_end_t = str(Dic_data['dispatchEndTime'])
         TimezoneOffset = int(Dic_data['TimezoneOffset'])
         DispatchThreshold = int(Dic_data['DispatchThreshold'])
         FlowerThreshold = int(Dic_data['FlowerThreshold'])
-        # print begintime, endtime
-        return getProbFisrtDic(querySort=querySort,
-                               queryPram=queryPram,
-                               queryPlmn=queryPlmn,
-                               begintime=begintime,
-                               endtime=endtime,
-                               TimezoneOffset=TimezoneOffset,
-                               DispatchThreshold=DispatchThreshold,
-                               FlowerThreshold=FlowerThreshold)
+        return getProbFisrtDic(query_sort=querySort,
+                               query_pram=queryPram,
+                               query_plmn=queryPlmn,
+                               begin_time=begintime,
+                               end_time=endtime,
+                               dispatch_begin_time = dispatch_begin_t,
+                               dispatch_end_time = dispatch_end_t,
+                               timezone_off_set=TimezoneOffset,
+                               dispatch_threshold=DispatchThreshold,
+                               flower_threshold=FlowerThreshold)
     return False
 
 

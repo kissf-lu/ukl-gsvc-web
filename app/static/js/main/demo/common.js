@@ -3,7 +3,43 @@
  */
 
 
-
+/**============================================================================
+ *  -------export xls files by submitting json data to server-------
+ *
+ * using submit method to submit json value to service and export xls to users.
+ * @param data: data like {'data':view_data} ;
+ * @param item_alert: jquery type warn DOC ID ;
+ * @param url_query:  post url;
+ * @return {boolean} return false to forbid DOC fresh;
+ *==============================================================================**/
+function excelExport(data,item_alert, url_query) {
+    var exportdata=data;
+    if (exportdata.data===[]){
+        // alter
+        alert_func(item_alert, '无输出数据！');
+        var alertClass = 'warn';
+        var alert_str = [' ', '无输出数据!'].join(' ');
+        appendAlertInfo(alertClass, alert_str, item_alert);
+    }
+    else{
+        var temp = document.createElement("form");
+        temp.action = url_query;
+        temp.method = "post";
+        temp.style.display = "none";
+        var opt = document.createElement("textarea");
+        opt.name = "data";
+        opt.value = JSON.stringify(exportdata.data);
+        temp.appendChild(opt);
+        document.body.appendChild(temp);
+        temp.submit();
+    }
+    return false;
+}
+/**====================================================
+ *
+ * @param drop_down_id
+ * @constructor
+ *=====================================================*/
 function DropDownList(drop_down_id){
     this.dropDownID = drop_down_id;
 }
@@ -685,8 +721,28 @@ MomentTime.prototype.getSubUTCTime = function () {
 function GetSplitTimeDay(begin_time, end_time, day_gap) {
     this.begin_time = begin_time;
     this.end_time = end_time;
-    this.day_gap = day_gap
+    this.day_gap = day_gap || 0;
 }
+/**
+ * 获取起始，截止时间的分段时间值
+ * @param tiem_type  查询时间类型
+ * @returns {Array}  返回json[] 格式数据
+ */
+GetSplitTimeDay.prototype.towPartListDic = function (tiem_type) {
+    var time_type = tiem_type ===undefined ? 'unix' : tiem_type;
+    var list_time = [];
+    list_time.push({
+        begin: new UnixTime(this.begin_time).getUCTUnix(),
+        end: new UnixTime(this.end_time).getUCTUnix()
+    });
+
+    return list_time;
+};
+/**=================================
+ *
+ * @param tiem_type
+ * @returns {Array}
+ *==================================*/
 GetSplitTimeDay.prototype.thirdPartListDic = function (tiem_type) {
     var time_type = tiem_type ===undefined ? 'unix' : tiem_type;
     var list_time = [];

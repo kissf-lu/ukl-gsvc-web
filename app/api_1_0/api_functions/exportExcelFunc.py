@@ -594,3 +594,27 @@ def get_excelNewVsimTestInfo(dic_data):
                                         datetimekey=dateTimeKey)
 
     return sorted_list_data
+
+
+def get_export_package_flower(dic_data):
+    """
+    
+    :param dic_data: 
+    :return: 
+    """
+    dicData = dic_data
+    sortKey = [unicode("国家"),
+               unicode("imsi"),
+               unicode("套餐名称"),
+               unicode("iccid"),
+               unicode("网络集名称"),
+               unicode("上次次套餐更新时间"),
+               unicode("下次套餐更新时间"),
+               unicode("累计流量"),
+               unicode("流量使用率_OSS"),
+               unicode("流量使用率_SASS")
+               ]
+    dateTimeKey = [unicode("上次次套餐更新时间"), unicode("下次套餐更新时间")]
+    sorted_list_data = getListExcelDataHour(dic_data=dicData,sort_key=sortKey,datetimekey=dateTimeKey)
+
+    return sorted_list_data
