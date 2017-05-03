@@ -74,7 +74,7 @@ function initProbDicjqxGrid() {
         },
         autoshowfiltericon: true,
         columnmenuopening: function (menu, datafield, height) {
-            var column = $("#FlowerQueryjqxGrid").jqxGrid('getcolumn', datafield);
+            var column = $("#initProbDicjqxGrid").jqxGrid('getcolumn', datafield);
             if (column.filtertype == "custom") {
                 menu.height(155);
                 setTimeout(function () {
