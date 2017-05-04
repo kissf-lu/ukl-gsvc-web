@@ -141,7 +141,7 @@ function excelExport(data) {
     }
     else {
         var temp = document.createElement("form");
-        temp.action = $SCRIPT_ROOT + "/api/v1.0/export_Flower/"//"/test_exportExcel";
+        temp.action = $SCRIPT_ROOT + "/api/v1.0/export_Flower/";  //"/test_exportExcel";
         temp.method = "post";
         temp.style.display = "none";
         var opt = document.createElement("textarea");
@@ -164,23 +164,27 @@ function TimeDimChange(param) {
             dateRangeBeginTOEndGapUnit: 'days',
             dateRangeTimeBeginID: param.TimeBegin,
             dateRangeBeginInitTime: {'hour':0,'minute': 0, 'second': 0},
-            dateRangeBeginFormat: "YYYY-MM-DD",
-            dateRangeBeginIfHourView: false,
+            dateRangeBeginFormat: "YYYY-MM-DD HH",
+            dateRangeBeginIfHourView: true,
             dateRangeEndTONowGap: 0,
             dateRangeEndTONowGapUnit: 'days',
             dateRangeTimeEndID: param.TimeEnd,
             dateRangeEndInitTime: {'hour':0,'minute': 0, 'second': 0},
-            dateRangeEndFormat: "YYYY-MM-DD",
-            dateRangeEndIfHourView: false
+            dateRangeEndFormat: "YYYY-MM-DD HH",
+            dateRangeEndIfHourView: true
         },
         hours:{
             columnsCellsFormat: 'yyyy-MM-dd HH',
             dateRangeBeginTOEndGap: 6,
             dateRangeBeginTOEndGapUnit: 'h',
             dateRangeTimeBeginID: param.TimeBegin,
+            dateRangeBeginInitTime: {'minute': 0, 'second': 0},
+            dateRangeBeginFormat: "YYYY-MM-DD HH",
             dateRangeEndTONowGap: 0,
             dateRangeEndTONowGapUnit: 'h',
-            dateRangeTimeEndID: param.TimeEnd
+            dateRangeTimeEndID: param.TimeEnd,
+            dateRangeEndInitTime: {'minute': 0, 'second': 0},
+            dateRangeEndFormat: "YYYY-MM-DD HH"
         }
     };
     var NotificationTimeDim = new Notificationbar(
@@ -221,6 +225,18 @@ function TimeDimChange(param) {
         NotificationTimeDim.notificationAction('open');
     }
 }
+function get_ajax_time_list(time_dim ,str_begin_time, str_end_time, time_gap) {
+    var list_time = [];
+    if (time_dim ==='hours'){
+        list_time = new GetSplitTimeDay(str_begin_time, str_end_time, 0).towPartListDic();
+    } else {
+        list_time = (moment(str_begin_time, "YYYY-MM-DD HH:mm:ss").get('h') ===0 &&
+                     moment(str_end_time, "YYYY-MM-DD HH:mm:ss").get('h') ===0) ?
+            new GetSplitTimeDay(str_begin_time, str_end_time, 0).towPartListDic() :
+            new GetSplitTimeDay(str_begin_time, str_end_time, time_gap).thirdPartListDic();
+    }
+    return list_time;
+}
 
 function getFlowerAjax(option_data, option_id, ajax_set, grid_obj) {
     var momentBegin = moment(option_data.Begintime, "YYYY-MM-DD HH:mm:ss");
@@ -236,6 +252,7 @@ function getFlowerAjax(option_data, option_id, ajax_set, grid_obj) {
         option_id.id_JqxNotificationContent
     );
     //
+    var list_tiem = get_ajax_time_list(option_data.TimeDim, option_data.Begintime, option_data.Endtime, DayGap);
     QueryjqxNotification.init();
     //隐藏上次通知
     QueryjqxNotification.notificationAction('closeLast');
@@ -250,8 +267,7 @@ function getFlowerAjax(option_data, option_id, ajax_set, grid_obj) {
     var alertClass = 'warning';
     var queryPost = {
         querySort: option_data.TimeDim,
-        begintime: new UnixTime(option_data.Begintime).getUCTUnix(),
-        endtime: new UnixTime(option_data.Endtime).getUCTUnix(),
+        timeList: list_tiem,
         mcc: option_data.Mcc,
         plmn: option_data.Plmn,
         imsi: option_data.Imsi,
@@ -370,9 +386,9 @@ $(function () {
     initjqxDropDownList();
     //初始化小时颗粒日期栏
     var daterange_hour_begin = new Mydaterange(6, 'h', GlobeIdSet.timeStart).UTCTime();
-    daterange_hour_begin.initTime();
+    daterange_hour_begin.initTime({'minute': 0, 'second': 0}, "YYYY-MM-DD HH");
     var daterange_hour_end = new Mydaterange(0, 'h', GlobeIdSet.timeEnd).UTCTime();
-    daterange_hour_end.initTime();
+    daterange_hour_end.initTime({'minute': 0, 'second': 0}, "YYYY-MM-DD HH");
     // 初始化chosen
     GlobeIdSet.chosenFlowerKey.chosen({width: "100%"});
     GlobeIdSet.timeDim.change(function () {
@@ -388,7 +404,6 @@ $(function () {
         TimeDimChange(Param);
     });
     GlobeIdSet.flowerDataGet.click( function (){
-        //alert(moment(GlobeIdSet.timeStart.val()).add(moment().utcOffset(),'m').unix());
         var option = {
             data:{
                 TimeDim: GlobeIdSet.timeDim.val(),

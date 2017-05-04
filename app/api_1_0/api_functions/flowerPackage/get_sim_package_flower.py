@@ -243,7 +243,7 @@ def mongo_agg_hour(db_str, pip_line, oriage_db):
             return dic_results
 
 
-def mongo_agg_day(db_str, pip_line_hour, pip_line_day,oriage_db):
+def mongo_agg_day(db_str, pip_line_hour, pip_line_day, oriage_db):
     """
     
     :param db_str: 
@@ -512,7 +512,7 @@ def getPackageInfo(package_set_param):
             bam_status_str = " AND a.`bam_status` IN (" + bam_status + ") "
         if add_key:
             if 'sim_agg' in add_key:
-                sim_agg_str = "c.`name` AS 'sim_agg',  "
+                sim_agg_str = "p.`name` AS 'sim_agg',  "
             if 'last_update_time' in add_key:
                 last_update_time_str = "DATE_FORMAT(b.`last_update_time`,'%Y-%m-%d %H')  AS 'last_update_time', "
         query_str = (

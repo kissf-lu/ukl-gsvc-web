@@ -27,7 +27,8 @@ from api_functions.exportExcelFunc import (get_excel140countryDataAndSorted,
                                            get_excelNewVsimTestInfoDeleteTemple,
                                            get_excelNewVsimTestInfoInsertTemple,
                                            get_excelNewVsimTestInfoUpdateTemple,
-                                           get_excelNewVsimTestInfo)
+                                           get_excelNewVsimTestInfo,
+                                           get_export_package_flower)
 
 
 @api.route('/export_countrySrcStatic/', methods=['POST'])
@@ -227,5 +228,17 @@ def export_newVsimTestInfo():
 
         return excel.make_response_from_array(sortedDicData, "xls",
                                               file_name="NewVsimTestInfo")
+
+    return False
+
+
+@api.route('/export_package_flower/', methods=['POST'])
+def export_package_flower():
+    if request.method == 'POST':
+        dic_data = json.loads(request.form['data'])
+        sortedDicData = get_export_package_flower(dic_data=dic_data)
+
+        return excel.make_response_from_array(sortedDicData, "xls",
+                                              file_name="gsvc_export_package_flower")
 
     return False

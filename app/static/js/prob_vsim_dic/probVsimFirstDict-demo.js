@@ -43,6 +43,7 @@ var countryProbDicsource = {
         {name: 'iccid', type: 'string'},
         {name: 'package_type_name', type: 'string'},
         {name: 'next_update_time', type: 'date'},
+        {name: 'sim_agg', type: 'string'},
         {name: 'bam', type: 'string'},
         {name: 'imsi_con', type: 'int'},
         {name: 'imei_con', type: 'int'},
@@ -73,7 +74,7 @@ function initProbDicjqxGrid() {
         },
         autoshowfiltericon: true,
         columnmenuopening: function (menu, datafield, height) {
-            var column = $("#FlowerQueryjqxGrid").jqxGrid('getcolumn', datafield);
+            var column = $("#initProbDicjqxGrid").jqxGrid('getcolumn', datafield);
             if (column.filtertype == "custom") {
                 menu.height(155);
                 setTimeout(function () {
@@ -118,6 +119,7 @@ function initProbDicjqxGrid() {
                 text: '套餐更新日期', datafield: 'next_update_time', filtertype: 'date', width: 100,
                 cellsformat: 'yyyy-MM-dd HH:mm:ss'
             },
+            {text: '网络集名', datafield: 'sim_agg', filtertype: 'checkedlist', width: 100},
             {text: 'bam', datafield: 'bam', width: 180, filtertype: "range"},
             {text: '分卡次数', datafield: 'imsi_con', width: 70, filtertype: "range"},
             {text: '不同终端数', datafield: 'imei_con', width: 80, filtertype: "range"},
@@ -215,7 +217,7 @@ $("#probDicExcelExport").click(function () {
     var rows = $('#initProbDicjqxGrid').jqxGrid('getdisplayrows');
     var alldatanum = rows.length;
     var view_data = [];
-    var json_data = {'data': view_data}
+    var json_data = {'data': view_data};
     var paginginformation =
         $('#initProbDicjqxGrid').jqxGrid('getpaginginformation');
     // The page's number.
@@ -241,6 +243,7 @@ $("#probDicExcelExport").click(function () {
                             iccid: rows[i + j].iccid,
                             package_type_name: rows[i + j].package_type_name,
                             next_update_time: rows[i + j].next_update_time,
+                            sim_agg: rows[i + j].sim_agg,
                             bam: rows[i + j].bam,
                             imsi_con: rows[i + j].imsi_con,
                             imei_con: rows[i + j].imei_con,
@@ -266,6 +269,7 @@ $("#probDicExcelExport").click(function () {
                             iccid: rows[i + j].iccid,
                             套餐类型: rows[i + j].package_type_name,
                             套餐更新日期: rows[i + j].next_update_time,
+                            网络集名: rows[i + j].sim_agg,
                             BAM: rows[i + j].bam,
                             分卡次数: rows[i + j].imsi_con,
                             不同终端数: rows[i + j].imei_con,
@@ -346,7 +350,7 @@ $("#ProbDic_dataGet").click(function () {
     var conformImsi = checkImsiReg(Imsi);
     var conformPlmn = checkplmnReg(Plmn);
 
-    var querySort = "";
+    var querySort = "country";
     var queryPost = {};
     var idItem = {
         queryBt: $("#ProbDic_dataGet"),
@@ -367,18 +371,20 @@ $("#ProbDic_dataGet").click(function () {
     //删除上次告警
     idItem.queryAlert.children().detach();
     if (country_imsi_check) {
-        //必须进行国家选择才能查询!
-        querySort = "country";
+        // post data setting
         queryPost = {
             querySort: querySort,
             queryPram: Country,
             queryPlmn: Plmn,
-            begintime: Begintime,
-            endtime: Endtime,
+            begintime: new UnixTime(Begintime).getLocalUnix(),
+            endtime: new UnixTime(Endtime).getLocalUnix(),
+            dispatchBeginTime: new MomentTime(Begintime).getSubUTCTime().format('YYYY-MM-DD HH:mm:ss'),
+            dispatchEndTime: new MomentTime(Endtime).getSubUTCTime().format('YYYY-MM-DD HH:mm:ss'),
             TimezoneOffset: TimezoneOffset,
             DispatchThreshold: DispatchThreshold,
             FlowerThreshold: FlowerThreshold
         };
+        //必须进行国家选择才能查询!
         //关闭国家限制，后续要打开在设置
         if ((Country === "") && (DispatchThreshold <= 10)) {
             appendAlertInfo('warning', '不设置国家，分卡次数阈值必须大于等于10次!', idItem.queryAlert);
@@ -456,6 +462,7 @@ $("#ProbDic_dataGet").click(function () {
                                         iccid: item.iccid,
                                         package_type_name: item.package_type_name,
                                         next_update_time: item.next_update_time,
+                                        sim_agg: item.sim_agg,
                                         bam: item.bam,
                                         imsi_con: item.imsi_con,
                                         imei_con: item.imei_con,
@@ -485,17 +492,19 @@ $("#ProbDic_dataGet").click(function () {
     }
     else {
         querySort = "imsi";
+        // post data setting
         queryPost = {
             querySort: querySort,
             queryPram: Imsi,
             queryPlmn: Plmn,
-            begintime: Begintime,
-            endtime: Endtime,
+            begintime: new UnixTime(Begintime).getLocalUnix(),
+            endtime: new UnixTime(Endtime).getLocalUnix(),
+            dispatchBeginTime: new MomentTime(Begintime).getSubUTCTime().format('YYYY-MM-DD HH:mm:ss'),
+            dispatchEndTime: new MomentTime(Endtime).getSubUTCTime().format('YYYY-MM-DD HH:mm:ss'),
             TimezoneOffset: TimezoneOffset,
             DispatchThreshold: DispatchThreshold,
             FlowerThreshold: FlowerThreshold
         };
-
         if (!(conformImsi)) {
             $("#queryQlert").append(
                 queryAndReturnAlert +
@@ -648,7 +657,7 @@ function checkplmnReg(str) {
         return false;
     }
 }
-// ------------------------------------------------------------初始化天维度选择通知栏
+// -------------------------------------------初始化天维度选择通知栏
 function countryChartQuerynotification_init() {
     //初始化通知
     $("#countryChartQueryjqxNotification").jqxNotification({
@@ -658,7 +667,7 @@ function countryChartQuerynotification_init() {
 
 }
 
-//--------------------------------------------------------------main-初始化主程序-----------------------------------------
+//----------------------------------------------main-初始化主程序
 $(function () {
     var idItem = {
         beginTime: $('#input-daterange-start'),
