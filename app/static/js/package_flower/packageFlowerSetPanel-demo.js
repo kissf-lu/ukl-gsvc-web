@@ -48,7 +48,8 @@ SetPanelView.prototype.SetPanelInit = function (panel_param, panel_data) {
     actionParam.packageSimNumReadOnlyID.val(panel_data.SimNum);
     //
     actionParam.packageUpdateTimeReadOnlyID.val(panel_data.NextUpdateTime);
-    // 套餐流量设置
+    // 修复firefox浏览器date range 插件在modal界面选择日期失效bug
+    $.fn.modal.Constructor.prototype.enforceFocus = function () { };
     var dateBegin = new Mydaterange(0, 'h', panel_param.beginTimeID).SetTime(panel_data.LastUpdateTime);
     dateBegin.initTime({'minute': 0, 'second': 0}, "YYYY-MM-DD HH");
     var dateEnd = new Mydaterange(0, 'h', panel_param.endTimeID).SetTime(panel_data.NextUpdateTime);
