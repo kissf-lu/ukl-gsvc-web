@@ -272,7 +272,7 @@ def getCountryDispatchAndVsimInfo(country, queryPlmn, begintime, endtime, Dispat
         "FROM `t_css_vsim` AS a "
         "LEFT  JOIN `t_css_vsim_packages` b "
         "	ON a.`imsi`=b.`imsi`  "
-        "LEFT  JOIN `t_css_vsim_dispatcherlog` AS c "
+        "LEFT  JOIN `t_css_user_vsim_log` AS c "
         "        ON c.`imsi`=a.`imsi` "
         "WHERE  "
         "     a.`bam_status`='0' "
@@ -317,7 +317,7 @@ def getImsiDispatchAndVsimInfo(imsi, begintime, endtime):
         "FROM `t_css_vsim` AS a "
         "LEFT  JOIN `t_css_vsim_packages` b "
         "	ON a.`imsi`=b.`imsi`  "
-        "LEFT  JOIN `t_css_vsim_dispatcherlog` AS c "
+        "LEFT  JOIN `t_css_user_vsim_log` AS c "
         "        ON c.`imsi`=a.`imsi` "
         "WHERE  "
         "     a.`imsi` IN (" + strimsi + ")"
@@ -390,7 +390,7 @@ def getProbFisrtDic(querySort, queryPram, queryPlmn, begintime, endtime, Timezon
                 DicResults = {'info': {'err': True, 'errinfo': errInfo}, 'data': DicData}
                 return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
             elif not DicData:
-                DicResults = {'info': {'err': True, 'errinfo': '无查询结果，请重新设置查询参数'}, 'data': DicData}
+                DicResults = {'info': {'err': True, 'errinfo': '无分卡记录查询结果，请重新设置查询参数'}, 'data': DicData}
                 return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
             else:
                 try:

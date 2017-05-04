@@ -2,8 +2,8 @@
 
 
 from flask import request
-from flask import json
-from bson import json_util
+# from flask import json
+# from bson import json_util
 from . import api
 from api_functions.getVsimCardCountryInfo import (getVsimCountryStatic, getindexHtmlMutiLineData)
 # 导入查询手工维护表、系统资源统计表模块
@@ -13,8 +13,6 @@ from api_functions.getonSysSrc import (getVsimManulInfor,
 from api_functions.getCountrySrcConIndexGrid import qurycountrySrcCon
 # 获取问题初诊的信息函数
 from api_functions.getCountryProbDic import getProbFisrtDic
-# Python get Flower Model
-from api_functions.get_FlowerQueryFunction import getFlowers
 # new vsim test model
 from api_functions.newVsimTest import get_new_vsim_test_info
 # org ajax model
@@ -98,18 +96,27 @@ def get_mutiLine_maxUser():
         return getindexHtmlMutiLineData(country, begintime, endtime, butype=butype, timedim=timedim)
 
 
-@api.route('/get_countrySrcCon/', methods=['POST'])
+@api.route('/get_countrySrcCon/', methods=['GET', 'POST'])
 def get_countrySrcCon():
     """
     本API为主页国家概述面板获取国家不同套餐卡状态统计数据接口
     :return:
     """
+    # print request.args.get('country', 'ad', type=str)
     if request.method == 'POST':
         DicData = request.get_json()
         country = str(DicData['country'])
         orgName = str(DicData['org'])
+        vsimType = str(DicData['vsim_type'])
 
-        return qurycountrySrcCon(country, orgName)
+        return qurycountrySrcCon(country, orgName, vsimType)
+
+    if request.method == 'GET':
+        country = request.args.get('country', 'ad', type=str)
+        orgName = request.args.get('org', 'gtbu', type=str)
+        vsimType = request.args.get('vsim_type', '', type=str)
+
+        return qurycountrySrcCon(country, orgName, vsimType)
 
     return False
 
@@ -131,7 +138,7 @@ def get_countryProbVsimDic():
         TimezoneOffset = int(Dic_data['TimezoneOffset'])
         DispatchThreshold = int(Dic_data['DispatchThreshold'])
         FlowerThreshold = int(Dic_data['FlowerThreshold'])
-
+        # print begintime, endtime
         return getProbFisrtDic(querySort=querySort,
                                queryPram=queryPram,
                                queryPlmn=queryPlmn,
@@ -141,41 +148,6 @@ def get_countryProbVsimDic():
                                DispatchThreshold=DispatchThreshold,
                                FlowerThreshold=FlowerThreshold)
     return False
-
-
-@api.route('/get_FlowerQuery/', methods=['POST'])
-def get_FlowerQuery():
-    """
-    :return:
-    """
-    # paramKeyFromRequest = ['querySort','begintime','endtime','mcc','plmn','imsi','agg_group_key','TimezoneOffset']
-
-    Dic_data = request.get_json()
-
-    try:
-        querySort = str(Dic_data['querySort'])
-        begintime = str(Dic_data['begintime'])
-        endtime = str(Dic_data['endtime'])
-        queryMcc = str(Dic_data['mcc'])
-        queryPlmn = str(Dic_data['plmn'])
-        queryImsi = str(Dic_data['imsi'])
-        aggGroupKey = Dic_data['agg_group_key']
-        TimezoneOffset = int(Dic_data['TimezoneOffset'])
-
-    except KeyError:
-        errinfo = '前端POST数据异常!'
-        DicData = []
-        DicResults = {'info': {'err': True, 'errinfo': errinfo}, 'data': DicData}
-        return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
-
-    return getFlowers(querySort=querySort,
-                      begintime=begintime,
-                      endtime=endtime,
-                      mcc=queryMcc,
-                      plmn=queryPlmn,
-                      imsi=queryImsi,
-                      flower_query_key=aggGroupKey,
-                      TimezoneOffset=TimezoneOffset)
 
 
 @api.route('/get_newVsimTestInforTable/', methods=['POST'])

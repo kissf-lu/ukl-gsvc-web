@@ -12,7 +12,6 @@
     :copyright: (c) 2015 by Armin kissf lu.
     :license: ukl, see LICENSE for more details.
 """
-import datetime as dt
 from datetime import datetime
 
 
@@ -70,7 +69,7 @@ def getListExcelData(dic_data, sort_key, datetimekey):
             for date in datetimeKey:
                 if date in data.keys():
                     if (data[date] is not None) and (data[date] != ''):
-                        data[date] = str(datetime.strptime(data[date], '%Y-%m-%dT%H:%M:%S.%fZ') + dt.timedelta(hours=8))
+                        data[date] = str(datetime.strptime(data[date], '%Y-%m-%dT%H:%M:%S.%fZ'))
     for dic in dicData:
         temp_key = dic.keys()
         if len(max_key) < len(temp_key):
@@ -104,7 +103,7 @@ def getListExcelData(dic_data, sort_key, datetimekey):
     return sorted_list_data
 
 
-def getDayHourListExcelData(dic_data, sort_key, datetimekey):
+def getListExcelDataDay(dic_data, sort_key, datetimekey):
     """
 
     :param dic_data:
@@ -125,7 +124,62 @@ def getDayHourListExcelData(dic_data, sort_key, datetimekey):
             for date in datetimeKey:
                 if date in data.keys():
                     if (data[date] is not None) and (data[date] != ''):
-                        data[date] = str(datetime.strptime(data[date], '%Y-%m-%d %H') + dt.timedelta(hours=0))
+                        data[date] = str(datetime.strptime(data[date], '%Y-%m-%d'))
+    for dic in dicData:
+        temp_key = dic.keys()
+        if len(max_key) < len(temp_key):
+            max_key = temp_key
+
+    for sortofkey in sortKey:
+        if sortofkey not in max_key:
+            temp_null_key.append(sortofkey)
+
+    if temp_null_key:
+        for k in temp_null_key:
+            sortKey.remove(k)
+
+    for sk in sortKey:
+        for mk in max_key:
+            if sk == mk:
+                sort_max_key.append(sk)
+    # 添加标同行
+    sorted_list_data.append(sort_max_key)
+
+    for i in range(len(dicData)):
+        # 每次清除上次记录
+        temp_one_list = []
+        for key in sort_max_key:
+            try:
+                temp_one_list.append(dicData[i][key])
+            except KeyError:
+                temp_one_list.append('')
+        sorted_list_data.append(temp_one_list)
+
+    return sorted_list_data
+
+
+def getListExcelDataHour(dic_data, sort_key, datetimekey):
+    """
+
+    :param dic_data:
+    :param sort_key:
+    :param datetimekey: 数据中的时间数据
+    :return:
+    """
+    dicData = dic_data
+    datetimeKey = datetimekey
+    max_key = []
+    sort_max_key = []
+    sorted_list_data = []
+    sortKey = sort_key
+    temp_null_key = []
+
+    if datetimeKey:
+        for data in dicData:
+            for date in datetimeKey:
+                if date in data.keys():
+                    if (data[date] is not None) and (data[date] != ''):
+                        data[date] = str(datetime.strptime(data[date], '%Y-%m-%d %H'))
     for dic in dicData:
         temp_key = dic.keys()
         if len(max_key) < len(temp_key):
@@ -172,6 +226,7 @@ def get_excelCountrySrcStaticDataAndSorted(dic_data):
                unicode('归属机构'),
                unicode('在架卡数'),
                unicode('可用卡数'),
+               unicode('停用卡数'),
                unicode('流量不足卡数'),
                unicode('未激活卡数'),
                unicode('流量预警阀值_MB'),
@@ -182,9 +237,9 @@ def get_excelCountrySrcStaticDataAndSorted(dic_data):
 
     dateTimeKey = [unicode('套餐更新日期')]
     # print (dicData[1][unicode('套餐更新日期')])
-    sorted_list_data = getDayHourListExcelData(dic_data=dicData,
-                                               sort_key=sortKey,
-                                               datetimekey=dateTimeKey)
+    sorted_list_data = getListExcelDataHour(dic_data=dicData,
+                                            sort_key=sortKey,
+                                            datetimekey=dateTimeKey)
 
     return sorted_list_data
 
@@ -228,7 +283,6 @@ def get_excelFlowerDataAndSorted(dic_data):
                unicode('plmn'),
                unicode('lac'),
                unicode('Flower')]
-
     dateTimeKey = [unicode('time')]
     sorted_list_data = getListExcelData(dic_data=dicData,
                                         sort_key=sortKey,

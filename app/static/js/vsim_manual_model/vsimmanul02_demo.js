@@ -401,14 +401,14 @@ function manualGridExcelExport(grid_item, alert_item, url_query) {
                             iccid: rows[i+j].iccid,
                             套餐:rows[i+j].package_type,
                             套餐外付费类型:rows[i+j].charge_noflower,
-                            激活日期:rows[i+j].activated_time,
-                            上次套餐更新日期: rows[i+j].last_update_time,
-                            下次套餐更新日期: rows[i+j].next_update_time,
+                            激活日期:moment(rows[i+j].activated_time).add(moment().utcOffset(), 'm'),
+                            上次套餐更新日期: moment(rows[i+j].last_update_time).add(moment().utcOffset(), 'm'),
+                            下次套餐更新日期: moment(rows[i+j].next_update_time).add(moment().utcOffset(), 'm'),
                             备注:rows[i+j].remarks,
                             电话号码:rows[i+j].phone_num,
                             付费类型:rows[i+j].pay_type,
                             apn:rows[i+j].apn,
-                            上架日期:rows[i+j].shelved_time
+                            上架日期:moment(rows[i+j].shelved_time).add(moment().utcOffset(), 'm')
                         })
                     }
 
@@ -704,6 +704,7 @@ function sysGridExcelExport(grid_item, alert_item, url_query) {
             if (i==pagenum*pagesize){
                 for (var j = 0; j< pagesize; j++){
                     if (i+j< alldatanum){
+                        alert(moment(rows[i+j].next_update_time).add(moment().utcOffset(), 'm'));
                         view_data.push({
                             imsi: rows[i+j].imsi,
                             country: rows[i+j].country,
@@ -723,9 +724,9 @@ function sysGridExcelExport(grid_item, alert_item, url_query) {
                             初始流量MB: rows[i+j].init_flow,
                             累计使用流量MB: rows[i+j].total_use_flow,
                             剩余流量MB: rows[i+j].leave_flow,
-                            激活日期: rows[i+j].activate_time,
-                            上次套餐更新日期: rows[i+j].update_time,
-                            下次套餐更新日期: rows[i+j].next_update_time,
+                            激活日期: moment(rows[i+j].activate_time).add(moment().utcOffset(), 'm'),
+                            上次套餐更新日期: moment(rows[i+j].update_time).add(moment().utcOffset(), 'm'),
+                            下次套餐更新日期: moment(rows[i+j].next_update_time).add(moment().utcOffset(), 'm'),
                             iccid: rows[i+j].iccid,
                             BAM编码: rows[i+j].bam_code,
                             卡位: rows[i+j].slot_num,

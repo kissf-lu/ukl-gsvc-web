@@ -58,20 +58,23 @@ def mergeDataFunc(sourData, mergeData, mergekey, mergeindex):
     return sourData
 
 
-def qureyNcountrySrcCon(sys_str, database, country, org_name):
+def qureyNcountrySrcCon(sys_str, database, country, org_name, vsim_type):
     """
-
-    :param sys_str:
-    :param database:
-    :param country:
-    :param org_name:
-    :return:
+    
+    :param sys_str: 
+    :param database: 
+    :param country: 
+    :param org_name: 
+    :param vsim_type: 
+    :return: 
     """
 
     Country = country
     OrgName = org_name
+    VsimType = vsim_type
     countrySet = ''
     orgNameSet = ''
+    VsimTypSet = ''
     errInfo = ''
     qurey_result = []
     if Country:
@@ -81,6 +84,8 @@ def qureyNcountrySrcCon(sys_str, database, country, org_name):
             orgNameSet = " "
         else:
             orgNameSet = "AND e.`org_name` = '" + OrgName + "' "
+    if VsimType:
+        VsimTypSet = "AND a.`vsim_type` = '" + VsimType + "' "
     query_str = (
         "(SELECT "
         "a.`iso2`              AS 'Country', "
@@ -89,10 +94,27 @@ def qureyNcountrySrcCon(sys_str, database, country, org_name):
         "CASE WHEN e.`org_name` is null THEN '总计' else e.`org_name` END  AS 'ORG', "
         "COUNT(DISTINCT a.`imsi`) AS 'all_num', "
         "COUNT(DISTINCT (CASE WHEN a.`activate_status` = 1 THEN a.`imsi` END)) AS 'unact_num', "
-        "COUNT(DISTINCT (CASE WHEN a.`business_status`= 3 THEN a.`imsi` END)) AS 'flow_unenought_num', "
+        "COUNT(DISTINCT (CASE WHEN a.`available_status` != 0  "
+        "                          AND a.`business_status` NOT IN (3) "
+        "                          AND a.`activate_status` = 0 "
+        "                          THEN a.`imsi` END)) AS 'stop_num',"
+        "COUNT(DISTINCT (CASE WHEN a.`business_status`= 3 "
+        "                          AND b.`next_update_time` > DATE(NOW())"
+        "                          AND a.`activate_status` = 0 "
+        "                     THEN a.`imsi` END)) AS 'flow_unenought_num', "
         "COUNT(DISTINCT (CASE WHEN ((a.`available_status` = '0') "
         "                AND b.`next_update_time` IS NOT NULL "
-        "                AND b.`next_update_time` > DATE(NOW())) "
+        "                AND b.`next_update_time` > DATE(NOW()) "
+        "                AND b.`package_status` IN (0,1) "
+        "                AND a.business_status IN (0,4,5) "
+        "                AND (b.service_time_type = 0  "
+        "                     OR (( b.service_time_type = 1 AND ((b.gmt0_time_end > NOW() AND NOW() > '00:00:00') "
+        "                           OR (b.gmt0_time_start < NOW() AND NOW() <= '23:59:59')) "
+        "                               AND b.gmt0_time_end < b.gmt0_time_start )  "
+        "                     OR(b.service_time_type = 1 AND b.gmt0_time_start < NOW()AND b.gmt0_time_end > NOW() "
+        "                        AND   b.gmt0_time_end > b.gmt0_time_start )) "
+        "                     )"
+        "                 )"
         "                THEN a.`imsi` END)) AS 'ava_num', "
         "CASE WHEN 1 THEN '' END AS 'WarningFlow', "
         "CAST(SUM(CASE WHEN `activate_status` = 0 "
@@ -108,7 +130,7 @@ def qureyNcountrySrcCon(sys_str, database, country, org_name):
         "LEFT  JOIN `t_css_group`         AS e  ON a.`group_id`= e.`id` "
         "LEFT  JOIN `t_css_package_type`  AS c  ON c.`id` = b.`package_type_id` "
         "WHERE   a.`bam_status` = '0' "
-        "        AND a.`slot_status` = '0'  " + countrySet + orgNameSet + " "
+        "        AND a.`slot_status` = '0'  " + countrySet + orgNameSet + VsimTypSet + " "
         "        AND b.`package_type_name` IS NOT NULL "
         "        AND b.`init_flow` is not null "
         "GROUP BY a.`iso2`,e.`org_name` "
@@ -122,10 +144,27 @@ def qureyNcountrySrcCon(sys_str, database, country, org_name):
         "e.`org_name`          AS 'ORG', "
         "COUNT(DISTINCT a.`imsi`) AS 'all_num', "
         "COUNT(DISTINCT (CASE WHEN a.`activate_status` = 1 THEN a.`imsi` END)) AS 'unact_num', "
-        "COUNT(DISTINCT (CASE WHEN a.`business_status`= 3 THEN a.`imsi` END)) AS 'flow_unenought_num', "
+        "COUNT(DISTINCT (CASE WHEN a.`available_status` != 0  "
+        "                          AND a.`business_status` NOT IN (3) "
+        "                          AND a.`activate_status` = 0 "
+        "                          THEN a.`imsi` END)) AS 'stop_num',"
+        "COUNT(DISTINCT (CASE WHEN a.`business_status`= 3 "
+        "                          AND b.`next_update_time` > DATE(NOW())"
+        "                          AND a.`activate_status` = 0 "
+        "                     THEN a.`imsi` END)) AS 'flow_unenought_num', "
         "COUNT(DISTINCT (CASE WHEN ((a.`available_status` = '0') "
         "                     AND b.`next_update_time` IS NOT NULL "
-        "                     AND b.`next_update_time` > DATE(NOW())) "
+        "                     AND b.`next_update_time` > DATE(NOW()) "
+        "                     AND b.`package_status` IN (0,1) "
+        "                     AND a.business_status IN (0,4,5) "
+        "                     AND (b.service_time_type = 0  "
+        "                          OR (( b.service_time_type = 1 AND ((b.gmt0_time_end > NOW() AND NOW() > '00:00:00') "
+        "                          OR (b.gmt0_time_start < NOW() AND NOW() <= '23:59:59')) "
+        "                                                              AND b.gmt0_time_end < b.gmt0_time_start )  "
+        "                          OR(b.service_time_type = 1 AND b.gmt0_time_start < NOW()AND b.gmt0_time_end > NOW() "
+        "                                                     AND   b.gmt0_time_end > b.gmt0_time_start )) "
+        "                             )"
+        "                          )"
         "                THEN a.`imsi` END)) AS 'ava_num', "
         "CAST(c.`warning_flow`/1024/1024 AS UNSIGNED) AS 'warning_flow', "
         "CAST(SUM(CASE WHEN `activate_status` = 0 "
@@ -141,7 +180,7 @@ def qureyNcountrySrcCon(sys_str, database, country, org_name):
         "LEFT  JOIN `t_css_group`         AS e  ON a.`group_id`= e.`id` "
         "LEFT  JOIN `t_css_package_type`  AS c  ON c.`id` = b.`package_type_id` "
         "WHERE   a.`bam_status` = '0' "
-        "        AND a.`slot_status` = '0'  " + countrySet + orgNameSet + " "
+        "        AND a.`slot_status` = '0'  " + countrySet + orgNameSet + VsimTypSet + " "
         "        AND b.`package_type_name` IS NOT NULL "
         "        AND b.`init_flow` is not null "
         "GROUP BY a.`iso2`,b.`package_type_name`,DATE_FORMAT(b.`next_update_time`,'%Y-%m-%d %H'), e.`org_name` "
@@ -180,18 +219,20 @@ def qureyNcountrySrcCon(sys_str, database, country, org_name):
             return DicResults
 
 
-def qurycountrySrcCon(country, org_name):
+def qurycountrySrcCon(country, org_name, vsim_type):
     """
-
-    :param country:
-    :param org_name:
-    :return:
+    
+    :param country: 
+    :param org_name: 
+    :param vsim_type: 
+    :return: 
     """
 
     # ("统计新架构卡资源：---------------------------------------------------")
     N_countrySrcCon = qureyNcountrySrcCon('config_N',
                                           'glocalme_css',
                                           country,
-                                          org_name)
+                                          org_name,
+                                          vsim_type)
 
     return json.dumps(N_countrySrcCon, sort_keys=True, indent=4, default=json_util.default)
