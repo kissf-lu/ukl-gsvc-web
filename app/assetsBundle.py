@@ -26,12 +26,19 @@ home_js = Bundle(
 )
 vsimFlowerQuery_js = Bundle(
     # ("-- customer js --")
-    'js/main/demo/common.js',
     'js/vsim_flower/vsimFlowerQuery-demo.js',
     filters='jsmin',
     output='js/vsim_flower/gsvc_vsimFlowerQuery.js'
 )
+packageFlowerQuery_js = Bundle(
+    # ("-- customer js --")
+    'js/package_flower/packageFlower-demo.js',
+    'js/package_flower/packageFlowerSetPanel-demo.js',
+    filters='jsmin',
+    output='js/package_flower/gsvc_packageFlowerQuery.js'
+)
 probVsimFirstDict_js = Bundle(
+    # ("-- customer js --")
     'js/prob_vsim_dic/probVsimFirstDict-demo.js',
     filters='jsmin',
     output='js/prob_vsim_dic/gsvc_probVsimFirstDict.js'
@@ -69,6 +76,8 @@ jqwidgets_globle_css = Bundle(
     output='css/jqxGrid/gsvc_jqwidgets.css'
 )
 jqwidgets_globle_js = Bundle(
+    #  ("--moment js--")
+    'js/main/demo/common.js',
     # ("--jqwidgets js--")
     'js/jqwidgets/jqxcore.js',
     'js/jqwidgets/jqxgrid.js',

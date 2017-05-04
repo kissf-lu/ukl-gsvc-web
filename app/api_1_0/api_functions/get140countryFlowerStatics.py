@@ -235,8 +235,8 @@ def get_140countryFlower(startDate, stopDate, data):
     """
     beginLUnix and endLUnix is unix timestamp from 1970, is long int types.
     """
-    beginLUnix = (datetime_timestamp(startDate)) * 1000
-    endLUnix = (datetime_timestamp(stopDate)) * 1000
+    beginLUnix = int(startDate)*1000          # (datetime_timestamp(startDate)) * 1000
+    endLUnix = int(stopDate)*1000             # (datetime_timestamp(stopDate)) * 1000
     imsiData = data
     list_imsi = getlistimsi(imsiData)
     # query total flower and us flower from mongodb
@@ -310,10 +310,8 @@ def qury140countryFlowerStatics(begintime, endtime, TimezoneOffset):
     begindate = begintime
     enddate = endtime
     queryTimezoneOffset = int(TimezoneOffset)
-    queryGMTOBeginTime = getGMT0StrTime(str_time=begindate,
-                                        off_set=queryTimezoneOffset)
-    queryGMTOEndTime = getGMT0StrTime(str_time=enddate,
-                                      off_set=queryTimezoneOffset)
+    # queryGMTOBeginTime = getGMT0StrTime(str_time=begindate,off_set=queryTimezoneOffset)
+    # queryGMTOEndTime = getGMT0StrTime(str_time=enddate,off_set=queryTimezoneOffset)
     Info140Country = []
     FlowerData = []
     errInfoSrc = ''

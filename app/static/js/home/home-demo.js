@@ -113,6 +113,7 @@ function initcountrySrcConjqxGrid(item_grid, array){
             {name: 'ORG', type: 'string' },
             {name: 'all_num', type: 'int' },
             {name: 'ava_num', type: 'int' },
+            {name: 'stop_num', type: 'int' },
             {name: 'flow_unenought_num', type: 'int' },
             {name: 'unact_num', type: 'int' },
             {name: 'WarningFlow', type: 'int' },
@@ -178,6 +179,7 @@ function initcountrySrcConjqxGrid(item_grid, array){
                     { text: '归属机构', datafield: 'ORG', filtertype: 'checkedlist', width: 100},
                     { text: '在架卡数', datafield: 'all_num',filterable: "range" , width: 80 },
                     { text: '可用卡数', datafield: 'ava_num',filterable: "range" , width: 80 },
+                    { text: '停用卡数', datafield: 'stop_num',filterable: "range" , width: 80 },
                     { text: '流量不足卡数', datafield: 'flow_unenought_num',filterable: "range" , width: 90 },
                     { text: '未激活卡数', datafield: 'unact_num',filterable: "range" , width: 80 },
                     { text: '流量预警阀值_MB', datafield: 'WarningFlow',filterable: "range" , width: 120 },
@@ -208,13 +210,13 @@ function countrySrcConAjaxApi(options_param) {
     //disable query button
     options_param.getDataBtID.attr("disabled", true);
     var AjaxRequest = $.ajax({
-        type: "POST",
+        type: "GET",
         //get方法url地址
         url: $SCRIPT_ROOT + "/api/v1.0/get_countrySrcCon/",
         //request set
         contentType: "application/json",
         //data参数
-        data: JSON.stringify(queryPost),
+        data: queryPost,                                          // POST 推送json 方法JSON.stringify(queryPost),
         //server back data type
         dataType: "json"
     })
@@ -244,6 +246,7 @@ function countrySrcConAjaxApi(options_param) {
                         ORG: item.ORG,
                         all_num: item.all_num,
                         ava_num: item.ava_num,
+                        stop_num: item.stop_num,
                         flow_unenought_num: item.flow_unenought_num,
                         unact_num: item.unact_num,
                         WarningFlow: item.WarningFlow,
@@ -315,6 +318,7 @@ function excelGsvcHomeExportAPI(item_jqxgrid,item_alert) {
                                 归属机构: rows[i+j].ORG,
                                 在架卡数: rows[i+j].all_num,
                                 可用卡数: rows[i+j].ava_num,
+                                停用卡数: rows[i+j].stop_num,
                                 流量不足卡数: rows[i+j].flow_unenought_num,
                                 未激活卡数: rows[i+j].unact_num,
                                 流量预警阀值_MB: rows[i+j].WarningFlow,
@@ -673,19 +677,21 @@ function initSelect(select_class, select_data, select_options) {
 
 }
 function initSelectView(select_class){
-    //select country:
+    //select country data:
     var country_data = [
         {text: 'AD'},{text: 'AE'},{text: 'AF'},{text: 'AG'},{text: 'AI'},{text: 'AL'},{text: 'AM'},{text: 'AO'},{text: 'AQ'},{text: 'AR'},{text: 'AS'},{text: 'AT'},{text: 'AU'},{text: 'AW'},{text: 'AX'},{text: 'AZ'},{text: 'BA'},{text: 'BB'},{text: 'BD'},{text: 'BE'},{text: 'BF'},{text: 'BG'},{text: 'BH'},{text: 'BI'},{text: 'BJ'},{text: 'BL'},{text: 'BM'},{text: 'BN'},{text: 'BO'},{text: 'BQ'},{text: 'BR'},{text: 'BS'},{text: 'BT'},{text: 'BV'},{text: 'BW'},{text: 'BY'},{text: 'BZ'},{text: 'CA'},{text: 'CC'},{text: 'CD'},{text: 'CF'},{text: 'CG'},{text: 'CH'},{text: 'CI'},{text: 'CK'},{text: 'CL'},{text: 'CM'},{text: 'CN'},{text: 'CO'},{text: 'CR'},{text: 'CU'},{text: 'CV'},{text: 'CW'},{text: 'CX'},{text: 'CY'},{text: 'CZ'},{text: 'DE'},{text: 'DJ'},{text: 'DK'},{text: 'DM'},{text: 'DO'},{text: 'DZ'},{text: 'EC'},{text: 'EE'},{text: 'EG'},{text: 'EH'},{text: 'ER'},{text: 'ES'},{text: 'ET'},{text: 'FI'},{text: 'FJ'},{text: 'FK'},{text: 'FM'},{text: 'FO'},{text: 'FR'},{text: 'GA'},{text: 'GB'},{text: 'GD'},{text: 'GE'},{text: 'GF'},{text: 'GG'},{text: 'GH'},{text: 'GI'},{text: 'GL'},{text: 'GM'},{text: 'GN'},{text: 'GP'},{text: 'GQ'},{text: 'GR'},{text: 'GS'},{text: 'GT'},{text: 'GU'},{text: 'GW'},{text: 'GY'},{text: 'HK'},{text: 'HM'},{text: 'HN'},{text: 'HR'},{text: 'HT'},{text: 'HU'},{text: 'ID'},{text: 'IE'},{text: 'IL'},{text: 'IM'},{text: 'IN'},{text: 'IO'},{text: 'IQ'},{text: 'IR'},{text: 'IS'},{text: 'IT'},{text: 'JE'},{text: 'JM'},{text: 'JO'},{text: 'JP'},{text: 'KE'},{text: 'KG'},{text: 'KH'},{text: 'KI'},{text: 'KM'},{text: 'KN'},{text: 'KP'},{text: 'KR'},{text: 'KW'},{text: 'KY'},{text: 'KZ'},{text: 'LA'},{text: 'LB'},{text: 'LC'},{text: 'LI'},{text: 'LK'},{text: 'LR'},{text: 'LS'},{text: 'LT'},{text: 'LU'},{text: 'LV'},{text: 'LY'},{text: 'MA'},{text: 'MC'},{text: 'MD'},{text: 'ME'},{text: 'MF'},{text: 'MG'},{text: 'MH'},{text: 'MK'},{text: 'ML'},{text: 'MM'},{text: 'MN'},{text: 'MO'},{text: 'MP'},{text: 'MQ'},{text: 'MR'},{text: 'MS'},{text: 'MT'},{text: 'MU'},{text: 'MV'},{text: 'MW'},{text: 'MX'},{text: 'MY'},{text: 'MZ'},{text: 'NA'},{text: 'NC'},{text: 'NE'},{text: 'NF'},{text: 'NG'},{text: 'NI'},{text: 'NL'},{text: 'NO'},{text: 'NP'},{text: 'NR'},{text: 'NU'},{text: 'NZ'},{text: 'OM'},{text: 'PA'},{text: 'PC'},{text: 'PE'},{text: 'PF'},{text: 'PG'},{text: 'PH'},{text: 'PK'},{text: 'PL'},{text: 'PM'},{text: 'PN'},{text: 'PR'},{text: 'PS'},{text: 'PT'},{text: 'PW'},{text: 'PY'},{text: 'QA'},{text: 'RE'},{text: 'RO'},{text: 'RS'},{text: 'RU'},{text: 'RW'},{text: 'SA'},{text: 'SB'},{text: 'SC'},{text: 'SD'},{text: 'SE'},{text: 'SG'},{text: 'SH'},{text: 'SI'},{text: 'SJ'},{text: 'SK'},{text: 'SL'},{text: 'SM'},{text: 'SN'},{text: 'SO'},{text: 'SR'},{text: 'ST'},{text: 'SV'},{text: 'SX'},{text: 'SY'},{text: 'SZ'},{text: 'TC'},{text: 'TD'},{text: 'TF'},{text: 'TG'},{text: 'TH'},{text: 'TJ'},{text: 'TK'},{text: 'TL'},{text: 'TM'},{text: 'TN'},{text: 'TO'},{text: 'TR'},{text: 'TT'},{text: 'TV'},{text: 'TW'},{text: 'TZ'},{text: 'UA'},{text: 'UG'},{text: 'UM'},{text: 'US'},{text: 'UY'},{text: 'UZ'},{text: 'VA'},{text: 'VC'},{text: 'VE'},{text: 'VG'},{text: 'VI'},{text: 'VN'},{text: 'VU'},{text: 'WF'},{text: 'WS'},{text: 'YE'},{text: 'YT'},{text: 'ZA'},{text: 'ZM'},{text: 'ZW'},{text: 'noCountry'}
         ];
-    //select org：
+    //select org data：
     var org_name = [{text:'35ORG'}, {text:'a2network'}, {text:'CelloMobile'}, {text:'GFC_simbank'}, {text:'GLOBALWIFI'},
         {text:'北京信威'}, {text:'GWIFI'}, {text:'JETFI桔豐科技'}, {text:'LianLian'}, {text:'POCWIFI'}, {text:'TestMvno'},
         {text:'VisonData-ORG'}, {text:'YROAM'}, {text:'all'}
         ];
-    //select time dim：
+    //select time dim：data:
     var timedim_data = [{text: 'day'},{text: 'month'}];
-    //select buType：
+    //select buType data：
     var butype_data = [{text: 'GTBU'}];
+    // select vsimType data:
+    var vsim_type_data = [{text: '本国卡'}, {text: '多国卡'}];
     // select country views
     initSelect(select_class.country, {data: country_data}, {placeholder: "国家简码", allowClear: true});
     // select org views
@@ -694,6 +700,8 @@ function initSelectView(select_class){
     initSelect(select_class.buType, {data: butype_data}, {placeholder: "BU类别", allowClear: true});
     // select buType views
     initSelect(select_class.timeDim, {data: timedim_data}, {placeholder: "时间维度", allowClear: true});
+    // select vsim type views
+    initSelect(select_class.vsimType, {data: vsim_type_data}, {placeholder: "多国/本国", allowClear: true});
 }
 /**================================
  *  -------初始化显示选择函数
@@ -766,9 +774,11 @@ $(function () {
             orgSelectClass: $('.form-org'),
             buSelectClass: $('.form-butype'),
             timeDimClass: $('.form-timedim'),
+            vsimTypeClass: $('.form-vsim-type'),
             grid:{
                 countryStatic: $('#countrySrcConSelect'),
                 orgStatic: $('#OrgSelect'),
+                vsimType: $('#VsimType'),
                 gridID: $('#con-countrySRC-jqxgrid'),
                 dropDownListID: $('#jqxDropDownList'),
                 getGridDataID: $('#countrySrcCondataGet'),
@@ -814,7 +824,8 @@ $(function () {
         country: VarGsvcHome.item.countrySelectClass,
         org: VarGsvcHome.item.orgSelectClass,
         buType: VarGsvcHome.item.buSelectClass,
-        timeDim: VarGsvcHome.item.timeDimClass
+        timeDim: VarGsvcHome.item.timeDimClass,
+        vsimType: VarGsvcHome.item.vsimTypeClass
     };
     // 初始化 select
     initSelectView(selectClass);
@@ -837,7 +848,9 @@ $(function () {
             },
             postData:{
                 country: VarGsvcHome.item.grid.countryStatic.val(),
-                org: VarGsvcHome.item.grid.orgStatic.val()
+                org: VarGsvcHome.item.grid.orgStatic.val(),
+                vsim_type: VarGsvcHome.item.grid.vsimType.val() === '' ? '' :
+                    (VarGsvcHome.item.grid.vsimType.val() === '本国卡' ? '0' : '1')
             },
             queryAlert:{
                 alertID: VarGsvcHome.item.grid.alertID,

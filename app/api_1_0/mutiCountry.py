@@ -15,7 +15,7 @@ def get_140countryFlowerStatics():
         begintime = str(Dic_data['beginTime'])
         endtime = str(Dic_data['endTime'])
         TimezoneOffset = str(Dic_data['TimezoneOffset'])
-
+        print begintime,endtime
         return qury140countryFlowerStatics(begintime=begintime,
                                            endtime=endtime,
                                            TimezoneOffset=TimezoneOffset)

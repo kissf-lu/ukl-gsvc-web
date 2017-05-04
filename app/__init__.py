@@ -17,6 +17,7 @@ from assetsBundle import (
     main_js,
     home_js,
     vsimFlowerQuery_js,
+    packageFlowerQuery_js,
     probVsimFirstDict_js,
     vsimmanual_js,
     muticountry140_js,
@@ -74,6 +75,8 @@ def create_app(config_name):
     assets_env.register("home_js", home_js)
     # vsimFlowerQuery-statics
     assets_env.register("vsimFlowerQuery_js", vsimFlowerQuery_js)
+    # packageFlowerQuery-statics
+    assets_env.register("packageFlowerQuery_js", packageFlowerQuery_js)
     # probVsimFirstDict-statics
     assets_env.register("probVsimFirstDict_js", probVsimFirstDict_js)
     # vsimmanual-statics

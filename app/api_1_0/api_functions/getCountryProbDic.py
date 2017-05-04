@@ -7,6 +7,8 @@ from bson.code import Code
 from SqlPack.SQLModel import qureResultAsJson
 import time
 import pymongo
+import pymongo.errors
+import mysql.connector
 import datetime
 # 获取连接信息
 from SqlPack.pyMongoModel import (sql_info,
@@ -112,8 +114,8 @@ def getErr(queryData, beginTime, endTime):
                  # "errType":8,
                  # "mcc":'602',
                  # "errCode":{"$in" : [7,]},
-                 "errorTime": {"$gte": ((datetime_timestamp(beginTime)) * 1000),
-                               "$lte": ((datetime_timestamp(endTime)) * 1000)}
+                 "errorTime": {"$gte": (int(beginTime) * 1000),
+                               "$lte": (int(endTime) * 1000)}
                  }
     msMog = msmongo(MongoClient=MongoClient["N_oss_perflog"],
                     Database=Database["N_oss_perflog"],
@@ -146,8 +148,8 @@ def getCountryFlower(Dicdata, Begintime, Endtime, FlowerThreshold):
     flowerBegintime = Begintime
     flowerEndtime = Endtime
     FlowerHaving = FlowerThreshold
-    beginLUnix = (datetime_timestamp(flowerBegintime)) * 1000
-    endLUnix = (datetime_timestamp(flowerEndtime)) * 1000
+    beginLUnix = int(flowerBegintime) * 1000
+    endLUnix = int(flowerEndtime) * 1000
     pipeline = [{"$match": {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
                             'imsi': {'$in': list_imsi}
                             }
@@ -201,8 +203,8 @@ def getImsiFlower(Dicdata, Begintime, Endtime):
     # 查询起始和截止时间
     flowerBegintime = Begintime
     flowerEndtime = Endtime
-    beginLUnix = (datetime_timestamp(flowerBegintime)) * 1000
-    endLUnix = (datetime_timestamp(flowerEndtime)) * 1000
+    beginLUnix = int(flowerBegintime) * 1000
+    endLUnix = int(flowerEndtime) * 1000
     pipeline = [
         {"$match": {'createtime': {'$gte': beginLUnix, '$lte': endLUnix},
                     'imsi': {'$in': list_imsi}
@@ -266,14 +268,17 @@ def getCountryDispatchAndVsimInfo(country, queryPlmn, begintime, endtime, Dispat
         "a.`iccid`, "
         "b.`package_type_name`, "
         "DATE_FORMAT(b.`next_update_time`, '%Y-%m-%d %H:%i:%s') AS 'next_update_time', "
+        "p.`name` AS 'sim_agg', "
         "a.`bam_id` as 'bam', "
         "COUNT(c.`imsi`)AS 'imsi_con', "
         "COUNT(DISTINCT c.`imei`)AS 'imei_con' "
         "FROM `t_css_vsim` AS a "
         "LEFT  JOIN `t_css_vsim_packages` b "
         "	ON a.`imsi`=b.`imsi`  "
-        "LEFT  JOIN `t_css_vsim_dispatcherlog` AS c "
+        "LEFT  JOIN `t_css_user_vsim_log` AS c "
         "        ON c.`imsi`=a.`imsi` "
+        "LEFT  JOIN `t_css_plmnset` AS p "
+        "        ON a.`plmnset_id`=p.`id`"
         "WHERE  "
         "     a.`bam_status`='0' "
         "     AND a.`slot_status`='0' " + strCountryQueryStr + " " + strPlmnQueryStr + ""
@@ -303,7 +308,6 @@ def getImsiDispatchAndVsimInfo(imsi, begintime, endtime):
     strimsi = imsi
     strBegintime = begintime
     strEndtime = endtime
-
     query_str_vsim = (
         "SELECT "
         "a.`iso2` AS 'country', "
@@ -317,7 +321,7 @@ def getImsiDispatchAndVsimInfo(imsi, begintime, endtime):
         "FROM `t_css_vsim` AS a "
         "LEFT  JOIN `t_css_vsim_packages` b "
         "	ON a.`imsi`=b.`imsi`  "
-        "LEFT  JOIN `t_css_vsim_dispatcherlog` AS c "
+        "LEFT  JOIN `t_css_user_vsim_log` AS c "
         "        ON c.`imsi`=a.`imsi` "
         "WHERE  "
         "     a.`imsi` IN (" + strimsi + ")"
@@ -337,38 +341,37 @@ def getImsiDispatchAndVsimInfo(imsi, begintime, endtime):
     return DicResults
 
 
-def getProbFisrtDic(querySort, queryPram, queryPlmn, begintime, endtime, TimezoneOffset,
-                    DispatchThreshold, FlowerThreshold):
-    """=====================================================
-
-    :param querySort:
-    :param queryPram:
-    :param queryPlmn:
-    :param begintime:
-    :param endtime:
-    :param TimezoneOffset:
-    :param DispatchThreshold:
-    :param FlowerThreshold:
-    :return:
-    =========================================================="""
-    querysort = querySort
-    querypram = queryPram
-    queryplmn = queryPlmn
-    queryBegintime = begintime
-    queryendtime = endtime
-    queryTimezoneOffset = int(TimezoneOffset)
-    queryGMTOBeginTime = getGMT0StrTime(strTime=queryBegintime,
-                                        offSet=queryTimezoneOffset)
-    queryGMTOEndTime = getGMT0StrTime(strTime=queryendtime,
-                                      offSet=queryTimezoneOffset)
-    queyDispatchThreshold = DispatchThreshold
-    queryFlowerThreshold = FlowerThreshold
+def getProbFisrtDic(query_sort, query_pram, query_plmn, begin_time, end_time, dispatch_begin_time,
+                    dispatch_end_time, timezone_off_set, dispatch_threshold, flower_threshold):
+    """
+    
+    :param query_sort: 
+    :param query_pram: 
+    :param query_plmn: 
+    :param begin_time: 
+    :param end_time: 
+    :param dispatch_begin_time: 
+    :param dispatch_end_time: 
+    :param timezone_off_set: 
+    :param dispatch_threshold: 
+    :param flower_threshold: 
+    :return: 
+    """
+    querysort = query_sort
+    querypram = query_pram
+    queryplmn = query_plmn
+    queryBegintime = begin_time
+    queryendtime = end_time
+    query_dispatch_begin_t = dispatch_begin_time
+    query_dispatch_end_t = dispatch_end_time
+    queyDispatchThreshold = dispatch_threshold
+    queryFlowerThreshold = flower_threshold
     errInfo = ''
     DicData = []
     getErrDicData = []
     if (querysort == '') or (queryBegintime == '') or\
             (queryendtime == '') or (queyDispatchThreshold == '') or \
-            (queryFlowerThreshold == ''):
+            (queryFlowerThreshold == '') or (query_dispatch_begin_t == '') or (query_dispatch_end_t == ''):
         DicResults = {'info': {'err': True, 'errinfo': '存在空类型参数'}, 'data': []}
 
         return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
@@ -377,30 +380,28 @@ def getProbFisrtDic(querySort, queryPram, queryPlmn, begintime, endtime, Timezon
             try:
                 DicData = getCountryDispatchAndVsimInfo(country=querypram,
                                                         queryPlmn=queryplmn,
-                                                        begintime=queryGMTOBeginTime,
-                                                        endtime=queryGMTOEndTime,
+                                                        begintime=query_dispatch_begin_t,
+                                                        endtime=query_dispatch_end_t,
                                                         DispatchThreshold=queyDispatchThreshold)
             except ValueError:
                 errInfo = "NDatabase input Date Time ValueError"  # 'Database Error!'
-            except pymongo.errors.OperationFailure:
-                errInfo = "NDatabase Authentication failed!"
-            except pymongo.errors.NetworkTimeout:
-                errInfo = "NDatabase Connection Exceeded SocketTimeoutMS!"
+            except mysql.connector.Error as err:
+                errInfo = ("Something went wrong: {}".format(err))
             if errInfo != '':
                 DicResults = {'info': {'err': True, 'errinfo': errInfo}, 'data': DicData}
                 return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
             elif not DicData:
-                DicResults = {'info': {'err': True, 'errinfo': '无查询结果，请重新设置查询参数'}, 'data': DicData}
+                DicResults = {'info': {'err': True, 'errinfo': '无分卡记录查询结果，请重新设置查询参数'}, 'data': DicData}
                 return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
             else:
                 try:
                     getFlowerDicData = getCountryFlower(Dicdata=DicData,
-                                                        Begintime=queryGMTOBeginTime,
-                                                        Endtime=queryGMTOEndTime,
+                                                        Begintime=queryBegintime,
+                                                        Endtime=queryendtime,
                                                         FlowerThreshold=queryFlowerThreshold)
                     getErrDicData = getErr(queryData=getFlowerDicData,
-                                           beginTime=queryGMTOBeginTime,
-                                           endTime=queryGMTOEndTime)
+                                           beginTime=queryBegintime,
+                                           endTime=queryendtime)
                 except pymongo.errors.OperationFailure:
                     errInfo = "MongoDataBase Authentication failed!"
                 except pymongo.errors.NetworkTimeout:
@@ -416,14 +417,12 @@ def getProbFisrtDic(querySort, queryPram, queryPlmn, begintime, endtime, Timezon
         else:
             try:
                 DicData = getImsiDispatchAndVsimInfo(imsi=querypram,
-                                                     begintime=queryGMTOBeginTime,
-                                                     endtime=queryGMTOEndTime)
+                                                     begintime=query_dispatch_begin_t,
+                                                     endtime=query_dispatch_end_t)
             except ValueError:
                 errInfo = "NDatabase input Date Time ValueError"  # 'Database Error!'
-            except pymongo.errors.OperationFailure:
-                errInfo = "NDatabase Authentication failed!"
-            except pymongo.errors.NetworkTimeout:
-                errInfo = "NDatabase Connection Exceeded SocketTimeoutMS!"
+            except mysql.connector.Error as err:
+                errInfo = ("Something went wrong: {}".format(err))
             except:
                 errInfo = "NDatabase Unexpected error"
             if errInfo != '':
@@ -436,12 +435,12 @@ def getProbFisrtDic(querySort, queryPram, queryPlmn, begintime, endtime, Timezon
             else:
                 try:
                     getFlowerDicData = getImsiFlower(Dicdata=DicData,
-                                                     Begintime=queryGMTOBeginTime,
-                                                     Endtime=queryGMTOEndTime)
+                                                     Begintime=queryBegintime,
+                                                     Endtime=queryendtime)
 
                     getErrDicData = getErr(queryData=getFlowerDicData,
-                                           beginTime=queryGMTOBeginTime,
-                                           endTime=queryGMTOEndTime)
+                                           beginTime=queryBegintime,
+                                           endTime=queryendtime)
                 except pymongo.errors.OperationFailure:
                     errInfo = "MongoDataBase Authentication failed!"
                 except pymongo.errors.NetworkTimeout:

@@ -143,6 +143,17 @@ def vsimFlowerQuery():
     return render_template('flower_query_templates/vsimFlowerQuery.html')
 
 
+@main.route('/packageFlowerQuery')
+@login_required
+def packageFlowerQuery():
+    """
+
+    :return:
+    """
+
+    return render_template('flower_query_templates/packageFlowerQuery.html')
+
+
 @main.route('/newVsimInfoTable', methods=['GET', 'POST'])
 @login_required
 def newVsimInfoTable():
