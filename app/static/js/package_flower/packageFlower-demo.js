@@ -308,7 +308,7 @@ GridColumnsSet.prototype.setColumns = function (grid_id, grid_src_adapter) {
         {text: '分卡次数', datafield: 'sim_dispatch', filtertype: "range", width: 100, hidden: true},
         {text: '单次分卡流量', datafield: 'sim_dispatch_flower', filtertype: "range", width: 100, hidden: true},
         {text: '流量使用率(OSS)/%', datafield: 'percentage_f', width: 150 , hidden: false },
-        {text: '流量使用率(SAAS)/%', datafield: 'percentage_fs', width: 150 , hidden: false }
+        {text: '流量使用率(SAAS)/%', datafield: 'percentage_fs', width: 150 , hidden: true }
     ];
     return this;
 };
@@ -352,7 +352,7 @@ var jqxDropDownList = [
     {label: '分卡次数', value: 'sim_dispatch', checked: false},
     {label: '单次分卡流量', value: 'sim_dispatch_flower', checked: false},
     {label: '流量使用率(OSS)/%', value: 'percentage_f', checked: true},
-    {label: '流量使用率(SAAS)/%', value: 'percentage_fs', checked: true}
+    {label: '流量使用率(SAAS)/%', value: 'percentage_fs', checked: false}
 ];
 /**====================================
  *
