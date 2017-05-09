@@ -175,3 +175,17 @@ def get_select2_orgdata():
     :return:
     """
     return get_org()
+
+
+@api.route('/get_out_of_bam_slot_sim/', methods=['POST', 'GET'])
+def get_out_of_bam_slot_sim():
+    """
+    本api为资源页获取手工维护表数据
+    :return:
+    """
+    if request.method == 'GET':
+        Dic_data = request.get_json()
+
+        # return get_new_vsim_test_info(person, country, test_vsim_info)
+
+    return False

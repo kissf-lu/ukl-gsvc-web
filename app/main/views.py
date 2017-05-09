@@ -181,3 +181,13 @@ def export_excel():
             return jsonify({"data": returnJsonData})
 
     return render_template('/test_jquery/test_uploadfiles.html')
+
+
+@main.route('/OutOfBamSlotSim')
+@login_required
+def OutOfBamSlotSim():
+    """
+    
+    :return: 
+    """
+    return render_template('abnormal_sim_card/out_of_bam_slot_sim.html')
