@@ -16,19 +16,20 @@ from flask import json
 from . import api
 import flask_excel as excel
 # Python excel Mole
-from api_functions.exportExcelFunc import (get_excel140countryDataAndSorted,
-                                           get_excelFlowerDataAndSorted,
-                                           get_excelManulInfoDataAndSorted,
-                                           get_excelOnSysInfoDataAndSorted,
-                                           get_excelFirsProbDicDataAndSorted,
-                                           get_excelManualDeleteTemple,
-                                           get_excelManualInsertTemple,
-                                           get_excelCountrySrcStaticDataAndSorted,
-                                           get_excelNewVsimTestInfoDeleteTemple,
-                                           get_excelNewVsimTestInfoInsertTemple,
-                                           get_excelNewVsimTestInfoUpdateTemple,
-                                           get_excelNewVsimTestInfo,
-                                           get_export_package_flower)
+from .api_functions.exportExcelFunc import (get_excel140countryDataAndSorted,
+                                            get_excelFlowerDataAndSorted,
+                                            get_excelManulInfoDataAndSorted,
+                                            get_excelOnSysInfoDataAndSorted,
+                                            get_excelFirsProbDicDataAndSorted,
+                                            get_excelManualDeleteTemple,
+                                            get_excelManualInsertTemple,
+                                            get_excelCountrySrcStaticDataAndSorted,
+                                            get_excelNewVsimTestInfoDeleteTemple,
+                                            get_excelNewVsimTestInfoInsertTemple,
+                                            get_excelNewVsimTestInfoUpdateTemple,
+                                            get_excelNewVsimTestInfo,
+                                            get_export_package_flower
+                                            )
 
 
 @api.route('/export_countrySrcStatic/', methods=['POST'])
@@ -89,7 +90,7 @@ def export_manualDeleteTemplate():
 def export_manualInsertTemplate():
     if request.method == 'POST':
         dic_data = [{"imsi": "202052965490990",
-                     unicode("负责人"): unicode("刘超"),
+                     u("负责人"): u("刘超"),
                      unicode("国家"): unicode("希腊"),
                      unicode("运营商"): unicode("Vodafone"),
                      unicode("超套餐限速/费用"): unicode("不可用"),

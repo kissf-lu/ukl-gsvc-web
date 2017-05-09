@@ -68,16 +68,16 @@ def UnixTOStrTime(value, format_str):
     return dt
 
 
-def getGMT0StrTime(strTime, offSet):
+def getGMT0StrTime(str_time, offset):
     """=======================================
-    :param strTime:
-    :param offSet:
+    :param str_time:
+    :param offset:
     :return:
     ==========================================="""
     try:
-        GMT0dateTime = datetime.datetime.strptime(strTime, '%Y-%m-%d %H:%M:%S')-datetime.timedelta(minutes=offSet)
+        GMT0dateTime = datetime.datetime.strptime(str_time, '%Y-%m-%d %H:%M:%S')-datetime.timedelta(minutes=offset)
     except ValueError:
-        GMT0dateTime = datetime.datetime.strptime(strTime, '%Y-%m-%d') - datetime.timedelta(minutes=offSet)
+        GMT0dateTime = datetime.datetime.strptime(str_time, '%Y-%m-%d') - datetime.timedelta(minutes=offset)
 
     return str(GMT0dateTime)
 
@@ -330,7 +330,7 @@ def getDaysFlowerThrTime(imsi, time_list, mcc, plmn, flower_key):
     day_match_stages = {'createtime': day_match['createtime'],
                         'imsi': {'$in': list_imsi}}
     if groupItem is None:
-        keysNULL = 'NULL'
+        pass
     else:
         for keys in groupItem:
             if keys == 'plmn':
@@ -412,7 +412,7 @@ def getDaysFlowerThrTime(imsi, time_list, mcc, plmn, flower_key):
     if not groupItem:
         if aggeData_day and aggeData_hour:
             return_data.extend(aggeData_day)
-            pop_lis = []
+            # pop_lis = []
             for rd in return_data:
                 temp_pop_di = None
                 for i in range(len(aggeData_hour)):
@@ -442,7 +442,7 @@ def getDaysFlowerThrTime(imsi, time_list, mcc, plmn, flower_key):
     return return_data
 
 
-def getFlowers(querySort, time_list, mcc, plmn, imsi, flower_query_key, TimezoneOffset):
+def getFlowers(querySort, time_list, mcc, plmn, imsi, flower_query_key, time_zone_offset):
     """=====================================================================
     gsvc mongodb 流量查询接口函数。完成小时/月维度imsi流量查询，返回查询数据
 
@@ -453,21 +453,16 @@ def getFlowers(querySort, time_list, mcc, plmn, imsi, flower_query_key, Timezone
     :param plmn: 设置查询plmn
     :param imsi: type: sting , 设置查询imsi,
     :param flower_query_key: 流量查询的附加聚合键值
-    :param TimezoneOffset: 时区，相对GMT0时间
+    :param time_zone_offset: 时区，相对GMT0时间
     =========================================================================
     :return: 返回带有err，data信息 DicResults = {'info': {'err': False, 'errinfo': errInfo}, 'data': DicData}
     =============================================================================================================="""
     querysort = querySort
     list_time = time_list
-    # queryEndtime = endtime
     queryMcc = str(mcc)
     queryPlmn = str(plmn)
     queryImsi = getlistimsi(imsi)
     queryFlowerKey = flower_query_key
-    queryTimezoneOffset = int(TimezoneOffset)
-    # 部署服务器是时间为GMT0时间
-    # queryGMTOBeginTime = getGMT0StrTime(strTime=queryBegintime, offSet=queryTimezoneOffset)
-    # queryGMTOEndTime = getGMT0StrTime(strTime=queryEndtime, offSet=queryTimezoneOffset)
     errInfo = ''
     DicData = []
     if (not querysort) or (not queryImsi) or (not list_time):
