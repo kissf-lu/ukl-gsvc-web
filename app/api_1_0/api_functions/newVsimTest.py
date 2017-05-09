@@ -5,8 +5,8 @@
 import json
 from bson import json_util
 import mysql.connector
-from SqlPack.SQLModel import qureResultAsJson
-from SqlPack.SqlLinkInfo import DataApiFuncSqlLink as Sql
+from .SqlPack.SQLModel import qureResultAsJson
+from .SqlPack.SqlLinkInfo import DataApiFuncSqlLink as Sql
 
 Sql_Info = Sql['NewVsimTestInfo']['query']
 
@@ -26,28 +26,36 @@ def getJosonData(sysStr, Database, query_str):
     return jsonResults
 
 
-def get_new_vsim_info(person, country, imsi):
+def get_new_vsim_info(person, country, test_vsim_info):
     """
 
     :param person:
     :param country:
-    :param imsi:
+    :param test_vsim_info:
     :return:
     """
     jsonResults = []
     query_person = person
     query_country = country
-    query_imsi = imsi
+    query_test_vsim_info = test_vsim_info
+    param = {'person_test': query_person, 'country_iso': query_country, 'card_info': query_test_vsim_info}
     errInfo = ""
-    country_str = " `country_iso`='" + query_country + "' "
-    if query_person:
-        person_str = " AND `person_test`= '" + query_person + "' "
-    else:
-        person_str = ""
-    if query_imsi:
-        imsi_str = " AND `imsi` LIKE " + "'" + query_imsi + "%' "
-    else:
-        imsi_str = ""
+    whereSet = ""
+    for key, value in param.items():
+        i = 0
+        if value:
+            if i == 0:
+                if key != 'card_info':
+                    whereSet = whereSet+"WHERE `"+key+"`"+"='"+value+"' "
+                else:
+                    whereSet = whereSet+"WHERE `card_info` LIKE " + "'%" + query_test_vsim_info + "%' "
+            else:
+                if key != 'card_info':
+                    whereSet = whereSet+' AND `'+key+'`'+"='"+value+"' "
+                else:
+                    whereSet = whereSet + " AND `card_info` LIKE " + "'%" + query_test_vsim_info + "%' "
+            i += 1
+    # print(unicode(whereSet))
     try:
         query_str = (
             "SELECT  "
@@ -92,9 +100,9 @@ def get_new_vsim_info(person, country, imsi):
             "`fail_reason`, "
             "`remark` as 'remark' "
             "FROM `vsim_test_info` as i "
-            "WHERE " + country_str + person_str + imsi_str
+            " "+whereSet
         )
-        #print query_str
+        # print query_str
         db = Sql_Info['db']
         database = Sql_Info['database']
         jsonResults = getJosonData(sysStr=db, Database=database, query_str=query_str)
@@ -118,15 +126,15 @@ def get_new_vsim_info(person, country, imsi):
             return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
 
 
-def get_new_vsim_test_info(person, country, imsi):
+def get_new_vsim_test_info(person, country, test_vsim_info):
     """
 
     :param person:
     :param country:
-    :param imsi:
+    :param test_vsim_info:
     :return:
     """
 
-    newVsimTestInfo = get_new_vsim_info(person, country, imsi)
+    newVsimTestInfo = get_new_vsim_info(person, country, test_vsim_info)
 
     return newVsimTestInfo

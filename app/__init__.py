@@ -11,26 +11,20 @@ from flask_pagedown import PageDown
 from flask_cache import Cache
 # css,js打包器
 from flask_assets import Environment
-from assetsBundle import (
+from .assetsBundle import (
     login_css,
     main_css,
     main_js,
-    home_css,
     home_js,
-    vsimFlowerQuery_css,
     vsimFlowerQuery_js,
-    probVsimFirstDict_css,
+    packageFlowerQuery_js,
     probVsimFirstDict_js,
-    vsimmanual_css,
     vsimmanual_js,
-    muticountry140_css,
     muticountry140_js,
+    jqwidgets_globle_css,
     jqwidgets_globle_js,
-    uploadfiles_css,
     uploadfiles_js,
-    new_vsim_test_info_css,
-    new_vsim_test_info_js
-)
+    new_vsim_test_info_js)
 # app config
 from config import config
 
@@ -70,39 +64,38 @@ def create_app(config_name):
     # 各个模块打包模块路径声明
     assets_env.init_app(app)
     # jqwidgets-plus
+    assets_env.register("jqwidgets_globle_css", jqwidgets_globle_css)
     assets_env.register("jqwidgets_globle_js", jqwidgets_globle_js)
     # login -statics
     assets_env.register("login_css", login_css)
     assets_env.register("main_css", main_css)
     assets_env.register("main_js", main_js)
     # gsvchome-statics
-    assets_env.register("home_css", home_css)
     assets_env.register("home_js", home_js)
     # vsimFlowerQuery-statics
-    assets_env.register("vsimFlowerQuery_css", vsimFlowerQuery_css)
     assets_env.register("vsimFlowerQuery_js", vsimFlowerQuery_js)
+    # packageFlowerQuery-statics
+    assets_env.register("packageFlowerQuery_js", packageFlowerQuery_js)
     # probVsimFirstDict-statics
-    assets_env.register("probVsimFirstDict_css", probVsimFirstDict_css)
     assets_env.register("probVsimFirstDict_js", probVsimFirstDict_js)
     # vsimmanual-statics
-    assets_env.register("vsimmanual_css", vsimmanual_css)
     assets_env.register("vsimmanual_js", vsimmanual_js)
     # 140country-statics
-    assets_env.register("muticountry140_css", muticountry140_css)
     assets_env.register("muticountry140_js", muticountry140_js)
     # new vsim infor table
-    assets_env.register("new_vsim_test_info_css", new_vsim_test_info_css)
     assets_env.register("new_vsim_test_info_js", new_vsim_test_info_js)
-    # 140country-statics
-    assets_env.register("uploadfiles_css", uploadfiles_css)
+    # uploadfiles
     assets_env.register("uploadfiles_js", uploadfiles_js)
 
+    # blueprint model import
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    # blueprint model import
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
+    # blueprint model import
     from .api_1_0 import api as api_1_0_blueprint
     app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
 

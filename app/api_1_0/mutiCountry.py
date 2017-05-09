@@ -2,9 +2,10 @@
 
 from flask import request
 from . import api
-from api_functions.get140countryFlowerStatics import qury140countryFlowerStatics
+from .api_functions.get140countryFlowerStatics import qury140countryFlowerStatics
 
-@api.route('/get_140countryFlowerStatics/',methods=['POST'])
+
+@api.route('/get_140countryFlowerStatics/', methods=['POST'])
 def get_140countryFlowerStatics():
     """
     本API140国卡统计页面统计数据接口

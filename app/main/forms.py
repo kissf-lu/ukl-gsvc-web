@@ -8,9 +8,9 @@ from wtforms import StringField, TextAreaField, BooleanField, SelectField,\
 from wtforms.validators import Required, Length, Email, Regexp
 from wtforms import ValidationError
 from flask_pagedown.fields import PageDownField
-from ..models import Role, User, VsimManualInfor
-reload(sys)
-sys.setdefaultencoding('utf8')
+from ..models import Role, User
+#reload(sys)
+#sys.setdefaultencoding('utf8')
 
 class NameForm(Form):
     name = StringField('What is your name?',
