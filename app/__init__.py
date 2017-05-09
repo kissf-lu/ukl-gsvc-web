@@ -27,10 +27,7 @@ from .assetsBundle import (
     new_vsim_test_info_js)
 # app config
 from config import config
-# blueprint model import
-from .main import main as main_blueprint
-from .auth import auth as auth_blueprint
-from .api_1_0 import api as api_1_0_blueprint
+
 
 bootstrap = Bootstrap()
 mail = Mail()
@@ -90,10 +87,16 @@ def create_app(config_name):
     # uploadfiles
     assets_env.register("uploadfiles_js", uploadfiles_js)
 
+    # blueprint model import
+    from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    # blueprint model import
+    from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
+    # blueprint model import
+    from .api_1_0 import api as api_1_0_blueprint
     app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
 
     return app
