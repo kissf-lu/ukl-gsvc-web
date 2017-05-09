@@ -305,6 +305,8 @@ GridColumnsSet.prototype.setColumns = function (grid_id, grid_src_adapter) {
             filtertype: 'date', hidden: false
         },
         {text: '累计流量/MB', datafield: 'flower', width: 100 , hidden: false },
+        {text: '分卡次数', datafield: 'sim_dispatch', filtertype: "range", width: 100, hidden: true},
+        {text: '单次分卡流量', datafield: 'sim_dispatch_flower', filtertype: "range", width: 100, hidden: true},
         {text: '流量使用率(OSS)/%', datafield: 'percentage_f', width: 150 , hidden: false },
         {text: '流量使用率(SAAS)/%', datafield: 'percentage_fs', width: 150 , hidden: false }
     ];
@@ -331,6 +333,8 @@ function gridFieldsSet() {
         {name: 'last_update_time', type: 'string'},
         {name: 'next_update_time', type: 'string'},
         {name: 'flower', type: 'number'},
+        {name: 'sim_dispatch', type: 'number'},
+        {name: 'sim_dispatch_flower', type: 'number'},
         {name: 'percentage_f', type: 'number'},
         {name: 'percentage_fs', type: 'number'}
     ];
@@ -345,6 +349,8 @@ var jqxDropDownList = [
     {label: '上次次套餐更新时间(GMT0)', value: 'last_update_time', checked: false},
     {label: '下次套餐更新时间(GMT0)', value: 'next_update_time', checked: true},
     {label: '累计流量/MB', value: 'flower', checked: true},
+    {label: '分卡次数', value: 'sim_dispatch', checked: false},
+    {label: '单次分卡流量', value: 'sim_dispatch_flower', checked: false},
     {label: '流量使用率(OSS)/%', value: 'percentage_f', checked: true},
     {label: '流量使用率(SAAS)/%', value: 'percentage_fs', checked: true}
 ];
@@ -387,6 +393,8 @@ function manualGridExcelExport(grid_item, alert_item, url_query) {
                             上次次套餐更新时间: rows[i+j].last_update_time,
                             下次套餐更新时间: rows[i+j].next_update_time,
                             累计流量: rows[i+j].flower,
+                            分卡次数: rows[i+j].sim_dispatch,
+                            单次分卡流量: rows[i+j].sim_dispatch_flower,
                             流量使用率_OSS: rows[i+j].percentage_f,
                             流量使用率_SASS: rows[i+j].percentage_fs
                         })
