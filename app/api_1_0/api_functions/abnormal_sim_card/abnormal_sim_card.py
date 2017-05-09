@@ -24,5 +24,3 @@ def getJsonData(sys_str, data_base, query_str):
                                    where=[])
     return jsonResults
 
-
-class 
