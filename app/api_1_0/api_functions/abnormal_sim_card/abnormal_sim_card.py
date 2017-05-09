@@ -10,6 +10,7 @@ mysql_link = {
     'css': sqlLink['qureyNVsim']
 }
 
+
 def getJsonData(sys_str, data_base, query_str):
     """
     qureResultAsJson 自带链接断开操作
