@@ -11,7 +11,7 @@ from flask_pagedown import PageDown
 from flask_cache import Cache
 # css,js打包器
 from flask_assets import Environment
-from assetsBundle import (
+from .assetsBundle import (
     login_css,
     main_css,
     main_js,
@@ -24,11 +24,13 @@ from assetsBundle import (
     jqwidgets_globle_css,
     jqwidgets_globle_js,
     uploadfiles_js,
-    new_vsim_test_info_js
-)
+    new_vsim_test_info_js)
 # app config
 from config import config
-
+# blueprint model import
+from .main import main as main_blueprint
+from .auth import auth as auth_blueprint
+from .api_1_0 import api as api_1_0_blueprint
 
 bootstrap = Bootstrap()
 mail = Mail()
@@ -88,13 +90,10 @@ def create_app(config_name):
     # uploadfiles
     assets_env.register("uploadfiles_js", uploadfiles_js)
 
-    from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
-    from .api_1_0 import api as api_1_0_blueprint
     app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
 
     return app

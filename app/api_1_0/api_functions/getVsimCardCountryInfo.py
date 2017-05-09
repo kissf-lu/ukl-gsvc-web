@@ -5,7 +5,7 @@ import json
 import decimal
 from bson import json_util
 import mysql.connector
-from SqlPack.SQLModel import qureResultAsJson
+from .SqlPack.SQLModel import qureResultAsJson
 
 S_sysStr = 'config_S'
 S_Database = 'ucloudplatform'

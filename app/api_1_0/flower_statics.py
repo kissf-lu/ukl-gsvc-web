@@ -9,8 +9,8 @@ from . import api
 # Python get Flower Model
 from app.api_1_0.api_functions.flowerPackage.get_vsim_hour_day_flower import getFlowers
 # sim_package_flower get Model
-from api_functions.flowerPackage.get_sim_package_flower import getSimPackageFlowerNextAPI
-from api_functions.flowerPackage.get_sim_package_flower import getSimPackageFlowerAPI
+from .api_functions.flowerPackage.get_sim_package_flower import getSimPackageFlowerNextAPI
+from .api_functions.flowerPackage.get_sim_package_flower import getSimPackageFlowerAPI
 
 
 @api.route('/get_FlowerQuery/', methods=['POST', 'GET'])
@@ -40,7 +40,7 @@ def get_FlowerQuery():
                       plmn=queryPlmn,
                       imsi=queryImsi,
                       flower_query_key=aggGroupKey,
-                      TimezoneOffset=TimezoneOffset)
+                      time_zone_offset=TimezoneOffset)
 
 
 @api.route('/get_package_flower/', methods=['GET'])
@@ -74,7 +74,7 @@ def get_package_flower_next():
     if request.method == 'POST':
         Dic_data = request.get_json()
         try:
-            package_date ={
+            package_date = {
                 'country': str(Dic_data['Country']),
                 'org': str(Dic_data['Org']),
                 'sim_type': str(Dic_data['SimType']),
