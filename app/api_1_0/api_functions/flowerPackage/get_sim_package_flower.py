@@ -466,6 +466,12 @@ def getPackageInfo(package_set_param):
     bam_status_str = ''
     sim_agg_str = ''
     last_update_time_str = ''
+    percentage_fs_str = ''
+    dispatch_con_str = ''
+    dispatch_where_time_set = ''
+    dispatch_begin_time = ''
+    dispatch_end_time = ''
+    dispatch_once_flower_str = ''
     try:
         country = package_set_param['country']
         org = package_set_param['org']
@@ -478,6 +484,8 @@ def getPackageInfo(package_set_param):
         slot_status = package_set_param['slot_status']
         bam_status = package_set_param['bam_status']
         add_key = package_set_param['add_group_key']
+        dispatch_begin_time = package_set_param['dispatch_begin_time']
+        dispatch_end_time = package_set_param['dispatch_end_time']
 
     except KeyError as kerr:
         errInfo = 'erro:' + str(kerr)
@@ -515,24 +523,35 @@ def getPackageInfo(package_set_param):
                 sim_agg_str = "p.`name` AS 'sim_agg',  "
             if 'last_update_time' in add_key:
                 last_update_time_str = "DATE_FORMAT(b.`last_update_time`,'%Y-%m-%d %H')  AS 'last_update_time', "
+            if 'percentage_fs' in add_key:
+                percentage_fs_str = ("CAST((b.`total_use_flow`/ b.`init_flow`)*100  AS DECIMAL(64,1)) "
+                                     "AS 'percentage_fs',  ")
+            if 'dispatch_con' in add_key:
+                dispatch_con_str = "count(d.`imsi`) as 'dispatch_con', "
+                dispatch_where_time_set = " AND '"+dispatch_begin_time+"'<= d.`create_time`<'"+dispatch_end_time+"' "
+            if 'dispatch_once_flower' in add_key:
+                dispatch_once_flower_str = ("CAST((b.`total_use_flow`/1024/1024/count(d.`imsi`))  AS DECIMAL(64,1)) "
+                                            "AS 'dispatch_once_flower', ")
         query_str = (
             "SELECT  "
             "a.`iso2` AS 'country', "
             "a.`imsi` AS 'imsi',  "
             "b.`package_type_name` AS 'package_name',  "
             "b.`init_flow`,  "
-            "CAST((b.`total_use_flow`/ b.`init_flow`)*100  AS DECIMAL(64,1)) AS 'percentage_fs',  "
             "a.`iccid` AS 'iccid', " + sim_agg_str + last_update_time_str + " "
+            ""+percentage_fs_str+dispatch_con_str+dispatch_once_flower_str+" "
             "DATE_FORMAT(b.`next_update_time`,'%Y-%m-%d %H')  AS 'next_update_time' "
             "FROM `t_css_vsim` AS a  "
             "LEFT  JOIN `t_css_vsim_packages` AS b  ON a.`imsi`= b.`imsi`  "
             "LEFT  JOIN `t_css_group`         AS e  ON a.`group_id`= e.`id`  "
             "LEFT  JOIN `t_css_package_type`  AS c  ON c.`id` = b.`package_type_id`  "
             "LEFT JOIN `t_css_plmnset` AS p ON a.`plmnset_id`=p.`id`  "
+            "LEFT  JOIN `t_css_user_vsim_log` AS d  ON d.`imsi` = a.`imsi` "
             "WHERE   b.`package_type_name` IS NOT NULL "
             "        AND b.`init_flow` IS NOT NULL " + org_str + country_str + sim_type_str + package_type_name_str +
             next_update_time_str + ava_status_str + business_status_str + package_status_str + slot_status_str +
-            bam_status_str
+            bam_status_str+dispatch_where_time_set+" "
+            "GROUP BY a.`iso2`, a.`imsi`, b.`package_type_name`"
         )
         try:
             packageInfoData = getJsonData(sys_str=sql_info['src_on_sys']['db'],
@@ -552,8 +571,13 @@ def getPackageInfo(package_set_param):
                 return dic_results
             else:
                 for cs in packageInfoData:
-                    if type(cs['percentage_fs']) is decimal.Decimal:
-                        cs['percentage_fs'] = float(cs['percentage_fs'])
+                    if 'percentage_fs' in cs.keys():
+                        if type(cs['percentage_fs']) is decimal.Decimal:
+                            cs['percentage_fs'] = float(cs['percentage_fs'])
+                    if 'dispatch_once_flower' in cs.keys():
+                        if type(cs['dispatch_once_flower']) is decimal.Decimal:
+                            cs['dispatch_once_flower'] = float(cs['dispatch_once_flower'])
+
                 dic_results = {'info': {'err': False, 'errInfo': errInfo}, 'data': packageInfoData}
 
                 return dic_results

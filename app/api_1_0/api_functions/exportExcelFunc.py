@@ -611,6 +611,8 @@ def get_export_package_flower(dic_data):
                unicode("上次次套餐更新时间"),
                unicode("下次套餐更新时间"),
                unicode("累计流量"),
+               unicode("分卡次数"),
+               unicode("单次分卡均流量"),
                unicode("流量使用率_OSS"),
                unicode("流量使用率_SASS")
                ]

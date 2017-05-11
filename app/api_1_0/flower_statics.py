@@ -5,7 +5,7 @@ from flask import json
 from flask import request
 # api 模块添加
 from . import api
-
+import time as t
 # Python get Flower Model
 from app.api_1_0.api_functions.flowerPackage.get_vsim_hour_day_flower import getFlowers
 # sim_package_flower get Model
@@ -74,7 +74,7 @@ def get_package_flower_next():
     if request.method == 'POST':
         Dic_data = request.get_json()
         try:
-            package_date ={
+            package_date = {
                 'country': str(Dic_data['Country']),
                 'org': str(Dic_data['Org']),
                 'sim_type': str(Dic_data['SimType']),
@@ -85,7 +85,9 @@ def get_package_flower_next():
                 'package_status': str(Dic_data['PackageStatus']),
                 'slot_status': str(Dic_data['SlotStatus']),
                 'bam_status': str(Dic_data['BamStatus']),
-                'add_group_key': Dic_data['addGroupKey']
+                'add_group_key': Dic_data['addGroupKey'],
+                'dispatch_begin_time': t.strftime('%Y-%m-%d %H:%M:%S', t.gmtime(Dic_data['ListTime'][0]['begin'])),
+                'dispatch_end_time': t.strftime('%Y-%m-%d %H:%M:%S', t.gmtime(Dic_data['ListTime'][-1]['end']))
             }
             flower_date = {
                 'query_type': Dic_data['queryType'],
@@ -100,8 +102,6 @@ def get_package_flower_next():
 
             return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
 
-        # errInfo = country+org+sim_type+package_type_name+next_update_time+'status'+ava_status+business_status+\
-        #           package_status+slot_status+bam_status
         return getSimPackageFlowerNextAPI(package_data=package_date, flower_data=flower_date)
 
     return False
