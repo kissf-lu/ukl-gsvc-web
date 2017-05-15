@@ -194,6 +194,7 @@ function getPackageInfoAjax(option_data, option_id, ajax_set, panel_set) {
 function AjaxPackageFlowerGet(ajax_param, ajax_option) {
     var day_gap = moment(ajax_param.data.FlowerEndTime).diff(moment(ajax_param.data.FlowerBeginTime), 'days');
     var time_list =[];
+    // query_type为查询颗粒度参数，当查询时间大于3天时，进行天纬度流量表查询，提高查询速度
     var query_type = 'day';
     var alertClass = 'warning';
     // remove old form html
@@ -249,7 +250,6 @@ function AjaxPackageFlowerGet(ajax_param, ajax_option) {
         alert_str = ['url设置有误，', '请重新设置！'].join(' ');
         appendAlertInfo(alertClass, alert_str, ajax_option.id.warn_sec_id);
         ajax_option.id.modal_id.modal('hide');
-
     } else if (day_gap<0){
         alert_str = ['查询时间设置有误，', '请重新设置！'].join(' ');
         appendAlertInfo(alertClass, alert_str, ajax_option.id.warn_sec_id);
@@ -305,9 +305,9 @@ GridColumnsSet.prototype.setColumns = function (grid_id, grid_src_adapter) {
             filtertype: 'date', hidden: false
         },
         {text: '累计流量/MB', datafield: 'flower', width: 100 , hidden: false },
-        {text: '分卡次数', datafield: 'sim_dispatch', filtertype: "range", width: 100, hidden: true},
-        {text: '单次分卡流量', datafield: 'sim_dispatch_flower', filtertype: "range", width: 100, hidden: true},
-        {text: '流量使用率(OSS)/%', datafield: 'percentage_f', width: 150 , hidden: false },
+        {text: '分卡次数', datafield: 'dispatch_con', width: 100 , hidden: true },
+        {text: '单次分卡流量/MB', datafield: 'dispatch_once_flower', width: 150 , hidden: true },
+        {text: '流量使用率(OSS)/%', datafield: 'percentage_f', width: 150 , hidden: true },
         {text: '流量使用率(SAAS)/%', datafield: 'percentage_fs', width: 150 , hidden: true }
     ];
     return this;
@@ -333,8 +333,8 @@ function gridFieldsSet() {
         {name: 'last_update_time', type: 'string'},
         {name: 'next_update_time', type: 'string'},
         {name: 'flower', type: 'number'},
-        {name: 'sim_dispatch', type: 'number'},
-        {name: 'sim_dispatch_flower', type: 'number'},
+        {name: 'dispatch_con', type: 'number'},
+        {name: 'dispatch_once_flower', type: 'number'},
         {name: 'percentage_f', type: 'number'},
         {name: 'percentage_fs', type: 'number'}
     ];
@@ -349,9 +349,9 @@ var jqxDropDownList = [
     {label: '上次次套餐更新时间(GMT0)', value: 'last_update_time', checked: false},
     {label: '下次套餐更新时间(GMT0)', value: 'next_update_time', checked: true},
     {label: '累计流量/MB', value: 'flower', checked: true},
-    {label: '分卡次数', value: 'sim_dispatch', checked: false},
-    {label: '单次分卡流量', value: 'sim_dispatch_flower', checked: false},
-    {label: '流量使用率(OSS)/%', value: 'percentage_f', checked: true},
+    {label: '分卡次数', value: 'dispatch_con', checked: false},
+    {label: '单次分卡流量/MB', value: 'dispatch_once_flower', checked: false},
+    {label: '流量使用率(OSS)/%', value: 'percentage_f', checked: false},
     {label: '流量使用率(SAAS)/%', value: 'percentage_fs', checked: false}
 ];
 /**====================================
@@ -393,13 +393,12 @@ function manualGridExcelExport(grid_item, alert_item, url_query) {
                             上次次套餐更新时间: rows[i+j].last_update_time,
                             下次套餐更新时间: rows[i+j].next_update_time,
                             累计流量: rows[i+j].flower,
-                            分卡次数: rows[i+j].sim_dispatch,
-                            单次分卡流量: rows[i+j].sim_dispatch_flower,
+                            分卡次数: rows[i+j].dispatch_con,
+                            单次分卡流量: rows[i+j].dispatch_once_flower,
                             流量使用率_OSS: rows[i+j].percentage_f,
                             流量使用率_SASS: rows[i+j].percentage_fs
                         })
                     }
-
                 }
             }
         }
