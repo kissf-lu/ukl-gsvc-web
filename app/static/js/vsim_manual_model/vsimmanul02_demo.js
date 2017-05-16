@@ -452,12 +452,13 @@ function actionManulAjaxAPI(grid_src_array, manual_item_param, manual_post_arg) 
     // clear old data
     var Country = manual_post_arg.postData.country;
     var imsi = manual_post_arg.postData.imsi;
+    var packageType = manual_post_arg.postData.packageTypeName;
     var gridArray = [];
-    if (Country==''){
+    if ((Country === '') && (packageType === '')){
         //
         alert_func(
             manual_item_param.manualAlertID,
-            "请设置查询国家!"
+            "国家和套餐至少设置一个参数!"
         );
     } else {
         // clear old data
@@ -876,7 +877,8 @@ $(function () {
                 manualDataGetID: $('#SrcVsimDataGet'),
                 manualAlertID: $('#manual_alert'),
                 manualGridFlash: $('#manualGridFlash'),
-                manualExcelExport: $('#manual_excel_export')
+                manualExcelExport: $('#manual_excel_export'),
+                manualPackageTypeName: $('#id-package-type-name-man')
             },
             sys:{
                 sysGridID: $('#sys_grid'),
@@ -893,7 +895,8 @@ $(function () {
                 sysSlotStatus: $('#sys_slot_status'),
                 sysBamStatus: $('#sys_bam_status'),
                 sysOcupyStatus: $('#sys_ocupy_status'),
-                sysPackageStatus: $('#sys_package_status')
+                sysPackageStatus: $('#sys_package_status'),
+                sysPackageTypeName: $('#id-package-type-name-sys')
             }
         }
     };
@@ -927,7 +930,8 @@ $(function () {
             postData:{
                 country: simManualGlobalParam.item.manual.manualCountryID.val(),
                 person: simManualGlobalParam.item.manual.manualPersonID.val(),
-                imsi: simManualGlobalParam.item.manual.manualImsiID.val()
+                imsi: simManualGlobalParam.item.manual.manualImsiID.val(),
+                packageTypeName: simManualGlobalParam.item.manual.manualPackageTypeName.val()
             },
             url: $SCRIPT_ROOT + '/api/v1.0/get_srcVsimManulInfor/',
             postMethod: 'POST'

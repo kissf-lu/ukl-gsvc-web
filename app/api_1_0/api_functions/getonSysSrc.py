@@ -34,14 +34,18 @@ def getVsimManulInfor(country, **kwargs):
     jsonResults = []
     queryPerson = ''
     queryImsi = ''
+    query_package_type = ''
     personWhere = ''
     imsiWhere = ''
+    package_type_where = ''
     errInfo = ""
     queryCoutry = country
     if 'person' in kwargs.keys():
         queryPerson = kwargs['person']
     if 'imsi' in kwargs.keys():
         queryImsi = kwargs['imsi']
+    if 'package_type' in kwargs.keys():
+        query_package_type = kwargs['package_type']
     # 逻辑判断
     if not queryCoutry:
         errInfo = '请设置查询国家'
@@ -50,7 +54,10 @@ def getVsimManulInfor(country, **kwargs):
             personWhere = "AND `person_gsvc`=" + "'" + queryPerson + "' "
         if queryImsi:
             imsiWhere = "AND `imsi` LIKE '" + queryImsi + "%' "
-        where = "WHERE `country_iso`=" + "'" + queryCoutry + "' " + personWhere + imsiWhere
+        if query_package_type:
+            package_type_where = "AND `package_type` LIKE '" + query_package_type + "%' "
+
+        where = "WHERE `country_iso`=" + "'" + queryCoutry + "' " + personWhere + imsiWhere + package_type_where
         query_str = ("SELECT "
                      "`imsi`, "
                      "`country_iso`, "

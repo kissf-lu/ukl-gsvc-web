@@ -30,8 +30,9 @@ def get_Country():
         country = str(Dic_data['country'])
         person = str(Dic_data['person'])
         imsi = str(Dic_data['imsi'])
+        package_type_name = str(Dic_data['packageTypeName'])
 
-        return getVsimManulInfor(country, person=person, imsi=imsi)
+        return getVsimManulInfor(country, person=person, imsi=imsi, package_type=package_type_name)
 
     return False
 
