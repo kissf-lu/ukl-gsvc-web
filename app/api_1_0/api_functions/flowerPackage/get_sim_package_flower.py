@@ -189,13 +189,14 @@ def get_sim_package_flower_api(sim_package_param):
     return json.dumps(sim_package_info, sort_keys=True, indent=4, default=json_util.default)
 
 
-def mongo_agg_hour(db_str, pip_line, oriage_db):
+def mongo_agg_hour(db_str, pip_line, origin_db, append_group_list):
     """
-    为查询时间间隔大于3天的天流量聚合函数
-    :param db_str:       数据库设置参数，key:value类型数据
-    :param pip_line:     mongodb pip line 命令参数 
-    :param oriage_db:    type:list [{},{},...]， 原始数据，默认为上次查询的基础数据
-    :return:             type:dic, 返回带有附加查询信息的dic类型数据至前端
+    为查询时间间隔小于等于3天的小时表流量聚合函数
+    :param db_str:                 数据库设置参数，key:value类型数据
+    :param pip_line:               mongodb pip line 命令参数 
+    :param origin_db:              type:list [{},{},...]， 原始数据，默认为上次查询的基础数据
+    :param append_group_list:      tyep:list [], 追加计算参数
+    :return:                       type:dic, 返回带有附加查询信息的dic类型数据至前端
     """
     agg_data = []
     errinfo = ''
@@ -227,7 +228,7 @@ def mongo_agg_hour(db_str, pip_line, oriage_db):
                 # 获得MB 单位流量
                 fd['Flower'] = round((fd['Flower'] / 1024 / 1024), 2)
             # 流量合并至套餐表单中
-            for pd in oriage_db['data']:
+            for pd in origin_db['data']:
                 pd_flower_if = False
                 for fd in agg_data:
                     if str(pd['imsi']) == fd['imsi']:
@@ -236,20 +237,21 @@ def mongo_agg_hour(db_str, pip_line, oriage_db):
                         break
                 if not pd_flower_if:
                     pd['flower'] = 0
-            dic_results = {'info': {'err': False, 'errinfo': errinfo}, 'data': oriage_db}
+            dic_results = {'info': {'err': False, 'errinfo': errinfo}, 'data': origin_db}
             return dic_results
         else:
             dic_results = {'info': {'err': False, 'errinfo': '无查询结果'}, 'data': []}
             return dic_results
 
 
-def mongo_agg_day(db_str, pip_line_hour, pip_line_day, oriage_db):
+def mongo_agg_day(db_str, pip_line_hour, pip_line_day, origin_db, append_group_list):
     """
-    
+    为查询时间间隔大于3天的天流量聚合函数
     :param db_str: 
-    :param pip_line_hour: 
-    :param pip_line_day: 
-    :param oriage_db: 
+    :param pip_line_hour:           mongodb pip line 命令参数, hour聚合
+    :param pip_line_day:            mongodb pip line 命令参数，day聚合
+    :param append_group_list:       type:list [], 追加计算参数， 用于选择附加输出信息
+    :param origin_db:               type:list [{},{},...]， 原始数据，默认为上次查询的基础数据
     :return: 
     """
     agg_data_hour = []
@@ -298,7 +300,7 @@ def mongo_agg_day(db_str, pip_line_hour, pip_line_day, oriage_db):
                     agg_data_hour[i]['Flower'] = round(((agg_data_hour[i]['Flower']) / 1024 / 1024),
                                                        2)  # 流量输出为MB
                 # 天套餐流量合并至信息表
-                for pd in oriage_db['data']:
+                for pd in origin_db['data']:
                     pd_flower_if = False
                     for fd in agg_data_day:
                         if str(pd['imsi']) == fd['imsi']:
@@ -309,13 +311,15 @@ def mongo_agg_day(db_str, pip_line_hour, pip_line_day, oriage_db):
                     # 如果没有匹配到相应的imsi数据，说明该imsi无该次查询流量信息，为0
                     if not pd_flower_if:
                         pd['flower'] = 0
-                # oriage_db为首次查询套餐信息的基础表，故每个imsi都有，即在imsi纬度，oriage_db包含agg_data_hour
+                # origin_db为首次查询套餐信息的基础表，故每个imsi都有，即在imsi纬度，origin_db包含agg_data_hour
                 for fd in agg_data_hour:
-                    for pd in oriage_db['data']:
+                    for pd in origin_db['data']:
                         if str(pd['imsi']) == fd['imsi']:
-                            pd['flower'] = pd['flower'] + fd['Flower']
+                            # 前端需要精度为2位的小数
+                            pd['flower'] = round(pd['flower'] + fd['Flower'], 2)
                             break
-                for pd in oriage_db['data']:
+                # 计算OSS数据库中的单个imsi流量使用率
+                for pd in origin_db['data']:
                     pd['percentage_f'] = round((pd['flower']/(pd['init_flow']/1024/1024))*100, 2)
             # 错误标记-keyerr
             except KeyError as ke:
@@ -325,7 +329,7 @@ def mongo_agg_day(db_str, pip_line_hour, pip_line_day, oriage_db):
                 dic_results = {'info': {'err': True, 'errinfo': errinfo}, 'data': []}
                 return dic_results
             else:
-                dic_results = {'info': {'err': False, 'errinfo': errinfo}, 'data': oriage_db}
+                dic_results = {'info': {'err': False, 'errinfo': errinfo}, 'data': origin_db}
                 return dic_results
         else:
             errinfo = '完成流量查询, 无对应套餐流量使用记录！'
@@ -344,6 +348,8 @@ def get_package_flower(flower_param, package_info):
     list_str_imsi = []
     query_type = ''
     list_time = []
+    # add_group_key 为前端传入的附加输出选项，用于选择是否计算附加输出信息
+    # 目前天流量附加聚合key为 ： percentage_f  为oss流量使用率
     add_group_key = []
     errinfo = ''
     group_id = {'imsi': "$imsi"}
@@ -359,7 +365,11 @@ def get_package_flower(flower_param, package_info):
     else:
         for pi in package_info['data']:
             list_str_imsi.append(str(pi['imsi']))
-
+        # #----------------------------------hour/day-----------------------------#
+        # query type 为 hour / day （GMT0时间）
+        #
+        #    1、hour 查询时间前端规定为3天(包括)
+        #    2、day 查询为超过3天为，day查询分为小时查询及天查询
         if query_type == 'hour':
             if list_time:
                 begin_time_unix = int(list_time[0]['begin']) * 1000
@@ -377,7 +387,8 @@ def get_package_flower(flower_param, package_info):
                     }]
                 flower_data_hour = mongo_agg_hour(db_str='queryhourFlower',
                                                   pip_line=pipeline,
-                                                  oriage_db=package_info)
+                                                  origin_db=package_info,
+                                                  append_group_list=add_group_key)
                 return flower_data_hour
             else:
                 errinfo = '小时查询的时间参数为空!'
@@ -387,7 +398,10 @@ def get_package_flower(flower_param, package_info):
             or_hour_match = []
             day_match = {}
             if list_time:
+                # 天查询为三段式查询，[{开头时间}，{中间时间}, {结尾时间}]
+                # 为实现起止查询时间小时颗粒度华，{开头时间}和{结尾时间}都为小时纬度查询，{中间时间}为天纬度查询
                 for i in range(len(list_time)):
+                    # if i !=1 表示不取中间天纬度时间，只取两头小时纬度时间
                     if i != 1:
                         or_hour_match.append({'createtime': {'$gte': int(list_time[i]['begin']) * 1000,
                                                              '$lt': int(list_time[i]['end']) * 1000
@@ -425,7 +439,8 @@ def get_package_flower(flower_param, package_info):
                 flower_data_day = mongo_agg_day(db_str=db_str,
                                                 pip_line_hour=pipeline_hour,
                                                 pip_line_day=pipeline_day,
-                                                oriage_db=package_info)
+                                                origin_db=package_info,
+                                                append_group_list=add_group_key)
                 return flower_data_day
             else:
                 errinfo = '天时间设置列表为空列表！'
