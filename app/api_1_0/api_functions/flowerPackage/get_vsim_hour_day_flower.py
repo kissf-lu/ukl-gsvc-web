@@ -82,13 +82,13 @@ def get_gmt0_str_time(str_time, offset):
     return str(gmt0_date_time)
 
 
-def getlistimsi(Data):
+def get_list_imsi(data_ismi):
     """===========================
 
-    :param Data:
+    :param data_ismi:
     :return: list_imsi
     ===================================="""
-    imsi_data = Data
+    imsi_data = data_ismi
     list_imsi = []
     if type(imsi_data) is dict:
         for data in imsi_data:
@@ -457,7 +457,7 @@ def get_flowers(query_sort, time_list, mcc, plmn, imsi, flower_query_key):
     list_time = time_list
     query_mcc = str(mcc)
     query_plmn = str(plmn)
-    query_imsi = getlistimsi(imsi)
+    query_imsi = get_list_imsi(imsi)
     query_flower_key = flower_query_key
     errinfo = ''
     dic_data = []

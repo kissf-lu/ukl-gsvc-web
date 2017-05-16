@@ -223,7 +223,8 @@ def mongo_agg_hour(db_str, pip_line, origin_db, append_group_list):
     else:
         if agg_data:
             for fd in agg_data:
-                agg_id_temp = fd.pop('_id')  # {‘_id’:{}}转换成标准json数据
+                # {‘_id’:{}}转换成标准json数据
+                agg_id_temp = fd.pop('_id')
                 fd.update(agg_id_temp)
                 # 获得MB 单位流量
                 fd['Flower'] = round((fd['Flower'] / 1024 / 1024), 2)
@@ -237,6 +238,13 @@ def mongo_agg_hour(db_str, pip_line, origin_db, append_group_list):
                         break
                 if not pd_flower_if:
                     pd['flower'] = 0
+            # 当percentage_f存在时，前端要求获取oss流量利用率
+            if 'percentage_f' in append_group_list:
+                for pd in origin_db['data']:
+                    pd['percentage_f'] = round((pd['flower'] / (pd['init_flow'] / 1024 / 1024)) * 100, 2)
+            if 'dispatch_once_flower' in append_group_list:
+                for pd in origin_db['data']:
+                    pd['dispatch_once_flower'] = round((pd['flower'] / pd['dispatch_con']), 2)
             dic_results = {'info': {'err': False, 'errinfo': errinfo}, 'data': origin_db}
             return dic_results
         else:
@@ -319,12 +327,17 @@ def mongo_agg_day(db_str, pip_line_hour, pip_line_day, origin_db, append_group_l
                             pd['flower'] = round(pd['flower'] + fd['Flower'], 2)
                             break
                 # 计算OSS数据库中的单个imsi流量使用率
-                for pd in origin_db['data']:
-                    pd['percentage_f'] = round((pd['flower']/(pd['init_flow']/1024/1024))*100, 2)
+                # 当percentage_f存在时，进行计算处理
+                if 'percentage_f' in append_group_list:
+                    for pd in origin_db['data']:
+                        pd['percentage_f'] = round((pd['flower'] / (pd['init_flow'] / 1024 / 1024)) * 100, 2)
+                # 当 dispatch_once_flower 存在时，进行单次分卡流量指标统计
+                if 'dispatch_once_flower' in append_group_list:
+                    for pd in origin_db['data']:
+                        pd['dispatch_once_flower'] = round(((pd['flower']) / pd['dispatch_con']), 2)
             # 错误标记-keyerr
             except KeyError as ke:
-                errinfo = '完成流量查询，天流量整形出现错误： ' + str(ke)
-
+                errinfo = ('完成流量查询，天流量整形出现错误,KeyError: '.format(ke))
             if errinfo:
                 dic_results = {'info': {'err': True, 'errinfo': errinfo}, 'data': []}
                 return dic_results
@@ -488,7 +501,6 @@ def get_package_info(package_set_param):
     dispatch_where_time_set = ''
     dispatch_begin_time = ''
     dispatch_end_time = ''
-    dispatch_once_flower_str = ''
 
     try:
         country = package_set_param['country']
@@ -505,7 +517,7 @@ def get_package_info(package_set_param):
         dispatch_begin_time = package_set_param['dispatch_begin_time']
         dispatch_end_time = package_set_param['dispatch_end_time']
     except KeyError as kerr:
-        errinfo = 'erro:' + str(kerr)
+        errinfo = ("Something went wrong as KeyError: {}".format(kerr))
     if errinfo:
         dic_results = {'info': {'err': True, 'errinfo': errinfo}, 'data': packageInfoData}
 
@@ -545,14 +557,11 @@ def get_package_info(package_set_param):
                 # SAAS系统卡流量使用率统计设置
                 percentage_fs_str = ("CAST((b.`total_use_flow`/ b.`init_flow`)*100  AS DECIMAL(64,1)) "
                                      "AS 'percentage_fs',  ")
-            if 'dispatch_con' in add_key:
-                # 分卡次数统计参数设置
+            if ('dispatch_con' in add_key) or ('dispatch_once_flower' in add_key):
+                # 分卡次数统计参数设置, 统计分卡次数或单次分卡流量大小时要统计此数据
                 dispatch_con_str = "count(d.`imsi`) as 'dispatch_con', "
-                dispatch_where_time_set = " AND '" + dispatch_begin_time + "'<= d.`create_time`<'" + dispatch_end_time + "' "
-            if 'dispatch_once_flower' in add_key:
-                # 单次分卡流量统计参数设置
-                dispatch_once_flower_str = ("CAST((b.`total_use_flow`/1024/1024/count(d.`imsi`))  AS DECIMAL(64,1)) "
-                                            "AS 'dispatch_once_flower', ")
+                dispatch_where_time_set = (" AND '" +
+                                           dispatch_begin_time + "'<= d.`create_time`<'" + dispatch_end_time + "' ")
         query_str = (
             "SELECT  "
             "a.`iso2` AS 'country', "
@@ -560,7 +569,7 @@ def get_package_info(package_set_param):
             "b.`package_type_name` AS 'package_name',  "
             "b.`init_flow`,  "
             "a.`iccid` AS 'iccid', " + sim_agg_str + last_update_time_str + " "
-            ""+percentage_fs_str+dispatch_con_str+dispatch_once_flower_str+" "
+            ""+percentage_fs_str+dispatch_con_str+" "
             "DATE_FORMAT(b.`next_update_time`,'%Y-%m-%d %H')  AS 'next_update_time' "
             "FROM `t_css_vsim` AS a  "
             "LEFT  JOIN `t_css_vsim_packages` AS b  ON a.`imsi`= b.`imsi`  "
@@ -595,9 +604,6 @@ def get_package_info(package_set_param):
                     if 'percentage_fs' in cs.keys():
                         if type(cs['percentage_fs']) is decimal.Decimal:
                             cs['percentage_fs'] = float(cs['percentage_fs'])
-                    if 'dispatch_once_flower' in cs.keys():
-                        if type(cs['dispatch_once_flower']) is decimal.Decimal:
-                            cs['dispatch_once_flower'] = float(cs['dispatch_once_flower'])
                 dic_results = {'info': {'err': False, 'errinfo': errinfo}, 'data': packageInfoData}
 
                 return dic_results

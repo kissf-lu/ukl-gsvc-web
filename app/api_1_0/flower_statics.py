@@ -74,7 +74,7 @@ def get_package_flower_next():
     if request.method == 'POST':
         dic_data = request.get_json()
         try:
-            package_date = {
+            package_data = {
                 'country': str(dic_data['Country']),
                 'org': str(dic_data['Org']),
                 'sim_type': str(dic_data['SimType']),
@@ -89,7 +89,7 @@ def get_package_flower_next():
                 'dispatch_begin_time': t.strftime('%Y-%m-%d %H:%M:%S', t.gmtime(dic_data['ListTime'][0]['begin'])),
                 'dispatch_end_time': t.strftime('%Y-%m-%d %H:%M:%S', t.gmtime(dic_data['ListTime'][-1]['end']))
             }
-            flower_date = {
+            flower_data = {
                 'query_type': dic_data['queryType'],
                 'list_time': dic_data['ListTime'],
                 'add_group_key': dic_data['addGroupKey']
@@ -101,6 +101,6 @@ def get_package_flower_next():
 
             return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
 
-        return get_sim_package_flower_next_api(package_data=package_date, flower_data=flower_date)
+        return get_sim_package_flower_next_api(package_data=package_data, flower_data=flower_data)
 
     return False
