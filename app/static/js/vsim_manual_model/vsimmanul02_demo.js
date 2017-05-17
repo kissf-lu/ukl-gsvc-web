@@ -705,7 +705,6 @@ function sysGridExcelExport(grid_item, alert_item, url_query) {
             if (i==pagenum*pagesize){
                 for (var j = 0; j< pagesize; j++){
                     if (i+j< alldatanum){
-                        alert(moment(rows[i+j].next_update_time).add(moment().utcOffset(), 'm'));
                         view_data.push({
                             imsi: rows[i+j].imsi,
                             country: rows[i+j].country,
@@ -744,12 +743,13 @@ function sysGridExcelExport(grid_item, alert_item, url_query) {
 //------------------------------------------------------------现网excel导出栏--end--------------------------
 function sysGridDataGetAjax(grid_src_array, sysArgs, postArg) {
     var Country = postArg.postData.country;
+    var PackageTypeName = postArg.postData.sys_package_type_name;
     var onSysgridArrayData = [];
-    if (Country=='' ){
+    if ((Country==='') && (PackageTypeName==='')){
         //delete old alter
         alert_func(
             sysArgs.sysAlertID,
-            ("请设置查询国家!")
+            ("请至少设置查询国家或套餐名称!")
         );
     }
     else {
@@ -983,7 +983,8 @@ $(function () {
                 bam_status: simManualGlobalParam.item.sys.sysBamStatus.val(),
                 occupy_status: simManualGlobalParam.item.sys.sysOcupyStatus.val(),
                 org: simManualGlobalParam.item.sys.sysOrgID.val(),
-                package_status: simManualGlobalParam.item.sys.sysPackageStatus.val()
+                package_status: simManualGlobalParam.item.sys.sysPackageStatus.val(),
+                sys_package_type_name: simManualGlobalParam.item.sys.sysPackageTypeName.val()
             },
             url: $SCRIPT_ROOT + '/api/v1.0/get_onSysSrc/',
             postMethod: 'POST'

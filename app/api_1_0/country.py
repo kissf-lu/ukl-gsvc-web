@@ -7,7 +7,7 @@ from flask import request
 from . import api
 from .api_functions.getVsimCardCountryInfo import (getVsimCountryStatic, getindexHtmlMutiLineData)
 # 导入查询手工维护表、系统资源统计表模块
-from .api_functions.getonSysSrc import (getVsimManulInfor, quryonSysSrc)
+from .api_functions.getonSysSrc import (get_vsim_manul_infor, qury_on_sys_src)
 # 获取gsvchome国家维度卡资源统计栏
 from .api_functions.getCountrySrcConIndexGrid import qurycountrySrcCon
 # 获取问题初诊的信息函数
@@ -20,49 +20,44 @@ from .api_functions.selectAjax.getSelectData import get_org
 
 # ("以下为资源页面API接口-------------------------------------------------------------------------------------------------")
 @api.route('/get_srcVsimManulInfor/', methods=['POST'])
-def get_Country():
+def get_country():
     """
     本api为资源页获取手工维护表数据
     :return:
     """
     if request.method == 'POST':
-        Dic_data = request.get_json()
-        country = str(Dic_data['country'])
-        person = str(Dic_data['person'])
-        imsi = str(Dic_data['imsi'])
-        package_type_name = str(Dic_data['packageTypeName'])
+        dic_data = request.get_json()
+        country = str(dic_data['country'])
+        person = str(dic_data['person'])
+        imsi = str(dic_data['imsi'])
+        package_type_name = str(dic_data['packageTypeName'])
 
-        return getVsimManulInfor(country, person=person, imsi=imsi, package_type=package_type_name)
+        return get_vsim_manul_infor(country, person=person, imsi=imsi, package_type=package_type_name)
 
     return False
 
 
 @api.route('/get_onSysSrc/', methods=['POST'])
-def get_onSysSrc():
+def get_on_sys_src():
     """
     本API为获取系统平台中的卡资源数据接口
     :return:
     """
     if request.method == 'POST':
-        Dic_data = request.get_json()
-        country = str(Dic_data['country'])
-        imsi = str(Dic_data['imsi'])
-        status = str(Dic_data['status'])
-        business_status = str(Dic_data['business_status'])
-        slot_status = str(Dic_data['slot_status'])
-        bam_status = str(Dic_data['bam_status'])
-        occupy_status = str(Dic_data['occupy_status'])
-        org = str(Dic_data['org'])
-        package_status = str(Dic_data['package_status'])
-        return quryonSysSrc(country,
-                            imsi=imsi,
-                            status=status,
-                            business_status=business_status,
-                            slot_status=slot_status,
-                            bam_status=bam_status,
-                            occupy_status=occupy_status,
-                            org=org,
-                            package_status=package_status)
+        dic_data = request.get_json()
+        country = str(dic_data['country'])
+        imsi = str(dic_data['imsi'])
+        status = str(dic_data['status'])
+        business_status = str(dic_data['business_status'])
+        slot_status = str(dic_data['slot_status'])
+        bam_status = str(dic_data['bam_status'])
+        occupy_status = str(dic_data['occupy_status'])
+        org = str(dic_data['org'])
+        package_status = str(dic_data['package_status'])
+        sys_package_type_name = str(dic_data['sys_package_type_name'])
+        return qury_on_sys_src(country, imsi=imsi, status=status, business_status=business_status,
+                               slot_status=slot_status, bam_status=bam_status, occupy_status=occupy_status,
+                               org=org, package_status=package_status,package_type_name=sys_package_type_name)
 
     return False
 
@@ -128,17 +123,17 @@ def get_countryProbVsimDic():
     :return:
     """
     if request.method == 'POST':
-        Dic_data = request.get_json()
-        querySort = str(Dic_data['querySort'])
-        queryPram = str(Dic_data['queryPram'])
-        queryPlmn = str(Dic_data['queryPlmn'])
-        begintime = str(Dic_data['begintime'])
-        endtime = str(Dic_data['endtime'])
-        dispatch_begin_t = str(Dic_data['dispatchBeginTime'])
-        dispatch_end_t = str(Dic_data['dispatchEndTime'])
-        TimezoneOffset = int(Dic_data['TimezoneOffset'])
-        DispatchThreshold = int(Dic_data['DispatchThreshold'])
-        FlowerThreshold = int(Dic_data['FlowerThreshold'])
+        dic_data = request.get_json()
+        querySort = str(dic_data['querySort'])
+        queryPram = str(dic_data['queryPram'])
+        queryPlmn = str(dic_data['queryPlmn'])
+        begintime = str(dic_data['begintime'])
+        endtime = str(dic_data['endtime'])
+        dispatch_begin_t = str(dic_data['dispatchBeginTime'])
+        dispatch_end_t = str(dic_data['dispatchEndTime'])
+        TimezoneOffset = int(dic_data['TimezoneOffset'])
+        DispatchThreshold = int(dic_data['DispatchThreshold'])
+        FlowerThreshold = int(dic_data['FlowerThreshold'])
         return getProbFisrtDic(query_sort=querySort,
                                query_pram=queryPram,
                                query_plmn=queryPlmn,
@@ -159,10 +154,10 @@ def get_newVsimTestInforTable():
     :return:
     """
     if request.method == 'POST':
-        Dic_data = request.get_json()
-        test_vsim_info = str(Dic_data['test_vsim_info'])
-        country = str(Dic_data['country'])
-        person = str(Dic_data['person'])
+        dic_data = request.get_json()
+        test_vsim_info = str(dic_data['test_vsim_info'])
+        country = str(dic_data['country'])
+        person = str(dic_data['person'])
 
         return get_new_vsim_test_info(person, country, test_vsim_info)
 
@@ -185,7 +180,7 @@ def get_out_of_bam_slot_sim():
     :return:
     """
     if request.method == 'GET':
-        Dic_data = request.get_json()
+        dic_data = request.get_json()
 
         # return get_new_vsim_test_info(person, country, test_vsim_info)
 

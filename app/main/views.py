@@ -171,7 +171,7 @@ def test_jqxgrid():
 def export_excel():
     if request.method == 'POST':
         arrayData = request.get_array(field_name='file')
-        DicData = exportExcelFunc.getDictExcelData(array_data=arrayData)
+        DicData = exportExcelFunc.get_dict_excel_data(array_data=arrayData)
         print (DicData['data'][0])
         if DicData['err']:
             returnJsonData = {'err': True, 'errinfo': DicData['errinfo'], 'data': []}

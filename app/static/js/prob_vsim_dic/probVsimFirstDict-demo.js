@@ -226,14 +226,14 @@ $("#probDicExcelExport").click(function () {
     var pagesize = paginginformation.pagesize;
     // The number of all pages.
     var pagescount = paginginformation.pagescount;
-    if (alldatanum == 0) {
+    if (alldatanum === 0) {
         //delete old alter
         $("#queryQlert").children().detach();
         $("#queryQlert").append((queryAndReturnAlert + '<p>无输出数据！</p></div>'));
     }
     else if (alldatanum <= 0) {
         for (var i = 0; i < rows.length; i++) {
-            if (i == pagenum * pagesize) {
+            if (i === pagenum * pagesize) {
                 for (var j = 0; j < pagesize; j++) {
                     if (i + j < alldatanum) {
                         view_data.push({
@@ -257,7 +257,7 @@ $("#probDicExcelExport").click(function () {
         }
         $("#initProbDicjqxGrid").jqxGrid('exportdata', 'xls', 'probDicResult', true, view_data);
     }
-    //超过200条数量的数据导出
+    //本地excel导出函数
     else {
         for (var i = 0; i < rows.length; i++) {
             if (i === pagenum * pagesize) {
@@ -289,14 +289,14 @@ $("#probDicExcelExport").click(function () {
 //post函数导出excel
 function excelExport(data) {
     var exportdata = data;
-    if (exportdata.data == []) {
+    if (exportdata.data === []) {
         //delete old alter
         $("#app-growl").children().detach();
         $("#app-growl").append((alertStr + '<p>无输出数据！</p></div>'));
     }
     else {
         var temp = document.createElement("form");
-        temp.action = $SCRIPT_ROOT + "/api/v1.0/export_FirsProbDic/"//"/test_exportExcel";
+        temp.action = $SCRIPT_ROOT + "/api/v1.0/export_FirsProbDic/"    //"/test_exportExcel";
         temp.method = "post";
         temp.style.display = "none";
         var opt = document.createElement("textarea");
@@ -512,14 +512,14 @@ $("#ProbDic_dataGet").click(function () {
                 "</div>"
             );
         }
-        else if (Begintime == "") {
+        else if (Begintime === "") {
             $("#queryQlert").append(
                 queryAndReturnAlert +
                 '<p>请选择要查询的起始时间!</p>' +
                 '</div>'
             );
         }
-        else if (Endtime == "") {
+        else if (Endtime === "") {
             $("#queryQlert").append(
                 queryAndReturnAlert +
                 '<p>请选择要查询的截止时间!</p>' +
@@ -527,7 +527,7 @@ $("#ProbDic_dataGet").click(function () {
             );
         }
         else {
-            if (HourGap == 0) {
+            if (HourGap === 0) {
                 $("#queryQlert").append(
                     queryAndReturnAlert +
                     '<p>起始和截止时间设置相同，请从新设置时间!</p>' +
@@ -572,7 +572,7 @@ $("#ProbDic_dataGet").click(function () {
                             $("#initProbDicjqxGrid").jqxGrid("clear");
                             $("#ProbDict-QueryjqxNotification").jqxNotification("closeLast");
                             var getData = data;
-                            if (getData.data.length == 0) {
+                            if (getData.data.length === 0) {
                                 if (getData.info.err) {
                                     //delete old alter
                                     $("#queryQlert").append(
@@ -595,11 +595,12 @@ $("#ProbDic_dataGet").click(function () {
                                         iccid: item.iccid,
                                         package_type_name: item.package_type_name,
                                         next_update_time: item.next_update_time,
+                                        sim_agg: item.sim_agg,
                                         bam: item.bam,
                                         imsi_con: item.imsi_con,
                                         imei_con: item.imei_con,
                                         Flower: item.Flower,
-                                        err: item.err,
+                                        err: item.err
                                     });
                                 });//each函数完成
                                 // set the new data
@@ -633,7 +634,7 @@ function checkImsiReg(str) {
     var RegExp1 = /^(['][0-9]+['])$/;
     var RegExp2 = /^(['][0-9]+['][,])*['][0-9]+[']$/;
     //plmn非空时监测输入格式是否合法
-    if ((RegExp1.exec(stringTest) || (RegExp2.exec(stringTest)) ) && (str != '')) {
+    if ((RegExp1.exec(stringTest) || (RegExp2.exec(stringTest)) ) && (str !== '')) {
         return true;
     }
     else {
@@ -646,11 +647,11 @@ function checkplmnReg(str) {
     var RegExp1 = /^(['][0-9]+['])$/;
     var RegExp2 = /^(['][0-9]+['][,])*['][0-9]+[']$/;
     //plmn非空时监测输入格式是否合法-规则为以数组开头结尾
-    if ((RegExp1.exec(stringTest) || (RegExp2.exec(stringTest)) ) && (str != '')) {
+    if ((RegExp1.exec(stringTest) || (RegExp2.exec(stringTest)) ) && (str !== '')) {
         return true;
     }
     //准许plmn为空
-    else if (str == '') {
+    else if (str === '') {
         return true;
     }
     else {
