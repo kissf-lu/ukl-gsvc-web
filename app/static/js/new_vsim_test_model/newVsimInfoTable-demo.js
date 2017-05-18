@@ -34,7 +34,7 @@ function initSelectView(init_select_class_list){
     ];
     //select person：
     var person_data = [{text: '刘超'},{text: '叶慧玲'},{text: '郑天琴'},{text: '曲薇'},{text: '黄柳青'},
-        {text: '凌刚'}, {text: '李红伟'},{text: '王成'}];
+        {text: '凌刚'}, {text: '李红伟'},{text: '王成'},{text: '尚晨晨'}];
     // select views
     init_select_class_list.country.select2({
         data: country_data

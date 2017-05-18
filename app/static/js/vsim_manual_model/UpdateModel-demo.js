@@ -134,9 +134,9 @@ function appendAlertInfo(alert_class, info_str){
     '<strong>'+info_str+'</strong> '+
     '</div>');
     // remove old form html
-    $("#app-growl").children().remove();
+    $("#manual_alert").children().remove();
     // append new form html
-    $("#app-growl").append(alertHTML);
+    $("#manual_alert").append(alertHTML);
 }
 
 // pre-submit callback
@@ -184,6 +184,7 @@ function showResponse(responseText, statusText, xhr, $form)  {
     var alertClass = '';
     var alertInfo = '';
     if (responseText.err){
+        alert(responseText.errinfo);
         alertClass = '<div class="alert alert-danger" role="alert">';
         alertInfo = ('操作失败：'+ responseText.errinfo);
     }
