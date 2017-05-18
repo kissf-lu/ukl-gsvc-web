@@ -376,7 +376,7 @@ def get_prob_fisrt_dic(query_sort, query_pram, query_plmn, begin_time, end_time,
                                                               endtime=query_dispatch_end_t,
                                                               dispatch_threshold=quey_dispatch_threshold)
             except ValueError:
-                err_info = "NDatabase input Date Time ValueError"  # 'Database Error!'
+                err_info = "NDatabase input Date Time ValueError"
             except mysql.connector.Error as err:
                 err_info = ("Something went wrong: {}".format(err))
             if err_info != '':
