@@ -5,13 +5,13 @@ from flask import request
 # from flask import json
 # from bson import json_util
 from . import api
-from .api_functions.getVsimCardCountryInfo import (getVsimCountryStatic, getindexHtmlMutiLineData)
+from .api_functions.getVsimCardCountryInfo import (get_vsim_country_static, get_index_html_muti_line_data)
 # 导入查询手工维护表、系统资源统计表模块
 from .api_functions.getonSysSrc import (get_vsim_manul_infor, qury_on_sys_src)
 # 获取gsvchome国家维度卡资源统计栏
-from .api_functions.getCountrySrcConIndexGrid import qurycountrySrcCon
+from .api_functions.getCountrySrcConIndexGrid import qury_country_src_con
 # 获取问题初诊的信息函数
-from .api_functions.getCountryProbDic import getProbFisrtDic
+from .api_functions.getCountryProbDic import get_prob_fisrt_dic
 # new vsim test model
 from .api_functions.newVsimTest import get_new_vsim_test_info
 # org ajax model
@@ -57,7 +57,7 @@ def get_on_sys_src():
         sys_package_type_name = str(dic_data['sys_package_type_name'])
         return qury_on_sys_src(country, imsi=imsi, status=status, business_status=business_status,
                                slot_status=slot_status, bam_status=bam_status, occupy_status=occupy_status,
-                               org=org, package_status=package_status,package_type_name=sys_package_type_name)
+                               org=org, package_status=package_status, package_type_name=sys_package_type_name)
 
     return False
 
@@ -71,84 +71,85 @@ def get_chart_country():
     """
     country = request.args.get('country', '', type=str)
 
-    return getVsimCountryStatic(country)
+    return get_vsim_country_static(country)
 
 
 @api.route('/get_mutiLine_maxUser/', methods=['POST'])
-def get_mutiLine_maxUser():
+def get_muti_line_max_user():
     """
     本api为绘制index主页峰值用户、卡数曲线接口
     :return: 峰值用户、在板卡数、可用卡数JSON数据
     """
     if request.method == 'POST':
-        DicData = request.get_json()
-        country = str(DicData['country'])
-        begintime = str(DicData['begintime'])
-        endtime = str(DicData['endtime'])
-        butype = str(DicData['butype'])
-        timedim = str(DicData['timedim'])
+        dic_data = request.get_json()
+        country = str(dic_data['country'])
+        begintime = str(dic_data['begintime'])
+        end_time = str(dic_data['endtime'])
+        butype = str(dic_data['butype'])
+        timedim = str(dic_data['timedim'])
 
-        return getindexHtmlMutiLineData(country, begintime, endtime, butype=butype, timedim=timedim)
+        return get_index_html_muti_line_data(country, begintime, end_time, butype=butype, timedim=timedim)
 
 
 @api.route('/get_countrySrcCon/', methods=['GET', 'POST'])
-def get_countrySrcCon():
+def get_country_src_con():
     """
     本API为主页国家概述面板获取国家不同套餐卡状态统计数据接口
     :return:
     """
-    # print request.args.get('country', 'ad', type=str)
-    if request.method == 'POST':
-        DicData = request.get_json()
-        country = str(DicData['country'])
-        orgName = str(DicData['org'])
-        vsimType = str(DicData['vsim_type'])
 
-        return qurycountrySrcCon(country, orgName, vsimType)
+    if request.method == 'POST':
+        dic_data = request.get_json()
+        country = str(dic_data['country'])
+        org_name = str(dic_data['org'])
+        vsim_type = str(dic_data['vsim_type'])
+
+        return qury_country_src_con(country, org_name, vsim_type)
 
     if request.method == 'GET':
         country = request.args.get('country', 'ad', type=str)
-        orgName = request.args.get('org', 'gtbu', type=str)
-        vsimType = request.args.get('vsim_type', '', type=str)
+        org_name = request.args.get('org', 'gtbu', type=str)
+        vsim_type = request.args.get('vsim_type', '', type=str)
 
-        return qurycountrySrcCon(country, orgName, vsimType)
+        return qury_country_src_con(country, org_name, vsim_type)
 
     return False
 
 
 @api.route('/get_countryProbVsimDic/', methods=['POST'])
-def get_countryProbVsimDic():
+def get_country_prob_vsim_dic():
     """
 
     :return:
     """
     if request.method == 'POST':
         dic_data = request.get_json()
-        querySort = str(dic_data['querySort'])
-        queryPram = str(dic_data['queryPram'])
-        queryPlmn = str(dic_data['queryPlmn'])
-        begintime = str(dic_data['begintime'])
-        endtime = str(dic_data['endtime'])
+        query_sort = str(dic_data['querySort'])
+        query_pram = str(dic_data['queryPram'])
+        query_plmn = str(dic_data['queryPlmn'])
+        begin_time = str(dic_data['begintime'])
+        end_time = str(dic_data['endtime'])
         dispatch_begin_t = str(dic_data['dispatchBeginTime'])
         dispatch_end_t = str(dic_data['dispatchEndTime'])
-        TimezoneOffset = int(dic_data['TimezoneOffset'])
-        DispatchThreshold = int(dic_data['DispatchThreshold'])
-        FlowerThreshold = int(dic_data['FlowerThreshold'])
-        return getProbFisrtDic(query_sort=querySort,
-                               query_pram=queryPram,
-                               query_plmn=queryPlmn,
-                               begin_time=begintime,
-                               end_time=endtime,
-                               dispatch_begin_time=dispatch_begin_t,
-                               dispatch_end_time=dispatch_end_t,
-                               timezone_off_set=TimezoneOffset,
-                               dispatch_threshold=DispatchThreshold,
-                               flower_threshold=FlowerThreshold)
+        time_zone_off_set = int(dic_data['TimezoneOffset'])
+        dispatch_threshold = int(dic_data['DispatchThreshold'])
+        flower_threshold = int(dic_data['FlowerThreshold'])
+        return get_prob_fisrt_dic(query_sort=query_sort,
+                                  query_pram=query_pram,
+                                  query_plmn=query_plmn,
+                                  begin_time=begin_time,
+                                  end_time=end_time,
+                                  dispatch_begin_time=dispatch_begin_t,
+                                  dispatch_end_time=dispatch_end_t,
+                                  timezone_off_set=time_zone_off_set,
+                                  dispatch_threshold=dispatch_threshold,
+                                  flower_threshold=flower_threshold
+                                  )
     return False
 
 
 @api.route('/get_newVsimTestInforTable/', methods=['POST'])
-def get_newVsimTestInforTable():
+def get_new_vsim_test_infor_table():
     """
     本api为资源页获取手工维护表数据
     :return:

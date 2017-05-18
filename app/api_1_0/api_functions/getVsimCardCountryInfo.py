@@ -7,41 +7,38 @@ from bson import json_util
 import mysql.connector
 from .SqlPack.SQLModel import qureResultAsJson
 
-S_sysStr = 'config_S'
-S_Database = 'ucloudplatform'
-N_sysStr = 'config_N'
-N_Database = 'glocalme_css'
-amzami_sysStr = 'config_amzami'
-amzami_Database = 'gsvcdatabase'
+old_sys_str = 'config_S'
+ucloudplatform_db = 'ucloudplatform'
+saas_sys_str = 'config_N'
+glocalme_css_db = 'glocalme_css'
+amzami_sys_str = 'config_amzami'
+amzami_gsvc_db = 'gsvcdatabase'
 
 
-def getJosonData(sysStr, Database, query_str):
+def get_json_data(sys_str, database, query_str):
     """
 
-    :param sysStr:
-    :param Database:
+    :param sys_str:
+    :param database:
     :param query_str:
     :return:
     """
-    jsonResults = qureResultAsJson(sysStr=sysStr,
-                                   Database=Database,
-                                   query_str=query_str,
-                                   where=[])
-    return jsonResults
+    json_results = qureResultAsJson(sysStr=sys_str, Database=database, query_str=query_str, where=[])
+    return json_results
 
 
-def getNVsimCountryStatic(country):
+def get_saas_vsim_country_static(country):
     """
 
     :param country:
     :return:
     """
-    queryCoutry = country
+    query_country = country
 
-    if queryCoutry == "":
+    if query_country == "":
         where = ""
     else:
-        where = "AND `iso2`=" + "'" + queryCoutry + "' "
+        where = "AND `iso2`=" + "'" + query_country + "' "
 
     query_str_vsim = ("SELECT "
                       "a.`iso2` AS 'country', "
@@ -76,21 +73,21 @@ def getNVsimCountryStatic(country):
                       "   AND a.`dr`=0   "
                       "GROUP BY a.`iso2` "
                       "ORDER BY COUNT(DISTINCT a.`imsi`) DESC ")
-    jsonResults_Nvsim = getJosonData(sysStr=N_sysStr, Database=N_Database, query_str=query_str_vsim)
+    json_results_sass_sim = get_json_data(sys_str=saas_sys_str, database=glocalme_css_db, query_str=query_str_vsim)
 
-    return jsonResults_Nvsim
+    return json_results_sass_sim
 
 
-def getVsimPackageflowStatus(country):
+def get_vsim_package_flow_status(country):
     """
 
     :return:
     """
-    queryCoutry = country
-    if queryCoutry == "":
+    query_country = country
+    if query_country == "":
         where = ""
     else:
-        where = "AND `iso2`=" + "'" + queryCoutry + "' "
+        where = "AND `iso2`=" + "'" + query_country + "' "
 
     query_str_flow = (
         "SELECT "
@@ -115,148 +112,150 @@ def getVsimPackageflowStatus(country):
         "GROUP BY a.`iso2`,b.`package_type_name`,DATE_FORMAT(b.`next_update_time`,'%Y-%m-%d %H'), e.`org_name` "
     )
 
-    VsimPackageflowStatus = getJosonData(sysStr=N_sysStr, Database=N_Database, query_str=query_str_flow)
+    vsim_package_flow_status = get_json_data(sys_str=saas_sys_str, database=glocalme_css_db, query_str=query_str_flow)
 
-    return VsimPackageflowStatus
+    return vsim_package_flow_status
 
 
-def getVsimCountryStatic(country, **kwargs):
+def get_vsim_country_static(country, **kwargs):
     """
     为主页gsvc HOME popchart图形接口
     :param country: 按国家进行数据统计
     :param kwargs: 后续根据需求变化增加变量
     :return:
     """
-    queryCoutry = country
-    errInfo = ''
-    vsimFlowerStatic = []
+    query_country = country
+    err_info = ''
+    vsim_flower_static = []
     try:
-        vsimFlowerStatic = getVsimPackageflowStatus(queryCoutry)
+        vsim_flower_static = get_vsim_package_flow_status(query_country)
     except KeyError as keyerr:
-        errInfo = ("when query MaxUser raise KeyError:{}".format(keyerr))
+        err_info = ("when query max_user raise KeyError:{}".format(keyerr))
     except mysql.connector.Error as err:
-        errInfo = ("Something went wrong when query MaxUser: {}".format(err))
-    if errInfo:
-        DicResults = {'info': {'err': True, 'errinfo': errInfo},
-                      'data': []}
+        err_info = ("Something went wrong when query max_user: {}".format(err))
+    if err_info:
+        dic_results = {'info': {'err': True, 'errinfo': err_info}, 'data': []}
     else:
-        if not vsimFlowerStatic:
-            DicResults = {'info': {'err': False, 'errinfo': "No Data"},
-                          'data': []}
+        if not vsim_flower_static:
+            dic_results = {'info': {'err': False, 'errinfo': "No Data"}, 'data': []}
 
         else:
-            for fs in vsimFlowerStatic:
+            for fs in vsim_flower_static:
                 if type(fs['Percentage']) is decimal.Decimal:
                     fs['Percentage'] = float(fs['Percentage'])
 
-            DicResults = {'info': {'err': False, 'errinfo': ''},
-                          'data': vsimFlowerStatic}
-    return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+            dic_results = {'info': {'err': False, 'errinfo': ''}, 'data': vsim_flower_static}
+    return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
 
 
-def getMutiLineNonshelfandAvaCard(country):
+def get_muti_line_on_shelf_ava_card(country):
     """
     本函数用于获取新架构在架卡状态统计数据：在架卡数、可用卡数
     :param country:
     :return:
     """
-    queryCountry = country
+    query_country = country
     # (当前国家总计卡数、可用卡数数据获取------------------------------GTBU-----------------------------------------)
-    query_str_N_onshelfandAvaCard = ("SELECT "
-                                     "a.`iso2` AS 'country', "
-                                     "COUNT(1) AS 'on_shelf_num', "
-                                     "COUNT(CASE WHEN (a.`available_status`=0 "
-                                     "                 AND b.`package_status`<>2 "
-                                     "                 AND a.`business_status`IN('0','4','5') "
-                                     "                 AND c.`pool_id` IS NOT NULL "
-                                     "                 AND a.`expire_time`>=NOW() "
-                                     "                 AND b.`expire_time`>=NOW()) "
-                                     "           THEN '0' "
-                                     "      END) AS 'ava_num' "
-                                     "FROM `t_css_vsim`AS a "
-                                     "LEFT  JOIN `t_css_vsim_packages` b "
-                                     "      ON a.`imsi`=b.`imsi` "
-                                     "LEFT JOIN `t_css_v_pool_map` AS c "
-                                     "      ON c.`vsim_id`=a.`id` "
-                                     "WHERE "
-                                     "   (b.`package_type_name` NOT  REGEXP '.*[0-9]国.*')"
-                                     "   AND a.`iso2`=" + "'" + queryCountry + "' "
-                                     "   AND a.`bam_status`=0 "
-                                     "   AND a.`slot_status`=0 "
-                                     "   AND a.`vsim_type` = 0 "
-                                     "   AND a.`dr`=0   "
-                                     "GROUP BY a.`iso2` "
-                                     )
-    jsonResults_N_onshelfandAvaCard = getJosonData(sysStr=N_sysStr,
-                                                   Database=N_Database,
-                                                   query_str=query_str_N_onshelfandAvaCard)
-    return jsonResults_N_onshelfandAvaCard
+    query_saas_on_shelf_and_ava_card = (
+        "SELECT "
+        "a.`iso2` AS 'country', "
+        "COUNT(1) AS 'on_shelf_num', "
+        "COUNT(CASE WHEN (a.`available_status`=0 "
+        "                 AND b.`package_status`<>2 "
+        "                 AND a.`business_status`IN('0','4','5') "
+        "                 AND c.`pool_id` IS NOT NULL "
+        "                 AND a.`expire_time`>=NOW() "
+        "                 AND b.`expire_time`>=NOW()) "
+        "           THEN '0' "
+        "      END) AS 'ava_num' "
+        "FROM `t_css_vsim`AS a "
+        "LEFT  JOIN `t_css_vsim_packages` b "
+        "      ON a.`imsi`=b.`imsi` "
+        "LEFT JOIN `t_css_v_pool_map` AS c "
+        "      ON c.`vsim_id`=a.`id` "
+        "WHERE "
+        "   (b.`package_type_name` NOT  REGEXP '.*[0-9]国.*')"
+        "   AND a.`iso2`=" + "'" + query_country + "' "
+        "   AND a.`bam_status`=0 "
+        "   AND a.`slot_status`=0 "
+        "   AND a.`vsim_type` = 0 "
+        "   AND a.`dr`=0   "
+        "GROUP BY a.`iso2` "
+    )
+    json_results_on_shelf_and_ava_card = get_json_data(sys_str=saas_sys_str, database=glocalme_css_db,
+                                                       query_str=query_saas_on_shelf_and_ava_card)
+    return json_results_on_shelf_and_ava_card
 
 
-def getMutiLineSonshelfandAvaCard(country):
+def get_muti_line_old_on_shelf_and_ava_card(country):
     """
     本函数用于获取老系统在架卡状态统计数据：在架卡数、可用卡数
     :param country:
     :return:
     """
-    queryCountry = country
+    query_country = country
     # (当前国家总计卡数、可用卡数数据获取------------------------------S-----------------------------------------)
-    query_str_S_onshelfandAvaCard = ("SELECT  "
-                                     "a.`country_code2`AS 'country', "
-                                     "COUNT(1) AS 'on_shelf_num', "
-                                     "COUNT(CASE WHEN  "
-                                     " a.`state`='00000' OR a.`state`='10000' THEN 1 END )AS 'ava_num' "
-                                     "FROM `t_resvsim` AS a "
-                                     "LEFT JOIN `t_resvsimpackagetype`AS c ON c.`itemid`=a.`packagetype` "
-                                     "LEFT JOIN `t_resvsimowner`AS e ON e.`sourceid`=a.`imsi` "
-                                     "LEFT JOIN `t_resoperator` AS r ON r.`code`=a.`sid` "
-                                     "LEFT JOIN `t_usmguser_parent`   AS f    ON f.`uid`=e.`ownerid`  "
-                                     "WHERE a.`state` LIKE '_0__0' "  # 在板卡条件
-                                     "AND e.`sourceid` IS NULL  "  # 是否代理商卡判断，NULL非代理商卡
-                                     "AND (c.`name` NOT  REGEXP '.*[0-9]国.*') "
-                                     "AND a.`country_code2`=" + "'" + queryCountry + "'"
-                                     "GROUP BY a.`country_code2` ")
+    query_old_onshelf_and_ava_card = (
+        "SELECT  "
+        "a.`country_code2`AS 'country', "
+        "COUNT(1) AS 'on_shelf_num', "
+        "COUNT(CASE WHEN  "
+        " a.`state`='00000' OR a.`state`='10000' THEN 1 END )AS 'ava_num' "
+        "FROM `t_resvsim` AS a "
+        "LEFT JOIN `t_resvsimpackagetype`AS c ON c.`itemid`=a.`packagetype` "
+        "LEFT JOIN `t_resvsimowner`AS e ON e.`sourceid`=a.`imsi` "
+        "LEFT JOIN `t_resoperator` AS r ON r.`code`=a.`sid` "
+        "LEFT JOIN `t_usmguser_parent`   AS f    ON f.`uid`=e.`ownerid`  "
+        "WHERE a.`state` LIKE '_0__0' "  # 在板卡条件
+        "AND e.`sourceid` IS NULL  "  # 是否代理商卡判断，NULL非代理商卡
+        "AND (c.`name` NOT  REGEXP '.*[0-9]国.*') "
+        "AND a.`country_code2`=" + "'" + query_country + "'"
+        "GROUP BY a.`country_code2` "
+    )
 
-    jsonResults_S_onshelfandAvaCard = getJosonData(sysStr=S_sysStr,
-                                                   Database=S_Database,
-                                                   query_str=query_str_S_onshelfandAvaCard)
-    return jsonResults_S_onshelfandAvaCard
+    on_shelf_and_ava_card = get_json_data(sys_str=old_sys_str, database=ucloudplatform_db,
+                                          query_str=query_old_onshelf_and_ava_card)
+
+    return on_shelf_and_ava_card
 
 
-def getMutiLineMaxUser(country, begintime, endtime, butype_set, timedim_set):
+def get_muti_line_max_user(country, begintime, endtime, bu_type_set, time_dim_set):
     """
 
     :param country:
     :param begintime:
     :param endtime:
-    :param butype_set:
-    :param timedim_set:
+    :param bu_type_set:
+    :param time_dim_set:
     :return:
     """
-    queryCountry = country
-    queryBeginTime = begintime
-    queryEndTime = endtime
-    butype_set = butype_set
-    timedim_set = timedim_set
-    query_str_MaxUser = (
+    query_country = country
+    query_begin_time = begintime
+    query_end_time = endtime
+    bu_type_set = bu_type_set
+    time_dim_set = time_dim_set
+    query_str__max_user = (
         "SELECT b.country,"
-        "       DATE_FORMAT(b.sampletime, " + timedim_set + ") AS sampletime , "
+        "       DATE_FORMAT(b.sampletime, " + time_dim_set + ") AS sampletime , "
         "       MAX(b.onlinemax) AS onlinemax "
         "FROM ( "
         "SELECT a.`country`, a.`createtime` AS sampletime, CAST(SUM(a.`onlinemax`) AS UNSIGNED) AS onlinemax "
         "FROM `gsvcdatabase`.`max_onlingusr_hour` AS a "
-        "WHERE a.`country`= " + "'" + queryCountry + "' "
-        "      AND a.`createtime`>= " + "'" + queryBeginTime + "' " + "AND a.`createtime`<" + "'" + queryEndTime + "' "
-        "   " + butype_set +
+        "WHERE a.`country`= " + "'" + query_country + "' "
+        "      AND a.`createtime`>= " + "'" + query_begin_time + "' " +
+        "AND a.`createtime`<" + "'" + query_end_time + "' "
+        "   " + bu_type_set +
         "GROUP BY a.`country`, a.`createtime` ) AS b "
-        "GROUP BY b.country ,DATE_FORMAT(b.sampletime, " + timedim_set + ")")
+        "GROUP BY b.country ,DATE_FORMAT(b.sampletime, " + time_dim_set + ")"
+    )
 
-    jsonResults_MaxUser = getJosonData(sysStr=amzami_sysStr, Database=amzami_Database, query_str=query_str_MaxUser)
+    json_results_max_user = get_json_data(sys_str=amzami_sys_str, database=amzami_gsvc_db,
+                                          query_str=query_str__max_user)
 
-    return jsonResults_MaxUser
+    return json_results_max_user
 
 
-def getindexHtmlMutiLineData(country, begintime, endtime, **kwargs):
+def get_index_html_muti_line_data(country, begintime, endtime, **kwargs):
     """
     :本部分用于获取绘制主页国家峰值曲线图数据。获取国家峰值用户、在板卡数、可用卡数统计数据
     :param country:
@@ -266,58 +265,52 @@ def getindexHtmlMutiLineData(country, begintime, endtime, **kwargs):
     :return:
     """
     # (maxonline 曲线数据获取)
-    BU = ''
-    butype_set = " "  # BU类型设置
-    timedim_set = "'%Y-%m-%d'"  # 时间维度设置
-    MaxUser = []
-    VsimCon = []
-    errInfo = ''
+    bu = ''
+    bu_type_set = " "  # bu类型设置
+    time_dim_set = "'%Y-%m-%d'"  # 时间维度设置
+    max_user = []
+    vsim_con = []
+    err_info = ''
     if 'butype' in kwargs.keys():
         butype = kwargs['butype']
-        BU = kwargs['butype']
+        bu = kwargs['butype']
         if butype:
             if butype == 'GTBU':
                 butype = '2'
-                butype_set = butype_set + " AND a.`butype`= " + butype + " "
+                bu_type_set = bu_type_set + " AND a.`butype`= " + butype + " "
 
     if 'timedim' in kwargs.keys():
         timedim = kwargs['timedim']
         if timedim != "":
             if timedim == 'month':
-                timedim_set = "'%Y-%m'"
+                time_dim_set = "'%Y-%m'"
     try:
-        MaxUser = getMutiLineMaxUser(country=country,
-                                     begintime=begintime,
-                                     endtime=endtime,
-                                     butype_set=butype_set,
-                                     timedim_set=timedim_set)
+        max_user = get_muti_line_max_user(country=country, begintime=begintime, endtime=endtime,
+                                          bu_type_set=bu_type_set, time_dim_set=time_dim_set)
     except KeyError as keyerr:
-        errInfo = ("when query MaxUser raise KeyError:{}".format(keyerr))
+        err_info = ("when query max_user raise KeyError:{}".format(keyerr))
     except mysql.connector.Error as err:
-        errInfo = ("Something went wrong when query MaxUser: {}".format(err))
-    if errInfo:
-        DicResults = {'info': {'err': True, 'errinfo': errInfo},
-                      'data': []}
+        err_info = ("Something went wrong when query max_user: {}".format(err))
+    if err_info:
+        dic_results = {'info': {'err': True, 'errinfo': err_info}, 'data': []}
     else:
-        if not MaxUser:
-            DicResults = {'info': {'err': False, 'errinfo': "No MaxUser Data"},
-                          'data': []}
+        if not max_user:
+            dic_results = {'info': {'err': False, 'errinfo': "No max_user Data"}, 'data': []}
 
         else:
             try:
-                if BU == 'ALL':
-                    VsimCon = getMutiLineNonshelfandAvaCard(country=country)
+                if bu == 'ALL':
+                    vsim_con = get_muti_line_on_shelf_ava_card(country=country)
                 else:
-                    VsimCon = getMutiLineNonshelfandAvaCard(country=country)
+                    vsim_con = get_muti_line_on_shelf_ava_card(country=country)
             except KeyError as keyerr:
-                errInfo = ("when query VsimCon raise KeyError:{}".format(keyerr))
+                err_info = ("when query vsim_con raise KeyError:{}".format(keyerr))
             except mysql.connector.Error as err:
-                errInfo = ("Something went wrong when query VsimCon: {}".format(err))
-            if errInfo:
-                DicResults = {'info': {'err': True, 'errinfo': errInfo},
-                              'data': []}
+                err_info = ("Something went wrong when query vsim_con: {}".format(err))
+            if err_info:
+                dic_results = {'info': {'err': True, 'errinfo': err_info}, 'data': []}
             else:
-                DicResults = {'info': {'err': False, 'errinfo': ''},
-                              'data': {'max_user': MaxUser, 'sim_con': VsimCon}}
+                dic_results = {'info': {'err': False, 'errinfo': ''},
+                               'data': {'max_user': max_user, 'sim_con': vsim_con}}
 
-    return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+    return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)

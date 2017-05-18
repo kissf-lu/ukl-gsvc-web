@@ -7,17 +7,13 @@ from bson.code import Code
 from .SqlPack.SQLModel import qureResultAsJson
 import time
 import pymongo
-import pymongo.errors
+import pymongo.errors as mongodb_error
 import mysql.connector
 import datetime
 # 获取连接信息
-from .SqlPack.pyMongoModel import (sql_info,
-                                   MongoClient,
-                                   Database,
-                                   Sheet
-                                   )
+from .SqlPack.pyMongoModel import (sql_info, MongoClient, Database, Sheet)
 # Mongo_Model
-from .SqlPack.Mongo_Model import (msmongo,pygroup)
+from .SqlPack.Mongo_Model import (msmongo, pygroup)
 from .SqlPack.SqlLinkInfo import getCountryProbDic
 # 获取新架构卡资源数据库连接信息
 Sql = getCountryProbDic['getSrc']
@@ -32,125 +28,122 @@ def datetime_timestamp(dt):
     return int(s)
 
 
-def getGMT0StrTime(strTime, offSet):
+def get_gmt0_str_time(str_time, off_set):
     """
 
-    :param strTime:
-    :param offSet:
+    :param str_time:
+    :param off_set:
     :return:
     """
-    GMT0dateTime = datetime.datetime.strptime(strTime, '%Y-%m-%d %H:%M:%S')-datetime.timedelta(minutes=offSet)
+    gmt0_date_time = datetime.datetime.strptime(str_time, '%Y-%m-%d %H:%M:%S')-datetime.timedelta(minutes=off_set)
 
-    return str(GMT0dateTime)
+    return str(gmt0_date_time)
 
 
-def getlistimsi(dicData):
+def get_list_imsi(dic_data):
     """
 
-    :param dicData:
+    :param dic_data:
     :return: list dic imsi
     """
     list_imsi = []
-    for i in range(len(dicData)):
-        list_imsi.append(str(dicData[i]['imsi']))
+    for i in range(len(dic_data)):
+        list_imsi.append(str(dic_data[i]['imsi']))
 
     return list_imsi
 
 
-def getJosonData(sysStr, database, query_str):
+def get_json_data(sys_str, database, query_str):
     """
 
-    :param sysStr:
+    :param sys_str:
     :param database:
     :param query_str:
     :return:
     """
-    jsonResults = qureResultAsJson(sysStr=sysStr,
-                                   Database=database,
-                                   query_str=query_str,
-                                   where=[])
-    return jsonResults
+    json_results = qureResultAsJson(sysStr=sys_str, Database=database, query_str=query_str, where=[])
+
+    return json_results
 
 
-def assemErrInfo(queryData, errData):
+def assemble_err_info(query_data, err_data):
     """
 
-    :param queryData:
-    :param errData:
+    :param query_data:
+    :param err_data:
     :return:
     """
-    assemErrInfoBaseData = queryData
-    assemErrInfoerrData = errData
-    for i in range(len(assemErrInfoBaseData)):
+    assemble_err_info_base_data = query_data
+    assemble_err_info_err_data = err_data
+    for i in range(len(assemble_err_info_base_data)):
         str_err = ''
         find_imsi = False
-        for j in range(len(assemErrInfoerrData)):
-            if str(assemErrInfoBaseData[i]['imsi']) == str(assemErrInfoerrData[j]['vsimImsi']):
-                str_err = str_err + '(' + str(int(assemErrInfoerrData[j]['errType'])) + "," + \
-                          str(int(assemErrInfoerrData[j]['errCode'])) + ' :' + str(
-                    int(assemErrInfoerrData[j]['count'])) + ')'
+        for j in range(len(assemble_err_info_err_data)):
+            if str(assemble_err_info_base_data[i]['imsi']) == str(assemble_err_info_err_data[j]['vsimImsi']):
+                str_err = str_err + '(' + str(int(assemble_err_info_err_data[j]['errType'])) + "," + \
+                          str(int(assemble_err_info_err_data[j]['errCode'])) + ' :' + str(
+                    int(assemble_err_info_err_data[j]['count'])) + ')'
                 find_imsi = True
         if not find_imsi:
             str_err = 'NULL'
         err = {'err': str_err}
-        assemErrInfoBaseData[i].update(err)
+        assemble_err_info_base_data[i].update(err)
 
-    return assemErrInfoBaseData
+    return assemble_err_info_base_data
 
 
-def getErr(queryData, beginTime, endTime):
+def get_err(query_data, begin_time, end_time):
     """
 
-    :param queryData:
-    :param beginTime:
-    :param endTime:
+    :param query_data:
+    :param begin_time:
+    :param end_time:
     :return:
     """
-    getErrbaseData = queryData
-    IMSI = []                        # 存储问题imsi
-    for dic in getErrbaseData:
-        IMSI.append(str(dic['imsi']))
-    condition = {"vsimImsi": {"$in": IMSI},
+    get_err_base_data = query_data
+    imsi = []                        # 存储问题imsi
+    for dic in get_err_base_data:
+        imsi.append(str(dic['imsi']))
+    condition = {"vsimImsi": {"$in": imsi},
                  # "errType":8,
                  # "mcc":'602',
                  # "errCode":{"$in" : [7,]},
-                 "errorTime": {"$gte": (int(beginTime) * 1000),
-                               "$lte": (int(endTime) * 1000)}
+                 "errorTime": {"$gte": (int(begin_time) * 1000),
+                               "$lte": (int(end_time) * 1000)}
                  }
-    msMog = msmongo(MongoClient=MongoClient["N_oss_perflog"],
-                    Database=Database["N_oss_perflog"],
-                    Sheet=Sheet["t_term_vsim_estfail"])
+    ms_mongo = msmongo(MongoClient=MongoClient["N_oss_perflog"], Database=Database["N_oss_perflog"],
+                       Sheet=Sheet["t_term_vsim_estfail"])
     key = {"vsimImsi": 1, "errType": 1, "errCode": 1}
     initial = {"count": 0}
     reducer = Code("""function(obj, prev){prev.count ++}""")
     lis_mongo_tab = ["vsimImsi", "errType", "errCode", "count"]
-    mongoErr = pygroup(msMog, "t_term_vsim_estfail", key, condition, initial, reducer, lis_mongo_tab)
-    returngetErrData = assemErrInfo(queryData=getErrbaseData, errData=mongoErr)
+    mongo_err = pygroup(ms_mongo, "t_term_vsim_estfail", key, condition, initial, reducer, lis_mongo_tab)
+    return_err_data = assemble_err_info(query_data=get_err_base_data, err_data=mongo_err)
 
-    return returngetErrData
+    return return_err_data
 
 
-def getCountryFlower(Dicdata, Begintime, Endtime, FlowerThreshold):
+def get_country_flower(dic_data, begin_time, end_time, flower_threshold):
     """
 
-    :param Dicdata:
-    :param Begintime:
-    :param Endtime:
-    :param FlowerThreshold:
+    :param dic_data:
+    :param begin_time:
+    :param end_time:
+    :param flower_threshold:
     :return:
     """
 
-    queryData = Dicdata
-    returnData = []
+    query_data = dic_data
+    return_data = []
     # 获取list imsi
-    list_imsi = getlistimsi(queryData)
+    list_imsi = get_list_imsi(query_data)
     # 查询起始和截止时间
-    flowerBegintime = Begintime
-    flowerEndtime = Endtime
-    FlowerHaving = FlowerThreshold
-    beginLUnix = int(flowerBegintime) * 1000
-    endLUnix = int(flowerEndtime) * 1000
-    pipeline = [{"$match": {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
+    flower_begin_time = begin_time
+    flower_end_time = end_time
+    flower_having_set = flower_threshold
+    begin_l_unix = int(flower_begin_time) * 1000
+    end_l_unix = int(flower_end_time) * 1000
+    pipeline = [{"$match": {'createtime': {'$gte': begin_l_unix, '$lt': end_l_unix},
                             'imsi': {'$in': list_imsi}
                             }
                  },
@@ -161,52 +154,52 @@ def getCountryFlower(Dicdata, Begintime, Endtime, FlowerThreshold):
                  }
                 ]
     connection = pymongo.MongoClient(sql_info['getCountryProbDic']['queryFlower']['uri'])
-    aggeData = list(connection.get_database(sql_info['getCountryProbDic']['queryFlower']['db']
+    agg_data = list(connection.get_database(sql_info['getCountryProbDic']['queryFlower']['db']
                                             ).get_collection(sql_info['getCountryProbDic']['queryFlower']['collection']
                                                              ).aggregate(pipeline))
-    for i in range(len(aggeData)):
-        agg_id_temp = aggeData[i].pop('_id')
-        aggeData[i].update(agg_id_temp)
-        aggeData[i]['Flower'] = round(((aggeData[i]['Flower'])/1024/1024), 2)
+    for i in range(len(agg_data)):
+        agg_id_temp = agg_data[i].pop('_id')
+        agg_data[i].update(agg_id_temp)
+        agg_data[i]['Flower'] = round(((agg_data[i]['Flower'])/1024/1024), 2)
     connection.close()
     pip_imsi = []
-    for i in range(len(queryData)):
-        ifZeroFlower = True
-        for j in range(len(aggeData)):
-            if str((aggeData[j]['imsi'])) == str(queryData[i]['imsi']):
-                ifZeroFlower = False
-                if aggeData[j]['Flower'] <= int(FlowerHaving):
-                    queryData[i].update({'Flower': aggeData[j]['Flower']})
+    for i in range(len(query_data)):
+        if_zero_flower = True
+        for j in range(len(agg_data)):
+            if str((agg_data[j]['imsi'])) == str(query_data[i]['imsi']):
+                if_zero_flower = False
+                if agg_data[j]['Flower'] <= int(flower_having_set):
+                    query_data[i].update({'Flower': agg_data[j]['Flower']})
                 else:
-                    pip_imsi.append(int(queryData[i]['imsi']))
-        if ifZeroFlower:
-            queryData[i].update({'Flower': 0})
-    for dic in queryData:
+                    pip_imsi.append(int(query_data[i]['imsi']))
+        if if_zero_flower:
+            query_data[i].update({'Flower': 0})
+    for dic in query_data:
         if int(dic['imsi']) not in pip_imsi:
-            returnData.append(dic)
+            return_data.append(dic)
 
-    return returnData
+    return return_data
 
 
-def getImsiFlower(Dicdata, Begintime, Endtime):
+def get_imsi_flower(dic_data, begin_time, end_time):
     """
 
-    :param Dicdata:
-    :param Begintime:
-    :param Endtime:
+    :param dic_data:
+    :param begin_time:
+    :param end_time:
     :return:
     """
 
-    queryData = Dicdata
+    query_data = dic_data
     # 获取list imsi
-    list_imsi = getlistimsi(queryData)
+    list_imsi = get_list_imsi(query_data)
     # 查询起始和截止时间
-    flowerBegintime = Begintime
-    flowerEndtime = Endtime
-    beginLUnix = int(flowerBegintime) * 1000
-    endLUnix = int(flowerEndtime) * 1000
+    flower_begin_time = begin_time
+    flower_end_time = end_time
+    begin_l_unix = int(flower_begin_time) * 1000
+    end_l_unix = int(flower_end_time) * 1000
     pipeline = [
-        {"$match": {'createtime': {'$gte': beginLUnix, '$lte': endLUnix},
+        {"$match": {'createtime': {'$gte': begin_l_unix, '$lte': end_l_unix},
                     'imsi': {'$in': list_imsi}
                     }
          },
@@ -216,51 +209,51 @@ def getImsiFlower(Dicdata, Begintime, Endtime):
         }
         }]
     connection = pymongo.MongoClient(sql_info['getCountryProbDic']['queryFlower']['uri'])
-    aggeData = list(connection.get_database(sql_info['getCountryProbDic']['queryFlower']['db']
+    agg_data = list(connection.get_database(sql_info['getCountryProbDic']['queryFlower']['db']
                                             ).get_collection(sql_info['getCountryProbDic']['queryFlower']['collection']
                                                              ).aggregate(pipeline))
 
-    for i in range(len(aggeData)):
-        agg_id_temp = aggeData[i].pop('_id')  # {‘_id’:{}}转换成标准json数据
-        aggeData[i].update(agg_id_temp)
-        aggeData[i]['Flower'] = round(((aggeData[i]['Flower'])/1024/1024), 2)
+    for i in range(len(agg_data)):
+        agg_id_temp = agg_data[i].pop('_id')  # {‘_id’:{}}转换成标准json数据
+        agg_data[i].update(agg_id_temp)
+        agg_data[i]['Flower'] = round(((agg_data[i]['Flower'])/1024/1024), 2)
     # 更新流量记录
-    for i in range(len(queryData)):
-        ifZeroFlower = True
-        for j in range(len(aggeData)):
-            if str((aggeData[j]['imsi'])) == str(queryData[i]['imsi']):
-                ifZeroFlower = False
-                queryData[i].update({'Flower': aggeData[j]['Flower']})
-        if ifZeroFlower:
-            queryData[i].update({'Flower': 0})
+    for i in range(len(query_data)):
+        if_zero_flower = True
+        for j in range(len(agg_data)):
+            if str((agg_data[j]['imsi'])) == str(query_data[i]['imsi']):
+                if_zero_flower = False
+                query_data[i].update({'Flower': agg_data[j]['Flower']})
+        if if_zero_flower:
+            query_data[i].update({'Flower': 0})
     connection.close()
 
-    return queryData
+    return query_data
 
 
-def getCountryDispatchAndVsimInfo(country, queryPlmn, begintime, endtime, DispatchThreshold):
+def get_country_dispatch_and_vsim_info(country, query_plmn, begin_time, endtime, dispatch_threshold):
     """
 
     :param country:
-    :param queryPlmn:
-    :param begintime:
+    :param query_plmn:
+    :param begin_time:
     :param endtime:
-    :param DispatchThreshold:
+    :param dispatch_threshold:
     :return:
     """
-    strCountry = country
-    strPlmn = queryPlmn
-    strBegintime = begintime
-    strEndtime = endtime
-    strDispatchThreshold = DispatchThreshold
-    if strPlmn == '':
-        strPlmnQueryStr = ''
+    query_country = country
+    str_plmn = query_plmn
+    query_begin_time = begin_time
+    query_end_time = endtime
+    str_dispatch_threshold = dispatch_threshold
+    if str_plmn == '':
+        query_plmn_str = ''
     else:
-        strPlmnQueryStr = ' '+'AND a.`plmn` IN (' + strPlmn + ') '
-    if strCountry == '':
-        strCountryQueryStr = ''
+        query_plmn_str = ' '+'AND a.`plmn` IN (' + str_plmn + ') '
+    if query_country == '':
+        query_country_str = ''
     else:
-        strCountryQueryStr = "" + "AND a.`iso2`= '" + strCountry + "' "
+        query_country_str = "" + "AND a.`iso2`= '" + query_country + "' "
     query_str_vsim = (
         "SELECT "
         "a.`iso2` AS 'country', "
@@ -281,33 +274,33 @@ def getCountryDispatchAndVsimInfo(country, queryPlmn, begintime, endtime, Dispat
         "        ON a.`plmnset_id`=p.`id`"
         "WHERE  "
         "     a.`bam_status`='0' "
-        "     AND a.`slot_status`='0' " + strCountryQueryStr + " " + strPlmnQueryStr + ""
+        "     AND a.`slot_status`='0' " + query_country_str + " " + query_plmn_str + ""
         "     AND a.`available_status`='0' "
-        "     AND c.`create_time`>= " + "'" + strBegintime + "'"
-        "     AND c.`create_time`< " + "'" + strEndtime + "'"
+        "     AND c.`create_time`>= " + "'" + query_begin_time + "'"
+        "     AND c.`create_time`< " + "'" + query_end_time + "'"
         "GROUP BY a.`iso2`, "
         "a.`imsi`, "
         "a.`iccid`, "
         "b.`package_type_name`, "
         "b.`next_update_time` "
-        "HAVING COUNT(c.`imsi`)> " + "'" + str(strDispatchThreshold) + "'"
+        "HAVING COUNT(c.`imsi`)> " + "'" + str(str_dispatch_threshold) + "'"
     )
-    DicResults = getJosonData(sysStr=Sql['db'], database=Sql['database'], query_str=query_str_vsim)
+    dic_results = get_json_data(sys_str=Sql['db'], database=Sql['database'], query_str=query_str_vsim)
 
-    return DicResults
+    return dic_results
 
 
-def getImsiDispatchAndVsimInfo(imsi, begintime, endtime):
+def get_imsi_dispatch_and_vsim_info(imsi, begin_time, endtime):
     """============================================
 
     :param imsi:
-    :param begintime:
+    :param begin_time:
     :param endtime:
     :return:
     =================================================="""
     strimsi = imsi
-    strBegintime = begintime
-    strEndtime = endtime
+    query_begin_time = begin_time
+    query_end_time = endtime
     query_str_vsim = (
         "SELECT "
         "a.`iso2` AS 'country', "
@@ -328,21 +321,21 @@ def getImsiDispatchAndVsimInfo(imsi, begintime, endtime):
         "     AND a.`bam_status`='0' "
         "     AND a.`slot_status`='0' "
         "     AND a.`available_status`='0' "
-        "     AND c.`create_time`>= " + "'" + strBegintime + "'"
-        "     AND c.`create_time`< " + "'" + strEndtime + "'"
+        "     AND c.`create_time`>= " + "'" + query_begin_time + "'"
+        "     AND c.`create_time`< " + "'" + query_end_time + "'"
         "GROUP BY a.`iso2`, "
         "a.`imsi`, "
         "a.`iccid`, "
         "b.`package_type_name`, "
         "b.`next_update_time` "
     )
-    DicResults = getJosonData(sysStr=Sql['db'], database=Sql['database'], query_str=query_str_vsim)
+    dic_results = get_json_data(sys_str=Sql['db'], database=Sql['database'], query_str=query_str_vsim)
 
-    return DicResults
+    return dic_results
 
 
-def getProbFisrtDic(query_sort, query_pram, query_plmn, begin_time, end_time, dispatch_begin_time,
-                    dispatch_end_time, timezone_off_set, dispatch_threshold, flower_threshold):
+def get_prob_fisrt_dic(query_sort, query_pram, query_plmn, begin_time, end_time, dispatch_begin_time,
+                       dispatch_end_time, timezone_off_set, dispatch_threshold, flower_threshold):
     """
     
     :param query_sort: 
@@ -357,99 +350,93 @@ def getProbFisrtDic(query_sort, query_pram, query_plmn, begin_time, end_time, di
     :param flower_threshold: 
     :return: 
     """
-    querysort = query_sort
-    querypram = query_pram
-    queryplmn = query_plmn
-    queryBegintime = begin_time
-    queryendtime = end_time
+    query_sort = query_sort
+    query_pram = query_pram
+    query_plmn = query_plmn
+    query_begin_time = begin_time
+    query_end_time = end_time
     query_dispatch_begin_t = dispatch_begin_time
     query_dispatch_end_t = dispatch_end_time
-    queyDispatchThreshold = dispatch_threshold
-    queryFlowerThreshold = flower_threshold
-    errInfo = ''
-    DicData = []
-    getErrDicData = []
-    if (querysort == '') or (queryBegintime == '') or\
-            (queryendtime == '') or (queyDispatchThreshold == '') or \
-            (queryFlowerThreshold == '') or (query_dispatch_begin_t == '') or (query_dispatch_end_t == ''):
-        DicResults = {'info': {'err': True, 'errinfo': '存在空类型参数'}, 'data': []}
+    quey_dispatch_threshold = dispatch_threshold
+    query_flower_threshold = flower_threshold
+    err_info = ''
+    dic_data = []
+    get_err_dic_data = []
+    if (query_sort == '') or (query_begin_time == '') or\
+            (query_end_time == '') or (quey_dispatch_threshold == '') or \
+            (query_flower_threshold == '') or (query_dispatch_begin_t == '') or (query_dispatch_end_t == ''):
+        dic_results = {'info': {'err': True, 'errinfo': '存在空类型参数'}, 'data': []}
 
-        return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+        return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
     else:
-        if querysort == 'country':
+        if query_sort == 'country':
             try:
-                DicData = getCountryDispatchAndVsimInfo(country=querypram,
-                                                        queryPlmn=queryplmn,
-                                                        begintime=query_dispatch_begin_t,
-                                                        endtime=query_dispatch_end_t,
-                                                        DispatchThreshold=queyDispatchThreshold)
+                dic_data = get_country_dispatch_and_vsim_info(country=query_pram, query_plmn=query_plmn,
+                                                              begin_time=query_dispatch_begin_t,
+                                                              endtime=query_dispatch_end_t,
+                                                              dispatch_threshold=quey_dispatch_threshold)
             except ValueError:
-                errInfo = "NDatabase input Date Time ValueError"  # 'Database Error!'
+                err_info = "NDatabase input Date Time ValueError"  # 'Database Error!'
             except mysql.connector.Error as err:
-                errInfo = ("Something went wrong: {}".format(err))
-            if errInfo != '':
-                DicResults = {'info': {'err': True, 'errinfo': errInfo}, 'data': DicData}
-                return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
-            elif not DicData:
-                DicResults = {'info': {'err': True, 'errinfo': '无分卡记录查询结果，请重新设置查询参数'}, 'data': DicData}
-                return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+                err_info = ("Something went wrong: {}".format(err))
+            if err_info != '':
+                dic_results = {'info': {'err': True, 'errinfo': err_info}, 'data': dic_data}
+                return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
+            elif not dic_data:
+                dic_results = {'info': {'err': True, 'errinfo': '无分卡记录查询结果，请重新设置查询参数'}, 'data': dic_data}
+                return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
             else:
                 try:
-                    getFlowerDicData = getCountryFlower(Dicdata=DicData,
-                                                        Begintime=queryBegintime,
-                                                        Endtime=queryendtime,
-                                                        FlowerThreshold=queryFlowerThreshold)
-                    getErrDicData = getErr(queryData=getFlowerDicData,
-                                           beginTime=queryBegintime,
-                                           endTime=queryendtime)
-                except pymongo.errors.OperationFailure:
-                    errInfo = "MongoDataBase Authentication failed!"
-                except pymongo.errors.NetworkTimeout:
-                    errInfo = "MongoDataBase Connection Exceeded SocketTimeoutMS!"
+                    get_flower_dic_data = get_country_flower(dic_data=dic_data, begin_time=query_begin_time,
+                                                             end_time=query_end_time,
+                                                             flower_threshold=query_flower_threshold)
+                    get_err_dic_data = get_err(query_data=get_flower_dic_data, begin_time=query_begin_time,
+                                               end_time=query_end_time)
+                except mongodb_error.OperationFailure:
+                    err_info = "MongoDataBase Authentication failed!"
+                except mongodb_error.NetworkTimeout:
+                    err_info = "MongoDataBase Connection Exceeded SocketTimeoutMS!"
                 except:
-                    errInfo = "MongoDataBase Unexpected error"
-                if errInfo != '':
-                    DicResults = {'info': {'err': True, 'errinfo': errInfo}, 'data': []}
-                    return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+                    err_info = "MongoDataBase Unexpected error"
+                if err_info != '':
+                    dic_results = {'info': {'err': True, 'errinfo': err_info}, 'data': []}
+                    return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
                 else:
-                    DicResults = {'info': {'err': False, 'errinfo': errInfo}, 'data': getErrDicData}
-                    return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+                    dic_results = {'info': {'err': False, 'errinfo': err_info}, 'data': get_err_dic_data}
+                    return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
         else:
             try:
-                DicData = getImsiDispatchAndVsimInfo(imsi=querypram,
-                                                     begintime=query_dispatch_begin_t,
-                                                     endtime=query_dispatch_end_t)
+                dic_data = get_imsi_dispatch_and_vsim_info(imsi=query_pram, begin_time=query_dispatch_begin_t,
+                                                           endtime=query_dispatch_end_t)
             except ValueError:
-                errInfo = "NDatabase input Date Time ValueError"  # 'Database Error!'
+                err_info = "NDatabase input Date Time ValueError"  # 'Database Error!'
             except mysql.connector.Error as err:
-                errInfo = ("Something went wrong: {}".format(err))
+                err_info = ("Something went wrong: {}".format(err))
             except:
-                errInfo = "NDatabase Unexpected error"
-            if errInfo != '':
-                DicResults = {'info': {'err': True, 'errinfo': errInfo}, 'data': DicData}
-                return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+                err_info = "NDatabase Unexpected error"
+            if err_info != '':
+                dic_results = {'info': {'err': True, 'errinfo': err_info}, 'data': dic_data}
+                return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
 
-            elif not DicData:
-                DicResults = {'info': {'err': True, 'errinfo': '无查询结果，请重新设置查询参数！'}, 'data': DicData}
-                return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+            elif not dic_data:
+                dic_results = {'info': {'err': True, 'errinfo': '无查询结果，请重新设置查询参数！'}, 'data': dic_data}
+                return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
             else:
                 try:
-                    getFlowerDicData = getImsiFlower(Dicdata=DicData,
-                                                     Begintime=queryBegintime,
-                                                     Endtime=queryendtime)
+                    get_flower_dic_data = get_imsi_flower(dic_data=dic_data, begin_time=query_begin_time,
+                                                          end_time=query_end_time)
 
-                    getErrDicData = getErr(queryData=getFlowerDicData,
-                                           beginTime=queryBegintime,
-                                           endTime=queryendtime)
-                except pymongo.errors.OperationFailure:
-                    errInfo = "MongoDataBase Authentication failed!"
-                except pymongo.errors.NetworkTimeout:
-                    errInfo = "MongoDataBase Connection Exceeded SocketTimeoutMS!"
+                    get_err_dic_data = get_err(query_data=get_flower_dic_data, begin_time=query_begin_time,
+                                               end_time=query_end_time)
+                except mongodb_error.OperationFailure:
+                    err_info = "MongoDataBase Authentication failed!"
+                except mongodb_error.NetworkTimeout:
+                    err_info = "MongoDataBase Connection Exceeded SocketTimeoutMS!"
                 except:
-                    errInfo = "MongoDataBase Unexpected error"
-                if errInfo != '':
-                    DicResults = {'info': {'err': True, 'errinfo': errInfo}, 'data': []}
-                    return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+                    err_info = "MongoDataBase Unexpected error"
+                if err_info != '':
+                    dic_results = {'info': {'err': True, 'errinfo': err_info}, 'data': []}
+                    return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
                 else:
-                    DicResults = {'info': {'err': False, 'errinfo': errInfo}, 'data': getErrDicData}
-                    return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+                    dic_results = {'info': {'err': False, 'errinfo': err_info}, 'data': get_err_dic_data}
+                    return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)

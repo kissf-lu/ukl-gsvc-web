@@ -4,15 +4,8 @@
 from .SqlPack.SQLModel import qureResultAsJson
 
 
-
-
-
 def getJosonData(sysStr, Database, query_str):
 
+    json_results = qureResultAsJson(sysStr=sysStr, Database=Database, query_str=query_str, where=[])
 
-    jsonResults = qureResultAsJson(sysStr=sysStr,
-                                   Database=Database,
-                                   query_str=query_str,
-                                   where=[])
-    return jsonResults
-
+    return json_results

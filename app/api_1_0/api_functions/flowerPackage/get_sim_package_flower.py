@@ -369,7 +369,8 @@ def get_package_flower(flower_param, package_info):
     try:
         query_type = flower_param['query_type']
         list_time = flower_param['list_time']
-        add_group_key = flower_param['add_group_key']
+        if flower_param['add_group_key']:
+            add_group_key = flower_param['add_group_key']
     except KeyError as kerr:
         errinfo = '参数设置错误-1：' + str(kerr)
     if errinfo:

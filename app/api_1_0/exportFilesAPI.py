@@ -33,11 +33,11 @@ from .api_functions.exportExcelFunc import (get_excel_140country_data_sorted,
 
 
 @api.route('/export_countrySrcStatic/', methods=['POST'])
-def export_countrySrcStatic():
+def export_country_source_static():
     if request.method == 'POST':
         dic_data = json.loads(request.form['data'])
-        sortedDicData = get_excel_country_src_static_data_sorted(dic_data=dic_data)
-        return excel.make_response_from_array(sortedDicData, "xls", file_name="ExportCountrySrcStaticData")
+        sorted_dic_data = get_excel_country_src_static_data_sorted(dic_data=dic_data)
+        return excel.make_response_from_array(sorted_dic_data, "xls", file_name="ExportCountrySrcStaticData")
     else:
         return False
 
@@ -47,9 +47,9 @@ def export_140country():
     if request.method == 'POST':
 
         dic_data = json.loads(request.form['data'])
-        sortedDicData = get_excel_140country_data_sorted(dic_data=dic_data)
+        sorted_dic_data = get_excel_140country_data_sorted(dic_data=dic_data)
 
-        return excel.make_response_from_array(sortedDicData, "xls", file_name="Export140countryFlowerData")
+        return excel.make_response_from_array(sorted_dic_data, "xls", file_name="Export140countryFlowerData")
     else:
 
         return False
@@ -59,9 +59,9 @@ def export_140country():
 def export_Flower():
     if request.method == 'POST':
         dic_data = json.loads(request.form['data'])
-        sortedDicData = get_excel_flower_data_sorted(dic_data=dic_data)
+        sorted_dic_data = get_excel_flower_data_sorted(dic_data=dic_data)
 
-        return excel.make_response_from_array(sortedDicData, "xls", file_name="ExportFlowerData")
+        return excel.make_response_from_array(sorted_dic_data, "xls", file_name="ExportFlowerData")
 
     return False
 
@@ -70,9 +70,9 @@ def export_Flower():
 def export_ManualInfo():
     if request.method == 'POST':
         dic_data = json.loads(request.form['data'])
-        sortedDicData = get_excel_manul_info_data_sorted(dic_data=dic_data)
+        sorted_dic_data = get_excel_manul_info_data_sorted(dic_data=dic_data)
 
-        return excel.make_response_from_array(sortedDicData, "xls", file_name="ExportManualInfoData")
+        return excel.make_response_from_array(sorted_dic_data, "xls", file_name="ExportManualInfoData")
     return False
 
 
@@ -80,9 +80,9 @@ def export_ManualInfo():
 def export_manualDeleteTemplate():
     if request.method == 'POST':
         dic_data = [{'imsi': '460068029099402'}, {'imsi': '416770118932592'}]
-        sortedDicData = get_excel_manual_delete_temple(dic_data=dic_data)
+        sorted_dic_data = get_excel_manual_delete_temple(dic_data=dic_data)
 
-        return excel.make_response_from_array(sortedDicData, "xls", file_name="manualDeleteTemplate")
+        return excel.make_response_from_array(sorted_dic_data, "xls", file_name="manualDeleteTemplate")
     return False
 
 
@@ -104,9 +104,9 @@ def export_manualInsertTemplate():
                      u"是否代理商卡 0否，1是代理商卡": "0",
                      u"卡的国家属性 0本国卡，1是多国卡": "0"
                      }]
-        sortedDicData = get_excel_manual_insert_temple(dic_data=dic_data)
+        sorted_dic_data = get_excel_manual_insert_temple(dic_data=dic_data)
 
-        return excel.make_response_from_array(sortedDicData, "xls", file_name="manualInsertAndUpdateTemplate")
+        return excel.make_response_from_array(sorted_dic_data, "xls", file_name="manualInsertAndUpdateTemplate")
     return False
 
 
@@ -135,9 +135,9 @@ def export_newVsimTestInfoDeleteTemplate():
     if request.method == 'POST':
         # dic_data=json.loads(request.form['data'])
         dic_data = [{'id_newvsimtest': '460068029099402'}, {'id_newvsimtest': '416770118932592'}]
-        sortedDicData = get_excel_new_sim_test_info_delete_temple(dic_data=dic_data)
+        sorted_dic_data = get_excel_new_sim_test_info_delete_temple(dic_data=dic_data)
 
-        return excel.make_response_from_array(sortedDicData, "xls", file_name="NewVsimTestInfoDeleteTemple")
+        return excel.make_response_from_array(sorted_dic_data, "xls", file_name="NewVsimTestInfoDeleteTemple")
 
     return False
 
@@ -175,9 +175,9 @@ def export_newVsimTestInfoUpdateTemplate():
                      u"失败原因": u"",
                      u"备注": u""
                      }]
-        sortedDicData = get_excel_new_sim_test_info_update_temple(dic_data=dic_data)
+        sorted_dic_data = get_excel_new_sim_test_info_update_temple(dic_data=dic_data)
 
-        return excel.make_response_from_array(sortedDicData, "xls", file_name="NewVsimTestInfoUpdateTemple")
+        return excel.make_response_from_array(sorted_dic_data, "xls", file_name="NewVsimTestInfoUpdateTemple")
 
     return False
 
@@ -213,20 +213,20 @@ def export_newVsimTestInfoInsertTemplate():
                      u"失败原因": u"",
                      u"备注": u""
                      }]
-        sortedDicData = get_excel_new_sim_test_info_insert_temple(dic_data=dic_data)
+        sorted_dic_data = get_excel_new_sim_test_info_insert_temple(dic_data=dic_data)
 
-        return excel.make_response_from_array(sortedDicData, "xls", file_name="NewVsimTestInfoInsertTemple")
+        return excel.make_response_from_array(sorted_dic_data, "xls", file_name="NewVsimTestInfoInsertTemple")
 
     return False
 
 
 @api.route('/export_newVsimTestInfo/', methods=['POST'])
-def export_newVsimTestInfo():
+def export_new_vsim_testInfo():
     if request.method == 'POST':
         dic_data = json.loads(request.form['data'])
-        sortedDicData = get_excel_new_sim_test_info(dic_data=dic_data)
+        sorted_dic_data = get_excel_new_sim_test_info(dic_data=dic_data)
 
-        return excel.make_response_from_array(sortedDicData, "xls", file_name="NewVsimTestInfo")
+        return excel.make_response_from_array(sorted_dic_data, "xls", file_name="NewVsimTestInfo")
 
     return False
 
@@ -235,8 +235,8 @@ def export_newVsimTestInfo():
 def export_package_flower():
     if request.method == 'POST':
         dic_data = json.loads(request.form['data'])
-        sortedDicData = get_export_package_flower(dic_data=dic_data)
+        sorted_dic_data = get_export_package_flower(dic_data=dic_data)
 
-        return excel.make_response_from_array(sortedDicData, "xls", file_name="gsvc_export_package_flower")
+        return excel.make_response_from_array(sorted_dic_data, "xls", file_name="gsvc_export_package_flower")
 
     return False
