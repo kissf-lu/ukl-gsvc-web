@@ -6,7 +6,7 @@ from bson import json_util
 from app.api_1_0.api_functions.SqlPack.SQLModel import qureResultAsJson
 import time
 import pymongo
-import pymongo.errors as pyMonogErr
+import pymongo.errors as py_mongo_error
 import datetime
 # 获取连接信息
 from app.api_1_0.api_functions.SqlPack.SqlLinkInfo import getFlowerQueryFunction as Sql
@@ -33,13 +33,13 @@ def timestamp_datetime(value):
     format1 = '%Y-%m-%d %H:%M:%S'
     format2 = '%Y-%m-%d'
     # value为传入的值为时间戳(整形)，如：1332888820
-    structFormate = time.gmtime(value)
+    struct_formate = time.gmtime(value)
     # 经过localtime转换后变成结构型时间
     # 最后再经过strftime函数转换为字符型正常日期格式。
     try:
-        dt = time.strftime(format1, structFormate)
+        dt = time.strftime(format1, struct_formate)
     except ValueError:
-        dt = time.strftime(format2, structFormate)
+        dt = time.strftime(format2, struct_formate)
 
     return dt
 
@@ -56,7 +56,7 @@ def StrTimeTOUnix(dt, format_str):
     return s
 
 
-def UnixTOStrTime(value, format_str):
+def unix_2_str_time(value, format_str):
     """============================================
 
     :param value:
@@ -68,37 +68,37 @@ def UnixTOStrTime(value, format_str):
     return dt
 
 
-def getGMT0StrTime(str_time, offset):
-    """=======================================
+def get_gmt0_str_time(str_time, offset):
+    """============================
     :param str_time:
     :param offset:
     :return:
-    ==========================================="""
+    ==============================="""
     try:
-        GMT0dateTime = datetime.datetime.strptime(str_time, '%Y-%m-%d %H:%M:%S')-datetime.timedelta(minutes=offset)
+        gmt0_date_time = datetime.datetime.strptime(str_time, '%Y-%m-%d %H:%M:%S')-datetime.timedelta(minutes=offset)
     except ValueError:
-        GMT0dateTime = datetime.datetime.strptime(str_time, '%Y-%m-%d') - datetime.timedelta(minutes=offset)
+        gmt0_date_time = datetime.datetime.strptime(str_time, '%Y-%m-%d') - datetime.timedelta(minutes=offset)
 
-    return str(GMT0dateTime)
+    return str(gmt0_date_time)
 
 
-def getlistimsi(Data):
+def get_list_imsi(data_ismi):
     """===========================
 
-    :param Data:
+    :param data_ismi:
     :return: list_imsi
     ===================================="""
-    imsiData = Data
+    imsi_data = data_ismi
     list_imsi = []
-    if type(imsiData) is dict:
-        for data in imsiData:
+    if type(imsi_data) is dict:
+        for data in imsi_data:
             list_imsi.append(str(data['imsi']))
-    elif type(imsiData) is list:
-        for data in imsiData:
+    elif type(imsi_data) is list:
+        for data in imsi_data:
             list_imsi.append(str(data))
 
-    elif type(imsiData) is str:
-        for data in imsiData.split(','):
+    elif type(imsi_data) is str:
+        for data in imsi_data.split(','):
             list_imsi.append(data)
 
     else:
@@ -123,178 +123,175 @@ def getJosonData(sysStr, Database, query_str):
     return jsonResults
 
 
-def getHoursFlower(imsi, list_time, Mcc, Plmn, FlowerKey):
+def get_hours_flower(imsi, list_time, mcc, plmn, flower_key):
     """===================================
     :param imsi: type [],
     :param list_time:
-    :param Mcc: 流量日志表mcc查询条件
-    :param Plmn: 流量日志表plmn 查询条件
-    :param FlowerKey: mongo group id, 用于添加不同group维度
+    :param mcc: 流量日志表mcc查询条件
+    :param plmn: 流量日志表plmn 查询条件
+    :param flower_key: mongo group id, 用于添加不同group维度
     =======================================
     :return:
     ======================================="""
     list_imsi = imsi
-    returnData = []
     # 查询起始和截止时间
-    flowerBegintime = list_time[0]['begin']
-    flowerEndtime = list_time[0]['end']
-    queryMcc = Mcc
-    queryPlmn = Plmn
-    groupItem = FlowerKey
-    groupID = {'imsi': "$imsi"}
-    if groupItem is None:
-        keysNULL = 'NULL'
+    flower_begin_time = list_time[0]['begin']
+    flower_end_time = list_time[0]['end']
+    query_mcc = mcc
+    query_plmn = plmn
+    group_item = flower_key
+    group_id = {'imsi': "$imsi"}
+    if group_item is None:
+        keys_null = 'NULL'
     else:
-        for keys in groupItem:
+        for keys in group_item:
             if keys == 'plmn':
-                addID = {'plmn': "$plmn"}
+                add_id = {'plmn': "$plmn"}
             elif keys == 'time':
-                addID = {'time': "$createtime"}
+                add_id = {'time': "$createtime"}
             elif keys == 'mcc':
-                addID = {'mcc': "$mcc"}
+                add_id = {'mcc': "$mcc"}
             elif keys == 'lac':
-                addID = {'lac': "$lac"}
+                add_id = {'lac': "$lac"}
             else:
                 continue
-            groupID.update(addID)
+            group_id.update(add_id)
 
     # Match Stages Set
     # Unix Time Make
-    beginLUnix = int(flowerBegintime)*1000  # (datetime_timestamp(flowerBegintime)) * 1000
-    endLUnix = int(flowerEndtime)*1000      # (datetime_timestamp(flowerEndtime)) * 1000
-    matchStages = {}
-    if queryPlmn and queryMcc:
-            matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
-                           'imsi': {'$in': list_imsi},
-                           'mcc': queryMcc,
-                           'plmn': queryPlmn
-                           }
-    elif queryMcc and not queryPlmn:
-            matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
-                           'imsi': {'$in': list_imsi},
-                           'mcc': queryMcc
-                           }
-    elif not queryMcc and queryPlmn:
-            matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
-                           'imsi': {'$in': list_imsi},
-                           'plmn': queryPlmn
-                           }
+    begin_l_unix = int(flower_begin_time)*1000  # (datetime_timestamp(flower_begin_time)) * 1000
+    end_l_unix = int(flower_end_time)*1000      # (datetime_timestamp(flower_end_time)) * 1000
+    if query_plmn and query_mcc:
+            match_stages = {'createtime': {'$gte': begin_l_unix, '$lt': end_l_unix},
+                            'imsi': {'$in': list_imsi},
+                            'mcc': query_mcc,
+                            'plmn': query_plmn
+                            }
+    elif query_mcc and not query_plmn:
+            match_stages = {'createtime': {'$gte': begin_l_unix, '$lt': end_l_unix},
+                            'imsi': {'$in': list_imsi},
+                            'mcc': query_mcc
+                            }
+    elif not query_mcc and query_plmn:
+            match_stages = {'createtime': {'$gte': begin_l_unix, '$lt': end_l_unix},
+                            'imsi': {'$in': list_imsi},
+                            'plmn': query_plmn
+                            }
     else:
-        matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
-                       'imsi': {'$in': list_imsi}
-                       }
+        match_stages = {'createtime': {'$gte': begin_l_unix, '$lt': end_l_unix},
+                        'imsi': {'$in': list_imsi}
+                        }
     pipeline = [
-        {"$match": matchStages
+        {"$match": match_stages
          },
         {"$group": {
-            "_id": groupID,
+            "_id": group_id,
             'Flower': {'$sum': {'$add': ["$userFlower", "$sysFlower"]}}
         }
         }]
     connection = pymongo.MongoClient(sql_info['queryhourFlower']['uri'])
-    aggeData = list(connection.get_database(sql_info['queryhourFlower']['db']
-                                            ).get_collection(sql_info['queryhourFlower']['collection']
-                                                             ).aggregate(pipeline)
-                    )
-    for i in range(len(aggeData)):
-        agg_id_temp = aggeData[i].pop('_id')                  # {‘_id’:{}}转换成标准json数据
-        aggeData[i].update(agg_id_temp)
-        aggeData[i]['Flower'] = round(((aggeData[i]['Flower'])/1024/1024), 2)  # 流量输出为MB
-        if groupItem is not None:
-            if ('time' in groupItem) and ('time' in aggeData[i]):
-                aggeData[i]['time'] = timestamp_datetime(aggeData[i]['time']/1000)
+    agge_data = list(connection.get_database(sql_info['queryhourFlower']['db']
+                                             ).get_collection(sql_info['queryhourFlower']['collection']
+                                                              ).aggregate(pipeline)
+                     )
+    for i in range(len(agge_data)):
+        agg_id_temp = agge_data[i].pop('_id')
+        agge_data[i].update(agg_id_temp)
+        agge_data[i]['Flower'] = round(((agge_data[i]['Flower'])/1024/1024), 2)
+        if group_item is not None:
+            if ('time' in group_item) and ('time' in agge_data[i]):
+                agge_data[i]['time'] = timestamp_datetime(agge_data[i]['time']/1000)
     connection.close()
 
-    return aggeData
+    return agge_data
 
 
-def getDaysFlower(imsi, Begintime, Endtime, Mcc, Plmn, FlowerKey):
+def get_days_flower(imsi, begin_time, end_time, mcc, plmn, flower_key):
     """
 
     :param imsi:
-    :param Begintime:
-    :param Endtime:
-    :param Mcc:
-    :param Plmn:
-    :param FlowerKey:
+    :param begin_time:
+    :param end_time:
+    :param mcc:
+    :param plmn:
+    :param flower_key:
     :return:
     """
     list_imsi = imsi
-    returnData = []
     # 查询起始和截止时间
-    flowerBegintime = Begintime
-    flowerEndtime = Endtime
-    queryMcc = Mcc
-    queryPlmn = Plmn
-    groupItem = FlowerKey
-    groupID = {'imsi': "$imsi"}
-    if groupItem is None:
-        keysNULL = 'NULL'
+    flower_begin_time = begin_time
+    flower_end_time = end_time
+    query_mcc = mcc
+    query_plmn = plmn
+    group_item = flower_key
+    group_id = {'imsi': "$imsi"}
+    if group_item is None:
+        keys_null = 'NULL'
     else:
-        for keys in groupItem:
+        for keys in group_item:
             if keys == 'plmn':
-                addID = {'plmn': "$plmn"}
+                add_id = {'plmn': "$plmn"}
             elif keys == 'time':
-                addID = {'time': "$createtime"}
+                add_id = {'time': "$createtime"}
             elif keys == 'mcc':
-                addID = {'mcc': "$mcc"}
+                add_id = {'mcc': "$mcc"}
             elif keys == 'lac':
-                addID = {'lac': "$lac"}
+                add_id = {'lac': "$lac"}
             else:
                 continue
 
-            groupID.update(addID)
+            group_id.update(add_id)
 
     # Match Stages Set---------------------------------------------------
     # Unix Time Make
-    beginLUnix = int(flowerBegintime)*1000   # (datetime_timestamp(flowerBegintime)) * 1000
-    endLUnix = int(flowerEndtime)*1000       # (datetime_timestamp(flowerEndtime)) * 1000
-    if queryPlmn and queryMcc:
-            matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
-                           'imsi': {'$in': list_imsi},
-                           'mcc': queryMcc,
-                           'plmn': queryPlmn
-                           }
-    elif queryMcc and not queryPlmn:
-            matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
-                           'imsi': {'$in': list_imsi},
-                           'mcc': queryMcc
-                           }
-    elif not queryMcc and queryPlmn:
-            matchStages = {'createtime': {'$gte': beginLUnix, '$lt': endLUnix},
-                           'imsi': {'$in': list_imsi},
-                           'plmn': queryPlmn
-                           }
+    begin_l_unix = int(flower_begin_time)*1000
+    end_l_unix = int(flower_end_time)*1000
+    if query_plmn and query_mcc:
+            match_stages = {'createtime': {'$gte': begin_l_unix, '$lt': end_l_unix},
+                            'imsi': {'$in': list_imsi},
+                            'mcc': query_mcc,
+                            'plmn': query_plmn
+                            }
+    elif query_mcc and not query_plmn:
+            match_stages = {'createtime': {'$gte': begin_l_unix, '$lt': end_l_unix},
+                            'imsi': {'$in': list_imsi},
+                            'mcc': query_mcc
+                            }
+    elif not query_mcc and query_plmn:
+            match_stages = {'createtime': {'$gte': begin_l_unix, '$lt': end_l_unix},
+                            'imsi': {'$in': list_imsi},
+                            'plmn': query_plmn
+                            }
     else:
-        matchStages = {'createtime': {'$gte': beginLUnix, '$lte': endLUnix},
-                       'imsi': {'$in': list_imsi}
-                       }
+        match_stages = {'createtime': {'$gte': begin_l_unix, '$lte': end_l_unix},
+                        'imsi': {'$in': list_imsi}
+                        }
     pipeline = [
-        {"$match": matchStages
+        {"$match": match_stages
          },
         {"$group": {
-            "_id": groupID,
+            "_id": group_id,
             'Flower': {'$sum': {'$add': ["$userFlower", "$sysFlower"]}}
         }
         }]
     connection = pymongo.MongoClient(sql_info['querydayFlower']['uri'])
-    aggeData = list(connection.get_database(sql_info['querydayFlower']['db']
-                                            ).get_collection(sql_info['querydayFlower']['collection']
-                                                             ).aggregate(pipeline)
-                    )
-    for i in range(len(aggeData)):
-        agg_id_temp = aggeData[i].pop('_id')         # {‘_id’:{}}转换成标准json数据
-        aggeData[i].update(agg_id_temp)
-        aggeData[i]['Flower'] = round(((aggeData[i]['Flower'])/1024/1024), 2)  # 流量输出为MB
-        if groupItem is not None:
-            if ('time' in groupItem) and ('time' in aggeData[i]):
-                aggeData[i]['time'] = timestamp_datetime(aggeData[i]['time']/1000)
+    agge_data = list(connection.get_database(sql_info['querydayFlower']['db']
+                                             ).get_collection(sql_info['querydayFlower']['collection']
+                                                              ).aggregate(pipeline)
+                     )
+    for i in range(len(agge_data)):
+        agg_id_temp = agge_data[i].pop('_id')         # {‘_id’:{}}转换成标准json数据
+        agge_data[i].update(agg_id_temp)
+        agge_data[i]['Flower'] = round(((agge_data[i]['Flower'])/1024/1024), 2)  # 流量输出为MB
+        if group_item is not None:
+            if ('time' in group_item) and ('time' in agge_data[i]):
+                agge_data[i]['time'] = timestamp_datetime(agge_data[i]['time']/1000)
     connection.close()
 
-    return aggeData
+    return agge_data
 
 
-def getDaysFlowerThrTime(imsi, time_list, mcc, plmn, flower_key):
+def get_days_flower_thr_time(imsi, time_list, mcc, plmn, flower_key):
     """
     
     :param imsi: 
@@ -306,10 +303,10 @@ def getDaysFlowerThrTime(imsi, time_list, mcc, plmn, flower_key):
     """
     list_imsi = imsi
     list_time = time_list
-    queryMcc = mcc
-    queryPlmn = plmn
-    groupItem = flower_key
-    groupID = {'imsi': "$imsi"}
+    query_mcc = mcc
+    query_plmn = plmn
+    group_item = flower_key
+    group_id = {'imsi': "$imsi"}
     or_hour_match = []
     day_match = {}
     return_data = []
@@ -329,43 +326,43 @@ def getDaysFlowerThrTime(imsi, time_list, mcc, plmn, flower_key):
                          'imsi': {'$in': list_imsi}}
     day_match_stages = {'createtime': day_match['createtime'],
                         'imsi': {'$in': list_imsi}}
-    if groupItem is None:
+    if group_item is None:
         pass
     else:
-        for keys in groupItem:
+        for keys in group_item:
             if keys == 'plmn':
-                addID = {'plmn': "$plmn"}
+                add_id = {'plmn': "$plmn"}
             elif keys == 'time':
-                addID = {'time': "$createtime"}
+                add_id = {'time': "$createtime"}
             elif keys == 'mcc':
-                addID = {'mcc': "$mcc"}
+                add_id = {'mcc': "$mcc"}
             elif keys == 'lac':
-                addID = {'lac': "$lac"}
+                add_id = {'lac': "$lac"}
             else:
                 continue
 
-            groupID.update(addID)
+            group_id.update(add_id)
 
-    if queryPlmn:
+    if query_plmn:
         hour_match_stages.update({
-            'plmn': queryPlmn
+            'plmn': query_plmn
         })
         day_match_stages.update({
-            'plmn': queryPlmn
+            'plmn': query_plmn
         })
 
-    if queryMcc:
+    if query_mcc:
         hour_match_stages.update({
-            'mcc': queryMcc
+            'mcc': query_mcc
         })
         day_match_stages.update({
-            'mcc': queryMcc
+            'mcc': query_mcc
         })
     pipeline_hour = [
         {"$match": hour_match_stages
          },
         {"$group": {
-            "_id": groupID,
+            "_id": group_id,
             'Flower': {'$sum': {'$add': ["$userFlower", "$sysFlower"]}}
         }
         }]
@@ -373,158 +370,148 @@ def getDaysFlowerThrTime(imsi, time_list, mcc, plmn, flower_key):
         {"$match": day_match_stages
          },
         {"$group": {
-            "_id": groupID,
+            "_id": group_id,
             'Flower': {'$sum': {'$add': ["$userFlower", "$sysFlower"]}}
         }
         }]
     connection_hour = pymongo.MongoClient(sql_info['queryhourFlower']['uri'])
-    aggeData_hour = list(connection_hour.get_database(sql_info['queryhourFlower']['db']
-                                                      ).get_collection(sql_info['queryhourFlower']['collection']
-                                                                       ).aggregate(pipeline_hour)
-                         )
+    agge_data_hour = list(connection_hour.get_database(sql_info['queryhourFlower']['db']
+                                                       ).get_collection(sql_info['queryhourFlower']['collection']
+                                                                        ).aggregate(pipeline_hour)
+                          )
     connection_hour.close()
     connection_day = pymongo.MongoClient(sql_info['querydayFlower']['uri'])
-    aggeData_day = list(connection_day.get_database(sql_info['querydayFlower']['db']
-                                                    ).get_collection(sql_info['querydayFlower']['collection']
-                                                                     ).aggregate(pipeline_day)
-                        )
+    agge_data_day = list(connection_day.get_database(sql_info['querydayFlower']['db']
+                                                     ).get_collection(sql_info['querydayFlower']['collection']
+                                                                      ).aggregate(pipeline_day)
+                         )
     connection_day.close()
 
-    if aggeData_day:
-        for i in range(len(aggeData_day)):
-            agg_id_temp = aggeData_day[i].pop('_id')  # {‘_id’:{}}转换成标准json数据
-            aggeData_day[i].update(agg_id_temp)
-            aggeData_day[i]['Flower'] = round(((aggeData_day[i]['Flower']) / 1024 / 1024), 2)  # 流量输出为MB
-            if groupItem is not None:
-                if ('time' in groupItem) and ('time' in aggeData_day[i]):
-                    aggeData_day[i]['time'] = timestamp_datetime(aggeData_day[i]['time'] / 1000)
+    if agge_data_day:
+        for i in range(len(agge_data_day)):
+            agg_id_temp = agge_data_day[i].pop('_id')  # {‘_id’:{}}转换成标准json数据
+            agge_data_day[i].update(agg_id_temp)
+            agge_data_day[i]['Flower'] = round(((agge_data_day[i]['Flower']) / 1024 / 1024), 2)  # 流量输出为MB
+            if group_item is not None:
+                if ('time' in group_item) and ('time' in agge_data_day[i]):
+                    agge_data_day[i]['time'] = timestamp_datetime(agge_data_day[i]['time'] / 1000)
 
-    if aggeData_hour:
-        for i in range(len(aggeData_hour)):
-            agg_id_temp = aggeData_hour[i].pop('_id')  # {‘_id’:{}}转换成标准json数据
-            aggeData_hour[i].update(agg_id_temp)
-            aggeData_hour[i]['Flower'] = round(((aggeData_hour[i]['Flower']) / 1024 / 1024), 2)  # 流量输出为MB
-            if groupItem is not None:
-                if ('time' in groupItem) and ('time' in aggeData_hour[i]):
+    if agge_data_hour:
+        for i in range(len(agge_data_hour)):
+            agg_id_temp = agge_data_hour[i].pop('_id')  # {‘_id’:{}}转换成标准json数据
+            agge_data_hour[i].update(agg_id_temp)
+            agge_data_hour[i]['Flower'] = round(((agge_data_hour[i]['Flower']) / 1024 / 1024), 2)  # 流量输出为MB
+            if group_item is not None:
+                if ('time' in group_item) and ('time' in agge_data_hour[i]):
                     # 小时表的显示时间重新设置为日
-                    aggeData_hour[i]['time'] = time.strftime('%Y-%m-%d', time.gmtime(aggeData_hour[i]['time'] / 1000))
+                    agge_data_hour[i]['time'] = time.strftime('%Y-%m-%d', time.gmtime(agge_data_hour[i]['time'] / 1000))
 
-    if not groupItem:
-        if aggeData_day and aggeData_hour:
-            return_data.extend(aggeData_day)
+    if not group_item:
+        if agge_data_day and agge_data_hour:
+            return_data.extend(agge_data_day)
             # pop_lis = []
             for rd in return_data:
                 temp_pop_di = None
-                for i in range(len(aggeData_hour)):
-                    if rd['imsi'] == aggeData_hour[i]['imsi']:
-                        rd['Flower'] = aggeData_hour[i]['Flower'] + rd['Flower']
+                for i in range(len(agge_data_hour)):
+                    if rd['imsi'] == agge_data_hour[i]['imsi']:
+                        rd['Flower'] = round(agge_data_hour[i]['Flower'] + rd['Flower'], 2)
                         temp_pop_di = i
                         break
                 if temp_pop_di is not None:
-                    aggeData_hour.pop(temp_pop_di)
-            if aggeData_hour:
-                return_data.extend(aggeData_hour)
+                    agge_data_hour.pop(temp_pop_di)
+            if agge_data_hour:
+                return_data.extend(agge_data_hour)
 
-        elif aggeData_day and not aggeData_hour:
-            return_data.extend(aggeData_day)
-        elif aggeData_hour and not aggeData_day:
-            return_data.extend(aggeData_hour)
+        elif agge_data_day and not agge_data_hour:
+            return_data.extend(agge_data_day)
+        elif agge_data_hour and not agge_data_day:
+            return_data.extend(agge_data_hour)
         else:
             return_data = []
     else:
-        if aggeData_day:
+        if agge_data_day:
             # 完成流量合并操作
-            return_data.extend(aggeData_day)
-        if aggeData_hour:
+            return_data.extend(agge_data_day)
+        if agge_data_hour:
             # 完成流量合并操作
-            return_data.extend(aggeData_hour)
+            return_data.extend(agge_data_hour)
 
     return return_data
 
 
-def getFlowers(querySort, time_list, mcc, plmn, imsi, flower_query_key, time_zone_offset):
+def get_flowers(query_sort, time_list, mcc, plmn, imsi, flower_query_key):
     """=====================================================================
     gsvc mongodb 流量查询接口函数。完成小时/月维度imsi流量查询，返回查询数据
 
     ========================================================================
-    :param querySort: hour/day 类型的查询，小时或天；
+    :param query_sort: hour/day 类型的查询，小时或天；
     :param time_list: 查询时间设置列表[]
     :param mcc: 设置查询mcc
     :param plmn: 设置查询plmn
     :param imsi: type: sting , 设置查询imsi,
     :param flower_query_key: 流量查询的附加聚合键值
-    :param time_zone_offset: 时区，相对GMT0时间
     =========================================================================
-    :return: 返回带有err，data信息 DicResults = {'info': {'err': False, 'errinfo': errInfo}, 'data': DicData}
+    :return: 返回带有err，data信息 dic_results = {'info': {'err': False, 'errinfo': errinfo}, 'data': dic_data}
     =============================================================================================================="""
-    querysort = querySort
+    query_sort = query_sort
     list_time = time_list
-    queryMcc = str(mcc)
-    queryPlmn = str(plmn)
-    queryImsi = getlistimsi(imsi)
-    queryFlowerKey = flower_query_key
-    errInfo = ''
-    DicData = []
-    if (not querysort) or (not queryImsi) or (not list_time):
-        DicResults = {'info': {'err': True, 'errinfo': '存在空类型参数'}, 'data': []}
-        return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+    query_mcc = str(mcc)
+    query_plmn = str(plmn)
+    query_imsi = get_list_imsi(imsi)
+    query_flower_key = flower_query_key
+    errinfo = ''
+    dic_data = []
+    if (not query_sort) or (not query_imsi) or (not list_time):
+        dic_results = {'info': {'err': True, 'errinfo': '存在空类型参数'}, 'data': []}
+        return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
     else:
-        if querysort == 'hours':
+        if query_sort == 'hours':
             try:
-                DicData = getHoursFlower(imsi=queryImsi,
-                                         list_time=list_time,
-                                         Mcc=queryMcc,
-                                         Plmn=queryPlmn,
-                                         FlowerKey=queryFlowerKey)
+                dic_data = get_hours_flower(imsi=query_imsi, list_time=list_time, mcc=query_mcc,
+                                            plmn=query_plmn, flower_key=query_flower_key)
             except ValueError:
-                errInfo = "input Date Time ValueError"
-            except pyMonogErr.OperationFailure:
-                errInfo = "DataBase Authentication failed!"
-            except pyMonogErr.NetworkTimeout:
-                errInfo = "DataBase Connection Exceeded SocketTimeoutMS!"
+                errinfo = "input Date Time ValueError"
+            except py_mongo_error.OperationFailure:
+                errinfo = "DataBase Authentication failed!"
+            except py_mongo_error.NetworkTimeout:
+                errinfo = "DataBase Connection Exceeded SocketTimeoutMS!"
             except:
-                errInfo = "Unexpected error"
-            if errInfo:
-                DicResults = {'info': {'err': True, 'errinfo': errInfo}, 'data': DicData}
-                return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+                errinfo = "Unexpected error"
+            if errinfo:
+                dic_results = {'info': {'err': True, 'errinfo': errinfo}, 'data': dic_data}
+                return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
             else:
-                if DicData:
-                    DicResults = {'info': {'err': True, 'errinfo': '无查询结果，请重新设置查询参数'}, 'data': DicData}
-                    return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+                if dic_data:
+                    dic_results = {'info': {'err': True, 'errinfo': '无查询结果，请重新设置查询参数'}, 'data': dic_data}
+                    return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
                 else:
-                    DicResults = {'info': {'err': False, 'errinfo': errInfo}, 'data': DicData}
-                    return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+                    dic_results = {'info': {'err': False, 'errinfo': errinfo}, 'data': dic_data}
+                    return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
         else:
             try:
                 if len(time_list) == 1:
-                    DicData = getDaysFlower(imsi=queryImsi,
-                                            Begintime=time_list[0]['begin'],
-                                            Endtime=time_list[0]['end'],
-                                            Mcc=queryMcc,
-                                            Plmn=queryPlmn,
-                                            FlowerKey=queryFlowerKey)
+                    dic_data = get_days_flower(imsi=query_imsi, begin_time=time_list[0]['begin'],
+                                               end_time=time_list[0]['end'], mcc=query_mcc,
+                                               plmn=query_plmn, flower_key=query_flower_key)
                 else:
-                    DicData = getDaysFlowerThrTime(imsi=queryImsi,
-                                                   time_list=time_list,
-                                                   mcc=queryMcc,
-                                                   plmn=queryPlmn,
-                                                   flower_key=queryFlowerKey)
+                    dic_data = get_days_flower_thr_time(imsi=query_imsi, time_list=time_list, mcc=query_mcc,
+                                                        plmn=query_plmn, flower_key=query_flower_key)
 
             except ValueError:
-                errInfo = "天维度的短时间日期有问题！"                     # 'Database Error!'
-            except pyMonogErr.OperationFailure:
-                errInfo = "DataBase Authentication failed!"
-            except pyMonogErr.NetworkTimeout:
-                errInfo = "DataBase Connection Exceeded SocketTimeoutMS!"
+                errinfo = "天维度的短时间日期有问题！"
+            except py_mongo_error.OperationFailure:
+                errinfo = "DataBase Authentication failed!"
+            except py_mongo_error.NetworkTimeout:
+                errinfo = "DataBase Connection Exceeded SocketTimeoutMS!"
             except:
-                errInfo = "Unexpected error"
-            if errInfo:
-                DicResults = {'info': {'err': True, 'errinfo': errInfo}, 'data': DicData}
-                return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+                errinfo = "Unexpected error"
+            if errinfo:
+                dic_results = {'info': {'err': True, 'errinfo': errinfo}, 'data': dic_data}
+                return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
             else:
-                if DicData:
-                    DicResults = {'info': {'err': True, 'errinfo': '无查询结果，请重新设置查询参数'}, 'data': DicData}
-                    return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+                if dic_data:
+                    dic_results = {'info': {'err': True, 'errinfo': '无查询结果，请重新设置查询参数'}, 'data': dic_data}
+                    return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)
                 else:
-                    DicResults = {'info': {'err': False, 'errinfo': errInfo}, 'data': DicData}
-                    return json.dumps(DicResults, sort_keys=True, indent=4, default=json_util.default)
+                    dic_results = {'info': {'err': False, 'errinfo': errinfo}, 'data': dic_data}
+                    return json.dumps(dic_results, sort_keys=True, indent=4, default=json_util.default)

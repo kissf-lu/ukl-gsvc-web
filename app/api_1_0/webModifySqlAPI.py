@@ -15,12 +15,12 @@ from flask import json
 from flask import request
 from bson import json_util
 # DataApiFunc 为数据库更新、插入、删除数据等操作函数
-from .api_functions.DataApiFunc import (deleManuleVsimSrc,
-                                        insertManuleVsimSrc,
-                                        updateManuleVsimSrc,
-                                        deleteNewVsimTestInfo,
-                                        insertNewVsimTestInfo,
-                                        updateNewVsimTestInfo
+from .api_functions.DataApiFunc import (dele_manul_vsim_src,
+                                        insert_manul_vsim_src,
+                                        update_manule_vsim_src,
+                                        delete_new_vsim_test_info,
+                                        insert_new_vsim_test_info,
+                                        update_new_vsim_test_info
                                         )
 
 
@@ -33,7 +33,7 @@ def delet_manulVsim():
     if request.method == 'POST':
         arrayData = request.get_array(field_name='file')
 
-        return deleManuleVsimSrc(array_data=arrayData)
+        return dele_manul_vsim_src(array_data=arrayData)
 
     else:
         returnJsonData = {'err': True, 'errinfo': '操作违法！', 'data': []}
@@ -50,7 +50,7 @@ def insert_manulVsim():
     if request.method == 'POST':
         arrayData = request.get_array(field_name='file')
 
-        return insertManuleVsimSrc(array_data=arrayData)
+        return insert_manul_vsim_src(array_data=arrayData)
 
     else:
         returnJsonData = {'err': True, 'errinfo': '操作违法！', 'data': []}
@@ -67,7 +67,7 @@ def update_manulVsim():
     if request.method == 'POST':
         arrayData = request.get_array(field_name='file')
 
-        return updateManuleVsimSrc(array_data=arrayData)
+        return update_manule_vsim_src(array_data=arrayData)
 
     else:
         returnJsonData = {'err': True, 'errinfo': '操作违法！', 'data': []}
@@ -84,7 +84,7 @@ def delet_newvsimtest_info_table():
     if request.method == 'POST':
         arrayData = request.get_array(field_name='file')
 
-        return deleteNewVsimTestInfo(array_data=arrayData)
+        return delete_new_vsim_test_info(array_data=arrayData)
 
     else:
         returnJsonData = {'err': True, 'errinfo': '操作违法！', 'data': []}
@@ -101,7 +101,7 @@ def insert_newvsimtest_info_table():
     if request.method == 'POST':
         arrayData = request.get_array(field_name='file')
 
-        return insertNewVsimTestInfo(array_data=arrayData)
+        return insert_new_vsim_test_info(array_data=arrayData)
 
     else:
         returnJsonData = {'err': True, 'errinfo': '操作违法！', 'data': []}
@@ -118,7 +118,7 @@ def update_newvsimtest_info_table():
     if request.method == 'POST':
         arrayData = request.get_array(field_name='file')
 
-        return updateNewVsimTestInfo(array_data=arrayData)
+        return update_new_vsim_test_info(array_data=arrayData)
 
     else:
         returnJsonData = {'err': True, 'errinfo': '操作违法！', 'data': []}

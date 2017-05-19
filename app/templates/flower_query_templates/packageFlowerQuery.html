@@ -74,12 +74,13 @@
                         <p><i class="fa fa-info-circle"></i>
                             添加流量查询附加输出信息
                         </p>
-                        <select data-placeholder="选择附加信息!" multiple class="chosen-select" style="width:300px;"
-                                id="id-chosen-panel">
+                        <select data-placeholder="选择附加信息!" multiple class="chosen-select" id="id-chosen-panel">
                             <option value="sim_agg">网络集名称</option>
                             <option value="last_update_time">上次套餐更新时间</option>
-                            <option value="sim_dispatch">分卡次数</option>
-                            <option value="sim_dispatch_flower">单次分卡流量</option>
+                            <option value="dispatch_con">分卡次数</option>
+                            <option value="dispatch_once_flower">单次分卡流量</option>
+                            <option value="percentage_f">流量使用率_OSS</option>
+                            <option value="percentage_fs">流量使用率_SASS</option>
                         </select>
                     </div>
                 </div>
@@ -267,7 +268,7 @@
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <i class="fa fa-table">
-                    2-套餐流量查询详情表
+                    2-套餐流量查询详情表(如出现少卡-请剔除分卡次数相关信息筛选，因为没有查询到相关分卡信息！)
                 </i>
                 <div class="ibox-tools">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
