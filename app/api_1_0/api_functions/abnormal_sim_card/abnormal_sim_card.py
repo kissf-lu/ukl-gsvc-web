@@ -36,7 +36,7 @@ def redis_connect_ping():
         li = redis_con.client_list()
         print('connect ok!')
         try:
-            for conn in redis_con.client_list():
+            for conn in li:
                 print('kill connect: ', conn['addr'])
             redis_con.client_kill(conn['addr'])
         except KeyError as ke:
